@@ -15,6 +15,7 @@ createHash = require("create-hash");
 bs58check = require("bs58check");
 bs58_2 = require("bs58");
 
+EC = require("elliptic").ec;
 
 //intial states & data
 //  ->serverlist
@@ -165,6 +166,7 @@ class aliwa_wallet{
 
             var message = JSON.parse(result.message);
             if (message.result == undefined || message.result == null) {
+                this.gui_was_updated = "failed_send";
                 return false;
             }
             if (message.result.length == 64) {    //only if result is a valid tx
@@ -181,6 +183,7 @@ class aliwa_wallet{
                 this.save_wallet(null);
             } else {
                 console.error(message.error);
+                this.gui_was_updated = "failed_send";
                 return message.error;
             }
 
@@ -358,7 +361,7 @@ class aliwa_wallet{
             this.db_wallet.update_config({"wallet_pw":null,"wallet_pw_salt":null,"wallet_pw_clear":null}); 
         }
         
-        this.save_wallet(null); 
+        this.save_wallet(null,true); 
         return true;
     }
     
@@ -726,7 +729,11 @@ class aliwa_wallet{
         this.socket.emit("send_raw_tx",hex,tx_object);             
     }
     
-    create_transaction(destinations,fee,utxo_result,fee_only) {        
+    create_transaction(destinations,fee,utxo_result,fee_only) { 
+        if(fee_only!=true && this.sync_state=="syncing"){
+            
+            return "server_not_synced";
+        }       
         var amount=numeral(0);
         for(var i=0;i<destinations.length;i++){
             amount.add(destinations[i].amount);
