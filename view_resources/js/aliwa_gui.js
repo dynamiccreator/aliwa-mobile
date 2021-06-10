@@ -2922,7 +2922,7 @@ async function view_set_password(startup=false,seed_words){
                 await window.electron.ipcRenderer_invoke('create_wallet', seed_words.seed_words, seed_words.seed_pw, null,true);
                 await window.electron.ipcRenderer_invoke("load_wallet", null);
                 var seed_words_loaded = await window.electron.ipcRenderer_invoke("get_wallet_seed");
-                if (seed_words != seed_words_loaded.seed_words) {
+                if (seed_words.seed_words != seed_words_loaded.seed_words) {
                     alert("CREATE WALLET - I/O ERROR \n\n Could not write or read wallet from disk.\n Your wallet was NOT created!\n Try again or contact support.");
                     $('.ui.modal').modal("hide");
                     setTimeout(function () {
@@ -2958,7 +2958,7 @@ async function view_set_password(startup=false,seed_words){
                 await window.electron.ipcRenderer_invoke('create_wallet', seed_words.seed_words, seed_words.seed_pw, new_pw,true);
                 await window.electron.ipcRenderer_invoke("load_wallet", new_pw);
                 var seed_words_loaded = await window.electron.ipcRenderer_invoke("get_wallet_seed");
-                if (seed_words != seed_words_loaded.seed_words) {
+                if (seed_words.seed_words != seed_words_loaded.seed_words) {
                     alert("CREATE WALLET - I/O ERROR \n\n Could not write or read wallet from disk.\n Your wallet was NOT created!\n Try again or contact support.");
                     $('.ui.modal').modal("hide");
                     setTimeout(function () {
@@ -3316,7 +3316,7 @@ function view_backup_page_seed_password_no_backup(startup,segment,seed_words){
         await window.electron.ipcRenderer_invoke('create_wallet', seed_words.seed_words, seed_pw, null);
         await window.electron.ipcRenderer_invoke("load_wallet", null); 
         var seed_words_loaded = await window.electron.ipcRenderer_invoke("get_wallet_seed");
-        if (seed_words != seed_words_loaded.seed_words) {
+        if (seed_words.seed_words != seed_words_loaded.seed_words) {
             alert("CREATE WALLET - I/O ERROR \n\n Could not write or read wallet from disk.\n Your wallet was NOT created!\n Try again or contact support.");
             $('.ui.modal').modal("hide");
             setTimeout(function () {
