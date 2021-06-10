@@ -161,6 +161,7 @@ function view_start_up(){
                     else{
                         $('#view_start_up_button_open_wallet').transition('shake');
                         show_popup_action(templ_loads,"error","Wrong Password");
+                        $("#view_startup_input_password").focus();
                     }
                 });
                 
@@ -267,6 +268,15 @@ function view_import_from_seed() {
         if (seed_words == "") {
             seed_words = null;
         }
+        if(seed_words == null || seed_words.length<1){ 
+//            $('.ui.modal').modal("hide");
+//            setTimeout(function () {
+//                show_dialogue_info(templ_loads,"Empty Seed!","Your seed must not be empty!","OK",function(){});
+//            }, 300);
+             $("#dialogues_input_yes").transition('shake');
+             show_popup_action(templ_loads,"error","Your seed must not be empty!"); 
+            return;
+        }
         $('.ui.modal').modal("hide");
         setTimeout(function () {
                     show_dialogue_input(templ_loads, "Enter your seed password.", "Enter your seed password", "Seed password", "text", "Proceed", "Abort", "data", async function () {
@@ -278,6 +288,16 @@ function view_import_from_seed() {
 
                         await window.electron.ipcRenderer_invoke('create_wallet', seed_words, seed_pw, null, true);
                         await window.electron.ipcRenderer_invoke("load_wallet", null);
+                        var seed_words_loaded=await window.electron.ipcRenderer_invoke("get_wallet_seed");
+                        if(seed_words!=seed_words_loaded.seed_words){                           
+                            alert("CREATE WALLET - I/O ERROR \n\n Could not write or read wallet from disk.\n Your wallet was NOT created!\n Try again or contact support.");
+                            $('.ui.modal').modal("hide");
+                            setTimeout(function () {
+                                view_start_up();
+                            }, 300);
+                            return;
+                        }
+                        
                         $('.ui.modal').modal("hide");
                         setTimeout(function () {
                             view_overview();
@@ -373,18 +393,20 @@ async function set_balance() {
         if(selected!=undefined && selected!=null)
         {selected=selected.toLowerCase()}
         else{selected="usd"}
-        var calc_total=numeral(global_balance.total).multiply(alias_prices[selected]).value();
-        var format_l=Math.ceil((Math.log(calc_total)/Math.log(9.99999)*-1))+2;
-        format_l= format_l > 8 ? 8 : format_l; //infinity memory error !!!!!!!!!!!!!!!!!!!!!!!!!       
-        format_l=format_l<2 ? 2 : format_l;
-        var f_string="";
-        for(var i=0;i<format_l;i++){
-         f_string+="0";   
-        }
-        console.log(calc_total+" | "+f_string)
-//        var formatted_currency_value=numeral(global_balance.total).multiply(alias_prices[selected]).value();
+        try {
+            var calc_total = numeral(global_balance.total).multiply(alias_prices[selected]).value();
+            var format_l = Math.ceil((Math.log(calc_total) / Math.log(9.99999) * -1)) + 2;
+            format_l = format_l > 8 ? 8 : format_l; //infinity memory error !!!!!!!!!!!!!!!!!!!!!!!!!       
+            format_l = format_l < 2 ? 2 : format_l;
+            var f_string = "";
+            for (var i = 0; i < format_l; i++) {
+                f_string += "0";   
+            }
+            console.log(calc_total+" | "+f_string)
+//          var formatted_currency_value=numeral(global_balance.total).multiply(alias_prices[selected]).value();
         
-        $("#balance_currency").text(numeral(global_balance.total).multiply(alias_prices[selected]).format("0."+f_string));
+            $("#balance_currency").text(numeral(global_balance.total).multiply(alias_prices[selected]).format("0."+f_string));
+        } catch (e) {}
         $("#currency").text(selected.toUpperCase());
 
         //update send
@@ -404,6 +426,13 @@ async function load_balance(){
     var sync_state = await window.electron.ipcRenderer_invoke("get_sync_state");
             if (sync_state == "synced") {
                 var was_updated= await window.electron.ipcRenderer_invoke("gui_was_updated");
+                //failed sends
+                if(was_updated=="failed_send"){                  
+                    setTimeout(function(){
+                        show_dialogue_info(templ_loads,"SEND ERROR!","Your transaction could not be sent! <br><br> This could be caused by an unsynced server, no sufficient funds or other unknown reasons.","OK",function(){});
+                    },4000);
+                    await window.electron.ipcRenderer_invoke("set_gui_updated");
+                }
                 if(!was_updated){                  
                     await window.electron.ipcRenderer_invoke("set_gui_updated");
                     //update overview and Send
@@ -697,8 +726,12 @@ function set_view_send_currency(){
         var amount=($("#view_send_input_amount").val()=="" ? "0" : $("#view_send_input_amount").val()); 
         amount=amount.replace(",",".");  
         
-        $("#send_currency_value").text(numeral((isNaN(amount) ? 0 : amount)).multiply(alias_prices[selected_currency.toString().toLowerCase()]).format("0.00000000"));
-         
+        try {
+        $("#send_currency_value").text(numeral((isNaN(amount) ? 0 : amount)).multiply(alias_prices[selected_currency.toString().toLowerCase()]).format("0.00000000"));    
+        } catch (e) {
+            
+        }
+              
      });
 }
 
@@ -886,6 +919,7 @@ async function open_send_dialogue(list_only){
                 }
              }
              var tx_info=await window.electron.ipcRenderer_invoke("get_raw_tx",tx_dest);
+             if(tx_info=="server_not_synced"){show_popup_action(templ_loads,"error","Wallet is not connected or synced with the server!",2500);return;}
              if(tx_info==false){show_popup_action(templ_loads,"error","Unknown error"); return;}
              
              var fee=tx_info.fee;
@@ -958,6 +992,13 @@ function clear_send_form() {
     $("#view_send_input_label").val("");
     $("#view_send_input_note").val("");
     $("#view_send_input_amount").val("");
+    
+    input_clear_button_func("#view_send_input_destination","#view_send_input_destination_clear");
+    input_clear_button_func("#view_send_input_label","#view_send_input_label_clear");
+    input_clear_button_func("#view_send_input_note","#view_send_input_note_clear");
+    input_clear_button_func("#view_send_input_amount","#view_send_input_amount_clear");
+    
+    $("#view_send_input_amount").trigger("change");
 }
 
 async function add_or_update_contact(address,label) {
@@ -1897,8 +1938,16 @@ async function view_settings(){
         $("#Settings_notifications_enabled").find("input[type=checkbox]").prop("checked",false);
       }
       
-      $("#Settings_notifications_enabled").off("click").on("click", async function (e) {
-          e.preventDefault();
+      $("#Settings_notifications_enabled").find("input[type=checkbox]").off("click").on("click", async function (e) {
+            if (notifications_enabled) {
+                $(this).prop("checked", true);
+            } else {
+                $(this).prop("checked", false);
+            }
+      });
+      
+    $("#Settings_notifications_enabled").off("click").on("click", async function (e) {
+//          e.preventDefault();
           console.log('$(this).find("input[type=checkbox]").prop("checked"):',$(this).find("input[type=checkbox]").prop("checked"))
         if ($(this).find("input[type=checkbox]").prop("checked")) {
             $(this).find("label").text('OFF');
@@ -1916,16 +1965,16 @@ async function view_settings(){
             notifications_enabled = true;
             
             
-            new Notification("ALiWa Wallet", {
-                icon: 'view_resources/img/aliwa_light.png',
-                body: "Notifications enabled"
-            });
-                    
+                new Notification("ALiWa Wallet", {
+                    icon: 'view_resources/img/aliwa_light.png',
+                    body: "Notifications enabled"
+                });
+                                
             await window.electron.ipcRenderer_invoke("set_notifications_enabled", true);
             await window.electron.ipcRenderer_invoke("save_wallet", null);
             
             
-        }            
+        }       
     });
     
      $("#settings_custom_server").off("click").on("click",function(){
@@ -2872,6 +2921,15 @@ async function view_set_password(startup=false,seed_words){
             if(startup){
                 await window.electron.ipcRenderer_invoke('create_wallet', seed_words.seed_words, seed_words.seed_pw, null,true);
                 await window.electron.ipcRenderer_invoke("load_wallet", null);
+                var seed_words_loaded = await window.electron.ipcRenderer_invoke("get_wallet_seed");
+                if (seed_words != seed_words_loaded.seed_words) {
+                    alert("CREATE WALLET - I/O ERROR \n\n Could not write or read wallet from disk.\n Your wallet was NOT created!\n Try again or contact support.");
+                    $('.ui.modal').modal("hide");
+                    setTimeout(function () {
+                        view_start_up();
+                    }, 300);
+                    return;
+                }
                 view_overview();
                 return;
             }                      
@@ -2899,6 +2957,15 @@ async function view_set_password(startup=false,seed_words){
             if(startup){
                 await window.electron.ipcRenderer_invoke('create_wallet', seed_words.seed_words, seed_words.seed_pw, new_pw,true);
                 await window.electron.ipcRenderer_invoke("load_wallet", new_pw);
+                var seed_words_loaded = await window.electron.ipcRenderer_invoke("get_wallet_seed");
+                if (seed_words != seed_words_loaded.seed_words) {
+                    alert("CREATE WALLET - I/O ERROR \n\n Could not write or read wallet from disk.\n Your wallet was NOT created!\n Try again or contact support.");
+                    $('.ui.modal').modal("hide");
+                    setTimeout(function () {
+                        view_start_up();
+                    }, 300);
+                    return;
+                }
                 view_overview();
                 return;
             }
@@ -3059,14 +3126,29 @@ async function view_backup_page_start_up_info(startup,segment,seed_words){
         $("#view_backup_it_is_safe_checkbox").prop("checked", true);}
    });   
      
-    $("#view_start_backup_button").off("click").on("click", function () {
-        if($("#view_backup_it_is_safe_checkbox").prop("checked")==true){
-            view_backup_page_write_down(startup,segment,seed_words,1); 
+    $("#view_start_backup_button").off("click").on("click", async function () {
+        var pw_result = await window.electron.ipcRenderer_invoke("compare_password", "");
+               
+        if ($("#view_backup_it_is_safe_checkbox").prop("checked") == true) {
+            if (pw_result) {
+                view_backup_page_write_down(startup, segment, seed_words, 1);
+            } else {
+                show_dialogue_input(templ_loads, "Enter Password", "Your password is required.<br>", "Password", "password", "Show Backup Phrase", "Abort", "data", async function () {
+                    var pw_result = await window.electron.ipcRenderer_invoke("compare_password", $("#dialogues_input_input").val());
+                    if (pw_result) {
+                        $('.ui.modal').modal("hide");
+                        view_backup_page_write_down(startup, segment, seed_words, 1);
+                    } else {
+                        $("#dialogues_input_yes").transition('shake');
+                        show_popup_action(templ_loads, "error", "Wrong password!");
+                    }
+
+                }, async function () {});
+            }
+        } else {
+            show_popup_action(templ_loads, "error", 'Select the "It is safe" checkbox!');
         }
-        else{
-           show_popup_action(templ_loads, "error", 'Select the "It is safe" checkbox!');
-        }
-       
+                   
     });
     
     if(startup){
@@ -3232,7 +3314,16 @@ function view_backup_page_seed_password_no_backup(startup,segment,seed_words){
                     seed_pw = null;
         }
         await window.electron.ipcRenderer_invoke('create_wallet', seed_words.seed_words, seed_pw, null);
-        await window.electron.ipcRenderer_invoke("load_wallet", null);       
+        await window.electron.ipcRenderer_invoke("load_wallet", null); 
+        var seed_words_loaded = await window.electron.ipcRenderer_invoke("get_wallet_seed");
+        if (seed_words != seed_words_loaded.seed_words) {
+            alert("CREATE WALLET - I/O ERROR \n\n Could not write or read wallet from disk.\n Your wallet was NOT created!\n Try again or contact support.");
+            $('.ui.modal').modal("hide");
+            setTimeout(function () {
+                view_start_up();
+            }, 300);
+            return;
+        }
         view_overview();
     });
     
@@ -3358,7 +3449,7 @@ function view_backup_page_verify(startup,segment,seed_words){
             }
             else{return;}
             console.log(autocomplete_bip39($(this).val(),seed_words_split));
-            var auto_text=autocomplete_bip39($(this).val(),seed_words_split);
+            var auto_text=autocomplete_bip39($(this).val().toString().toLowerCase(),seed_words_split);
              $(this).parent().find(".aliwa_autocomplete_popup").css("visibility","hidden");
             if(auto_text.length>0){
                 var auto_items="";
@@ -3470,9 +3561,6 @@ function view_backup_page_verify(startup,segment,seed_words){
                 if (seed_words.seed_pw == "") {
                     seed_words.seed_pw = null;
                 }
-//                await window.electron.ipcRenderer_invoke('create_wallet', seed_words.seed_words, seed_words.seed_pw, null);
-//                await window.electron.ipcRenderer_invoke("load_wallet", null);
-//                view_overview();
                   view_set_password(true,seed_words); 
             } else {
                 await window.electron.ipcRenderer_invoke("set_backup");
@@ -3492,7 +3580,7 @@ function autocomplete_bip39(input,seed_words){
     var outlist=[];
     if(input.length>0){
         for(var i=0;i<seed_words.length;i++){
-            if(seed_words[i].startsWith(input)){
+            if(seed_words[i].toString().toLowerCase().startsWith(input)){
                 outlist.push(seed_words[i]);
             }
         }
