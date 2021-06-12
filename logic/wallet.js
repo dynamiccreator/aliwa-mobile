@@ -227,7 +227,7 @@ class aliwa_wallet{
     }
     
      sync(st_start,ch_start){
-        if(!this.db_wallet.wallet_loaded || this.socket!=null){        
+        if(!this.db_wallet.wallet_loaded || this.socket==null){        
             return;
         }
         this.sync_state="syncing";
