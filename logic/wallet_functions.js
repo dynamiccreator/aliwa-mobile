@@ -105,7 +105,7 @@ class wallet_functions {
                     //re-generate ScriptPubKey from Public Key for inputs from staked coins:
                     var PKEY_FOR_SPKEY= Buffer.from(tx_input_data.inputs[j].public_key,"hex");
                     var step2 = createHash('sha256').update(PKEY_FOR_SPKEY).digest();
-                    var step3 = createHash('rmd160').update(step2).digest();
+                    var step3 = createHash('ripemd160').update(step2).digest();
                     var step4= "76a914"+step3.toString("hex")+"88ac";      
                     
                     prepare_sig += int_toVarint_byte((parseInt(Math.floor(step4.length/2))), 1); // length of script_pubkey
