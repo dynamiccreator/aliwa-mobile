@@ -27,7 +27,7 @@ class wallet_functions {
 
         for (var i = from; i < to; i++) {
 
-            const addrnode = root.derive("m/44'/213'/0'/" + change + "/" + i); //mainnet =213 ; testnet = 1 //=>>"m/44'/213'/0'/" + change + "/" + i
+            const addrnode = root.derive("m/44'/1'/0'/" + change + "/" + i); //mainnet =213 ; testnet = 1 //=>>"m/44'/213'/0'/" + change + "/" + i
 
 //            console.log(i + ". private: " + addrnode.privateKey.toString('hex'));
 //            console.log(i + ". public: " + addrnode._publicKey.toString('hex'));
@@ -37,7 +37,7 @@ class wallet_functions {
             const step2 = createHash('sha256').update(step1).digest();
             const step3 = createHash('ripemd160').update(step2).digest();
             var step4 = Buffer.allocUnsafe(21);
-            step4.writeUInt8(0x3f, 0); //mainnet = 0x3f ; testnet = 0x7f
+            step4.writeUInt8(0x7f, 0); //mainnet = 0x3f ; testnet = 0x7f
             step3.copy(step4, 1); //step4 now holds the extended RIPMD-160 result
             const step9 = bs58check.encode(step4);
 //            console.log(i + '. Adress: ' + step9 + " | " + step9.length);
@@ -48,8 +48,8 @@ class wallet_functions {
     }
 
     build_hex_transaction(tx_input_data)
-    {
-
+    {       
+console.log(tx_input_data);
 //count narrations
         var narr_count = 0;
         for (var n = 0; n < tx_input_data.outputs.length; n++) {
@@ -101,15 +101,9 @@ class wallet_functions {
                 prepare_sig += int_toVarint_byte(tx_input_data.inputs[j].input_index, 4); // output index -> new input index
 
                 // only sign itself not other tx inputs
-                if (i == j) {
-                    //re-generate ScriptPubKey from Public Key for inputs from staked coins:
-                    var PKEY_FOR_SPKEY= Buffer.from(tx_input_data.inputs[j].public_key,"hex");
-                    var step2 = createHash('sha256').update(PKEY_FOR_SPKEY).digest();
-                    var step3 = createHash('ripemd160').update(step2).digest();
-                    var step4= "76a914"+step3.toString("hex")+"88ac";      
-                    
-                    prepare_sig += int_toVarint_byte((parseInt(Math.floor(step4.length/2))), 1); // length of script_pubkey
-                    prepare_sig += step4;   // script_pubkey                       
+                if (i == j) {                                              
+                    prepare_sig += int_toVarint_byte((parseInt(Math.floor(tx_input_data.inputs[j].script_pubkey.length/2))), 1); // length of script_pubkey
+                    prepare_sig += tx_input_data.inputs[j].script_pubkey;   // script_pubkey
                 } else {
                     prepare_sig += "00";// nothing to sign 
                 }
@@ -130,7 +124,12 @@ class wallet_functions {
 
             var pure_sig = get_DER_sig(prepare_hash, tx_input_data.inputs[i].private_key);
             // length of signature,signature,hashcode type,public key length,public key
-            signatures[signatures.length] = int_toVarint_byte((pure_sig.length / 2) + 1, 1) + pure_sig + "01" + int_toVarint_byte((tx_input_data.inputs[i].public_key.length / 2), 1) + tx_input_data.inputs[i].public_key;
+            if(tx_input_data.inputs[i].script_pubkey.length==70){ //STAKED OUTPUT -> only needs 1 argument    
+                signatures[signatures.length] = int_toVarint_byte((pure_sig.length / 2) + 1, 1) + pure_sig + "01";
+            }
+            else{
+                signatures[signatures.length] = int_toVarint_byte((pure_sig.length / 2) + 1, 1) + pure_sig + "01" + int_toVarint_byte((tx_input_data.inputs[i].public_key.length / 2), 1) + tx_input_data.inputs[i].public_key;
+            }
         }
 
 //put everything together to get the final raw transaction
