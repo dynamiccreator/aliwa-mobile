@@ -9,7 +9,7 @@ class db_wallet {
        
        var sep_linux = process.cwd().indexOf("/") > -1;
        var sep = sep_linux ? "/" : "\\";
-       this.default_path = process.cwd() + sep + "aliwa_dat" + sep + "light_wallet.dat";
+       this.default_path = process.cwd() + sep + "aliwa_dat" + sep + "TESTNET_light_wallet.dat";
        
         if (!fs.existsSync(process.cwd() + sep + "aliwa_dat")) {
             fs.mkdirSync(process.cwd() + sep + "aliwa_dat");

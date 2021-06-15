@@ -278,7 +278,7 @@ module.exports = function () {
    
    //save and import dialogue
    ipcMain.handle('save_as_dialogue', async (event) => {
-       var filename = await dialog.showSaveDialog({title:"Save Backup File",defaultPath:"light_wallet.dat",buttonLabel:"Save Backup File"});
+       var filename = await dialog.showSaveDialog({title:"Save Backup File",defaultPath:"TESTNET_light_wallet.dat",buttonLabel:"Save Backup File"});
        console.log(filename);
        if(!filename.canceled){
            wallet.save_wallet(filename.filePath,true);

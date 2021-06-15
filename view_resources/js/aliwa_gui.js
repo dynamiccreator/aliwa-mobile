@@ -2185,7 +2185,7 @@ async function view_settings_custom_server(){
             return;
             }
             
-            show_dialogue_input(templ_loads, "Edit Server", "Enter a label and a server address.<br>", "Address", "text", "Edit Server Server", "Abort", "data", async function () {
+            show_dialogue_input(templ_loads, "Edit Server", "Edit address of server <b>\""+cur_label+"\"</b><br>", "Address", "text", "Edit Server", "Abort", "data", async function () {
             var address = $("#dialogues_input_input").val();
                  
             var can_add = await window.electron.ipcRenderer_invoke("edit_aliwa_server_address",cur_label,address);            
@@ -2198,6 +2198,7 @@ async function view_settings_custom_server(){
                 show_popup_action(templ_loads, "error", "Unknown error!");
             }
             }, async function () {});
+            setTimeout(function(){$("#dialogues_input_input").val(cur_address);},50);
         }
         
         if(view_settings_custom_server_site_state=="delete" && $(this).hasClass("aliwa_custom_server_address_item")){          

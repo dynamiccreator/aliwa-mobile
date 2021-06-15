@@ -49,7 +49,7 @@ class wallet_functions {
 
     build_hex_transaction(tx_input_data)
     {       
-console.log(tx_input_data);
+
 //count narrations
         var narr_count = 0;
         for (var n = 0; n < tx_input_data.outputs.length; n++) {
