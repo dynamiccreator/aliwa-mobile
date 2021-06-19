@@ -2,7 +2,7 @@
 A light wallet for the [ALIAS](https://alias.cash/) cryptocurrency.
 
 ## Donations
-Help completing the Alias Light wallet: Donate with ALIAS! 
+The easiest way to contribute to the Alias Light Wallet: Donate with ALIAS! 
 	
 	Public ALIAS address: SSq7CjsPzfanmCkcN9XhKHg7yMn3bXj8i5
 	Private ALIAS address: smYhZCsqgJdRkWB64GaLZ165HejRCL3tAkmDmxdCrG2McnuH7gReE3LjDoXLRqf3txrwiuE3BCpFFAADDbU1oYW4fr7y9MnU37U3AD
@@ -12,13 +12,19 @@ Help completing the Alias Light wallet: Donate with ALIAS!
 Also don't restore from seeds which contains funds you're not willing to lose.**
 
 ## Download Binaries
-WINDOWS : Not yet available
+ALiWa will be supported by all major Desktop and Mobile platforms.
 
-MAC OS : Not yet available
+* Desktop: Windows (7-10+), MacOS, Linux
+* Mobile: Android & iOS under [aliwa-mobile](https://github.com/dynamiccreator/aliwa-mobile)
+*************************************************************************************************
+**WINDOWS** : Not yet available
 
-LINUX DEB (Debian based, Debian,Ubuntu, ...) : Not yet available
+**MAC OS** : Not yet available
 
-Linux RPM (Red Hat based, Fedora, Suse, ...) : Not yet available
+**LINUX DEB** (Debian based, Debian,Ubuntu, ...) : Not yet available
+
+**Linux RPM** (Red Hat based, Fedora, Suse, ...) : Not yet available
+*************************************************************************************************
 
 ## Build from source (electron.js with electron-forge)
 
