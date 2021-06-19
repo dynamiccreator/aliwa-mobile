@@ -1,5 +1,5 @@
 # aliwa
-A light wallet for the ALIAS cryptocurrency  - https://alias.cash/
+A light wallet for the [ALIAS](https://alias.cash/) cryptocurrency.
 
 ## Donations
 Help completing the Alias Light wallet: Donate with ALIAS! 
