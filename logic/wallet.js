@@ -661,6 +661,18 @@ class aliwa_wallet{
         
     }
     
+    async get_server_info(){
+        var cnf=this.db_wallet.get_config_values(); 
+        var info={};
+        info.blockheight=cnf.sync_height;  
+        info.server_name=cnf.aliwa_server_address_label;
+        info.server_address=cnf.aliwa_server_address;
+        info.is_over_tor=cnf.aliwa_server_address.includes(".onion");
+            
+        return info;
+        
+    }
+    
      list_transactions(page, order_field, direction, search) {
         // returns the number of all transactions 
         // + an array of transactions ordered by order_field in acsending or descending order based on direction from page "page" 

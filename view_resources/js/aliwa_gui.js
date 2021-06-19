@@ -376,6 +376,15 @@ function actions_overview(){
      start_sync_interval();
 }
 
+async function set_about() {
+    var server_infos = await window.electron.ipcRenderer_invoke("get_server_info");
+//    console.log(server_infos)
+    $("#view_about_blockheight").text(server_infos.blockheight);
+    $("#view_about_server_label").text(server_infos.server_name);
+    $("#view_about_server_address").text(server_infos.server_address);
+    $("#view_about_is_tor").text((server_infos.is_over_tor ? "Yes" : "No"));
+}
+
 async function set_balance() {
 
     //show balance
@@ -417,7 +426,8 @@ async function set_balance() {
 async function start_sync_interval(){   
     if(sync_interval==null){
       sync_interval=setInterval(async function(){
-            load_balance();     
+            load_balance();
+            set_about();
             }, 250);
     }
 }
@@ -441,7 +451,7 @@ async function load_balance(){
                     alias_prices= await window.electron.ipcRenderer_invoke("get_alias_prices");                 
                     set_balance();
                     
-                                                         
+                                                     
                     //update transactions
                    if($("#view_transactions_table_body").html()!=null){
                        // console.log($("#view_transactions_table_body"))
