@@ -1,6 +1,6 @@
 {
   "name": "ALiWa",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "dynamiccreator",
   "description": "ALiWa (alpha) - A light wallet for the Alias crpytocurrency.",
   "main": "main.js",

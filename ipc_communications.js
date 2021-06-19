@@ -118,6 +118,11 @@ module.exports = function () {
         return balance;   
    });
    
+    ipcMain.handle('get_server_info', async (event) => {     
+        var info=await wallet.get_server_info();
+        return info;   
+   });
+   
    //RECEIVE*****************************************************************
        ipcMain.handle('get_latest_receive_addr', async (event) => {             
         return wallet.get_highest_unused_receive_address();
@@ -138,8 +143,24 @@ module.exports = function () {
    
    //SENDING***************************************************************** 
     ipcMain.handle('send', async (event,tx_info) => {             
-        console.log("before_sending: ",tx_info);
-        wallet.send_transaction(tx_info.hex,tx_info.tx_object);
+      //  console.log("before_sending: ",JSON.stringify(tx_info));
+       //CLEAN Private and Public KEYS!!!!
+       var cleaned_tx_info={};
+       cleaned_tx_info.inputs=[];
+       for(var i=0;i<tx_info.tx_object.inputs.length;i++){
+           var input={};
+           input.prev_tx=tx_info.tx_object.inputs[i].prev_tx;
+           input.input_index=tx_info.tx_object.inputs[i].input_index;
+           input.script_pubkey=tx_info.tx_object.inputs[i].script_pubkey;        
+           cleaned_tx_info.inputs.push(input);
+       }
+       cleaned_tx_info.outputs=JSON.parse(JSON.stringify(tx_info.tx_object.outputs));
+//       for(var i=0;i<tx_info.tx_object.outputs.length;i++){
+//           var outputs={};             
+//           cleaned_tx_info.outputs.push(JSON.parse(JSON.stringify(outputs[i])));
+//       }
+       console.log(JSON.stringify(cleaned_tx_info));
+        wallet.send_transaction(tx_info.hex,cleaned_tx_info);
    });
    
    ipcMain.handle('get_fee', async (event,destinations) => {
