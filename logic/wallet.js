@@ -975,6 +975,8 @@ class aliwa_wallet{
         //rewind -100 in case other server has lower sync_height / different orphans
         this.db_wallet.delete_orphans(new_height);
        
+        this.sync_state="syncing";
+        this.gui_was_updated=false;
         
         
         this.connect_to_server();
