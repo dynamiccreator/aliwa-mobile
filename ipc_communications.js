@@ -169,7 +169,7 @@ module.exports = function () {
         if(tx_build.exceed!=undefined){
             console.log("exceed returned with: "+tx_build.exceed);
             return tx_build;
-        }    
+        }        
         return tx_build.fee;
         }
         else{return false;}

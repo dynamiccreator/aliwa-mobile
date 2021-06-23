@@ -19,9 +19,11 @@ EC = require("elliptic").ec;
 
 //intial states & data
 //  ->serverlist
-var aliwa_serverlist=[{label:"Default Server (onion)",address:"ws://aliwa5ld6pm66lbwb2kfyzvqzco24ihnmzoknvaqg4uqhpdtelnfa4id.onion:3000"},
+var aliwa_serverlist=[{label:"Default Server (onion)",address:"ws://fastyy35vqxve2vwo6rz6x5upbiqaazpyvymspkf4shzdzcohls2hvid.onion:3000"},                     
+                      {label:"Default Server #2 (onion)",address:"ws://fastgnwu34hphgehucqx54jlkwjysx3su66bxpx5zljgvdzsiho5jgad.onion:3000"},
+                      {label:"ALiWA Test server (onion)",address:"ws://aliwa5ld6pm66lbwb2kfyzvqzco24ihnmzoknvaqg4uqhpdtelnfa4id.onion:3000"},   
                       {label:"localhost",address:"ws://localhost:3000"},
-                      {label:"ssl example",address:"wss://example.com:port"}];
+                      {label:"ssl example",address:"wss://your_domain:port"}];
 
 
 class aliwa_wallet{       
@@ -742,8 +744,7 @@ class aliwa_wallet{
     }
     
     create_transaction(destinations,fee,utxo_result,fee_only) { 
-        if(fee_only!=true && this.sync_state=="syncing"){
-            
+        if(fee_only!=true && this.sync_state=="syncing"){            
             return "server_not_synced";
         }       
         var amount=numeral(0);
@@ -793,12 +794,11 @@ class aliwa_wallet{
                 
             var dest_copy=JSON.parse(JSON.stringify(destinations));
             var change_amount=numeral(utxo_result.sum.value()).subtract(amount.value()).value();
-//            console.log("change_amount:"+change_amount);
-            if(utxo_result.sum.value()!=amount.value()){
-                
-                
-                dest_copy.push({destination_address: change_address, amount: change_amount});
-                
+//            console.log("change_amount:"+change_amount);  
+            var has_change=false;
+            if(utxo_result.sum.value()!=amount.value()){                              
+                dest_copy.push({destination_address: change_address, amount: change_amount}); 
+                has_change=true;
             }    
 //            console.log("dest_copy",dest_copy);    
             var prepared_tx={inputs:tx_inputs,outputs:dest_copy};                     
@@ -808,11 +808,32 @@ class aliwa_wallet{
             var tx_size=build_tx.length/2; // 2 hex len  -> 1 byte len 
             var total_fee=numeral((Math.ceil((tx_size+10)/1000))).multiply(this.const_fee).value();
             if(fee!=total_fee){
-                console.error("fee to small: "+fee+ " < "+total_fee);
-                return this.create_transaction(destinations,total_fee,utxo_result,fee_only);
+                if(has_change && change_amount <= (numeral(this.const_fee).multiply(2).value()) ){
+                    var prepared_tx_2 = {inputs: tx_inputs, outputs: destinations};
+                    var build_tx_2 = this.wallet_functions.build_hex_transaction(prepared_tx_2);
+//            console.log(build_tx);
+
+                    var tx_size_2 = build_tx_2.length / 2; // 2 hex len  -> 1 byte len 
+                    var total_fee_2=numeral((Math.ceil((tx_size_2+10)/1000))).multiply(this.const_fee).value();
+                    if(numeral(total_fee).subtract(total_fee_2).value() == this.const_fee){
+//                        console.log("destinations:",destinations)
+                        return {hex:build_tx_2,
+                               fee: numeral(total_fee_2).add( numeral(change_amount).subtract(this.const_fee).value() ).value(),
+                               tx_object:prepared_tx_2};
+                    }
+                     else{
+//                      console.log("ELSE CASE 1")
+                        return this.create_transaction(destinations,total_fee,utxo_result,fee_only);
+                     }
+                }
+                else{
+//                  console.log("ELSE CASE 2")
+                    return this.create_transaction(destinations,total_fee,utxo_result,fee_only);
+                }                     
             }
             else{
 //                console.log("final fee: "+fee);
+//console.log("destinations:",dest_copy)
                 return {hex:build_tx,fee:fee,tx_object:prepared_tx};
             }
 
