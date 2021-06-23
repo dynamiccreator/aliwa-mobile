@@ -2616,7 +2616,7 @@ function view_single_transaction_in_dialogue(tx,full_tx,confirmations) {
      
         
         //tx
-        $("#single_transaction_dialogue_tx_link a").attr("href", 'https://chainz.cryptoid.info/alias/tx.dws?' + tx + '.htm');
+        $("#single_transaction_dialogue_tx_link a").attr("href", 'https://chainz.cryptoid.info/alias-test/tx.dws?' + tx + '.htm');
         $("#single_transaction_dialogue_tx_link a").text(tx);
 
         $("#single_transaction_dialogue_tx_link").off("click").on("click", function () {
@@ -2632,7 +2632,7 @@ function view_single_transaction_in_dialogue(tx,full_tx,confirmations) {
         });
         
         //blockhash
-        $("#single_transaction_dialogue_blockhash_link a").attr("href", 'https://chainz.cryptoid.info/alias/block.dws?' + full_tx.blockhash + '.htm');
+        $("#single_transaction_dialogue_blockhash_link a").attr("href", 'https://chainz.cryptoid.info/alias-test/block.dws?' + full_tx.blockhash + '.htm');
         $("#single_transaction_dialogue_blockhash_link a").text(full_tx.blockhash);
 
         $("#single_transaction_dialogue_blockhash_link").off("click").on("click", function () {
@@ -3138,8 +3138,11 @@ async function view_backup_page_start_up_info(startup,segment,seed_words){
    });   
      
     $("#view_start_backup_button").off("click").on("click", async function () {
-        var pw_result = await window.electron.ipcRenderer_invoke("compare_password", "");
-               
+        var pw_result=true;
+        if(!startup){
+             pw_result = await window.electron.ipcRenderer_invoke("compare_password", "");
+        }
+          
         if ($("#view_backup_it_is_safe_checkbox").prop("checked") == true) {
             if (pw_result) {
                 view_backup_page_write_down(startup, segment, seed_words, 1);
