@@ -11,19 +11,19 @@ The easiest way to contribute to the Alias Light Wallet: Donate with ALIAS!
 **Please put no funds on this wallet, you're not willing to lose.
 Also don't restore from seeds which contains funds you're not willing to lose.**
 
-## Download Binaries
+## Download Binaries (public testnet)
 ALiWa will be supported by all major Desktop and Mobile platforms.
 
 * Desktop: Windows (7-10+), MacOS, Linux
 * Mobile: Android & iOS under [aliwa-mobile](https://github.com/dynamiccreator/aliwa-mobile)
 *************************************************************************************************
-**WINDOWS** : Not yet available
+**WINDOWS** : [ALiWa-WINDOWS-TESTNET-v0.0.7.zip](https://github.com/dynamiccreator/aliwa/releases/download/0.0.7/ALiWa-WINDOWS-TESTNET-v0.0.7.zip)
 
 **MAC OS** : Not yet available
 
-**LINUX DEB** (Debian based, Debian,Ubuntu, ...) : Not yet available
+**LINUX DEB** (Debian based, Debian,Ubuntu, ...) : [ALiWa-DEBIAN-Debian-Ubuntu-TESTNET-v0.0.7.deb](https://github.com/dynamiccreator/aliwa/releases/download/0.0.7/ALiWa-DEBIAN-Debian-Ubuntu-TESTNET-v0.0.7.deb)
 
-**Linux RPM** (Red Hat based, Fedora, Suse, ...) : Not yet available
+**Linux RPM** (Red Hat based, Fedora, Suse, ...) : [ALiWa-RED-HAT-Suse-Fedora-TESTNET-v0.0.7.rpm](https://github.com/dynamiccreator/aliwa/releases/download/0.0.7/ALiWa-RED-HAT-Suse-Fedora-TESTNET-v0.0.7.rpm)
 *************************************************************************************************
 
 ## Build from source (electron.js with electron-forge)
