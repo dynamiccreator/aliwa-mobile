@@ -22,7 +22,23 @@ jobs:
 
       - name: npm init
         run: npm init -y
-      - run: npm install aes256 argon2 bip39 bs58
+      - run: |
+          npm install \
+            aes256 \
+            argon2 \
+            bip39 \
+            bs58 \
+            bs58check \
+            create-hash \
+            electron-squirrel-startup \
+            elliptic \
+            hdkey \
+            lokijs \
+            npx \
+            numeral \
+            path \
+            socket.io-client \
+            socks-proxy-agent
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
@@ -44,7 +60,23 @@ jobs:
 
       - name: npm init
         run: npm init -y
-      - run: npm install aes256 argon2 bip39 bs58
+      - run: |
+          npm install \
+            aes256 \
+            argon2 \
+            bip39 \
+            bs58 \
+            bs58check \
+            create-hash \
+            electron-squirrel-startup \
+            elliptic \
+            hdkey \
+            lokijs \
+            npx \
+            numeral \
+            path \
+            socket.io-client \
+            socks-proxy-agent
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
@@ -66,7 +98,23 @@ jobs:
 
       - name: npm init
         run: npm init -y
-      - run: npm install aes256 argon2 bip39 bs58
+      - run: |
+          npm install \
+            aes256 \
+            argon2 \
+            bip39 \
+            bs58 \
+            bs58check \
+            create-hash \
+            electron-squirrel-startup \
+            elliptic \
+            hdkey \
+            lokijs \
+            npx \
+            numeral \
+            path \
+            socket.io-client \
+            socks-proxy-agent
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
