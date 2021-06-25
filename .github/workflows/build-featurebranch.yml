@@ -22,7 +22,7 @@ jobs:
 
       - name: npm init
         run: npm init -y
-      - run: npm install aes256
+      - run: npm install aes256 argon2
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
@@ -44,7 +44,7 @@ jobs:
 
       - name: npm init
         run: npm init -y
-      - run: npm install aes256
+      - run: npm install aes256 argon2
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
@@ -66,7 +66,7 @@ jobs:
 
       - name: npm init
         run: npm init -y
-      - run: npm install aes256
+      - run: npm install aes256 argon2
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
