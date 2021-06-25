@@ -1,0 +1,70 @@
+name: Featurebranch
+on:
+  push:
+    branches-ignore:
+      - 'master'
+      - 'develop'
+
+jobs:
+  # ==========================================================================
+  # Build Linux version
+  buildLinux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Build binaries
+        run: npm init -y
+      - run: npm i --save-dev electron
+      - run: npm i -g @electron-forge/cli
+      - run: electron-forge import
+      - run: npm run make
+
+  # ==========================================================================
+  # Build MacOS version
+  buildMacOS:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Build MacOS binaries
+        run: npm init -y
+      - run: npm i --save-dev electron
+      - run: npm i -g @electron-forge/cli
+      - run: electron-forge import
+      - run: npm run make
+
+  # ==========================================================================
+  # Build Windows x64 version
+  buildWindows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Build Windows binaries
+        run: npm init -y
+      - run: npm i --save-dev electron
+      - run: npm i -g @electron-forge/cli
+      - run: electron-forge import
+      - run: npm run make
