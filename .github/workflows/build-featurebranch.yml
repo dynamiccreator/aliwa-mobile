@@ -20,8 +20,9 @@ jobs:
         with:
           node-version: 14.x
 
-      - name: Build binaries
+      - name: npm init
         run: npm init -y
+      - run: npm install aes256
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
@@ -41,8 +42,9 @@ jobs:
         with:
           node-version: 14.x
 
-      - name: Build MacOS binaries
+      - name: npm init
         run: npm init -y
+      - run: npm install aes256
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
@@ -62,8 +64,9 @@ jobs:
         with:
           node-version: 14.x
 
-      - name: Build Windows binaries
+      - name: npm init
         run: npm init -y
+      - run: npm install aes256
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
