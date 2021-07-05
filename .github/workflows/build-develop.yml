@@ -1,0 +1,185 @@
+name: Develop
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  # ==========================================================================
+  # Create Github tag/release and export short SHA of current HEAD
+  prepareRelease:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.url }}
+      github_sha_short: ${{ steps.slug.outputs.sha8 }}
+      aliwa_release: ${{ steps.determine_release.outputs.aliwa_release }}
+    steps:
+      - uses: actions/checkout@v1
+      - name: Get short SHA
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M:%S')"
+      - name: Set Alias release/tag name
+        id: determine_release
+        run: |
+          echo "::set-output name=aliwa_release::Build${{ github.run_number }}"
+
+      # First create the plain release, so the upload URL could be exported
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.determine_release.outputs.aliwa_release }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Releasenotes from Develop
+        id: create_release_develop
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.determine_release.outputs.aliwa_release }}
+          name: "Continuous build #${{ github.run_number }}"
+          body: |
+            Build #${{ github.run_number }} from ${{ steps.date.outputs.date }}
+            - To verify checksums see dedicated checksum files for each download
+          draft: false
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ==========================================================================
+  # Build all x86 Linux flavours except Ubuntu 20.04. See next step.
+  buildLinux:
+    runs-on: ubuntu-latest
+    needs: prepareRelease
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: npm init
+        run: npm init -y
+      - name: Install dependencies
+        run: yarn
+      - run: npm i --save-dev electron
+      - run: npm i -g @electron-forge/cli
+      - run: electron-forge import
+      - run: npm run make
+      - name: Deploy binaries
+        run: >
+          echo "To be done..."
+        env:
+          GITHUB_CI_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ==========================================================================
+  # Build MacOS version
+  buildMacOS:
+    runs-on: macos-latest
+    needs: prepareRelease
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: npm init
+        run: npm init -y
+      - name: Install dependencies
+        run: yarn
+      - run: npm i --save-dev electron
+      - run: npm i -g @electron-forge/cli
+      - run: electron-forge import
+      - run: npm run make
+
+#      - name: Create MacOS sha256 checksum file
+#        run: |
+#          shasum -a 256 ${{ github.workspace }}/cmake-build-cmdline-mac/aliaswallet/Alias.dmg | awk '{ print $1 }' > ${{ github.workspace }}/cmake-build-cmdline-mac/aliaswallet/Alias.sha256
+#          cat ${{ github.workspace }}/cmake-build-cmdline-mac/aliaswallet/Alias.sha256
+#
+#      - name: Upload MacOS Build
+#        id: upload-release-asset
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.GITHUB_TOKEN }}
+#          file: ${{ github.workspace }}/cmake-build-cmdline-mac/aliaswallet/Alias.dmg
+#          asset_name: Alias-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Mac.dmg
+#          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+#          overwrite: true
+#
+#      - name: Upload MacOS checksum file
+#        id: upload-release-checksum
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.GITHUB_TOKEN }}
+#          file: ${{ github.workspace }}/cmake-build-cmdline-mac/aliaswallet/Alias.sha256
+#          asset_name: Alias-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Mac.sha256
+#          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+#          overwrite: true
+
+  # ==========================================================================
+  # Build Windows x64 version
+  buildWindows:
+    runs-on: windows-latest
+    needs: prepareRelease
+    outputs:
+      upload_url: ${{ needs.prepareRelease.outputs.upload_url }}
+      github_sha_short: ${{ needs.prepareRelease.outputs.github_sha_short }}
+      aliwa_release: ${{ needs.prepareRelease.outputs.aliwa_release }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: npm init
+        run: npm init -y
+      - name: Install dependencies
+        run: yarn
+      - run: npm i --save-dev electron
+      - run: npm i -g @electron-forge/cli
+      - run: electron-forge import
+      - run: npm run make
+
+#      - name: Create zip archive and sha256 checksum
+#        run: |
+#          powershell Compress-Archive build/delivery/Alias Alias.zip
+#          powershell "(Get-FileHash Alias.zip).Hash > Alias.sha256"
+#          powershell "(Get-Content Alias.sha256) | Out-File Alias.sha256 -Encoding ascii"
+#          type Alias.sha256
+#
+#      - name: Upload Windows Build
+#        id: upload-release-asset
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.GITHUB_TOKEN }}
+#          file: ${{ github.workspace }}/Alias.zip
+#          asset_name: Alias-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Win64.zip
+#          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+#          overwrite: true
+#
+#      - name: Upload Windows checksum file
+#        id: upload-release-checksum
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.GITHUB_TOKEN }}
+#          file: ${{ github.workspace }}/Alias.sha256
+#          asset_name: Alias-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Win64.sha256
+#          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+#          overwrite: true
