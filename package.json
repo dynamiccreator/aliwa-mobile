@@ -8,7 +8,6 @@
   "contributors": [],
 "dependencies": {
     "aes256": "*",
-    "argon2": "*",
     "bip39": "*",
     "bs58": "*",
     "bs58check": "*",
