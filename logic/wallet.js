@@ -3,7 +3,6 @@ fs = require('fs');
 aes256 = require("aes256");
 
 crypto = require('crypto');
-argon2 = require('argon2');
 
 numeral = require('numeral');
 
@@ -16,6 +15,9 @@ bs58check = require("bs58check");
 bs58_2 = require("bs58");
 
 EC = require("elliptic").ec;
+
+
+hashwasm= require('./argon2.umd.min');
 
 //intial states & data
 //  ->serverlist
