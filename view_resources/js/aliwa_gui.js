@@ -263,8 +263,7 @@ function view_import_from_seed() {
      show_dialogue_modal(templ_loads,"Import Wallet Method","You can enter your Backup Phrase or import from file.","Import from File","Enter Backup Prase",null
         ,async function(){                                             
                 setTimeout(async function(){
-                    var import_path=await window.electron.ipcRenderer_invoke('import_file_dialogue');
-                    console.log("import_path:",import_path); 
+                    var import_path=await window.electron.ipcRenderer_invoke('import_file_dialogue');                 
                     if(import_path){                       
                         setTimeout(function(){
                             $('.ui.modal').modal("hide");
