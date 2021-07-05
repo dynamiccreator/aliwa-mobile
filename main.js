@@ -1,24 +1,60 @@
 const { app, BrowserWindow} = require('electron');
 const path = require('path');
 
-//start tor
+//start tor on windows or mac 
+if(process.platform == 'darwin' || process.platform == 'win32'){
 try {
-const exec = require('child_process').exec;
-var sep_linux = process.cwd().indexOf("/") > -1;
-var sep = sep_linux ? "/" : "\\";
-const myShellScript = exec(process.cwd() + sep +'tor'+sep+'Tor'+sep+'tor.exe');
+    const fs = require('fs');
+    const exec = require('child_process').exec;
+//    var sep_linux = process.cwd().indexOf("/") > -1;
+//    var sep = sep_linux ? "/" : "\\";
 
-myShellScript.stdout.on('data', (data)=>{
-    console.log(data); 
-    // do whatever you want here with data
-});
-myShellScript.stderr.on('data', (data)=>{
-    console.error(data);
-});
-} catch (e) {
-    
+        var aliwa_tor_folder='tor-for-mac';
+        var aliwa_app_data=path.join(process.env.HOME ,"Library","Application Support","ALiWa");
+        var aliwa_app_data_tor_DIR=path.join(aliwa_app_data,aliwa_tor_folder);
+        var aliwa_app_data_tor_APP=path.join(aliwa_app_data_tor_DIR,"Contents","Resources","TorBrowser","Tor",'tor');
+       
+        
+        if(process.platform == 'win32'){
+            aliwa_tor_folder="tor-for-win";
+            aliwa_app_data=path.join(process.env.APPDATA,"ALiWa");
+            aliwa_app_data_tor_DIR=path.join(aliwa_app_data,aliwa_tor_folder);
+            aliwa_app_data_tor_APP=path.join(aliwa_app_data_tor_DIR,'Tor','tor.exe');
+        }
+
+        if (!fs.existsSync(aliwa_app_data_tor_DIR)) {
+        const execute1 = exec("cp -R " + path.join(__dirname,aliwa_tor_folder) + ' ' + aliwa_app_data);
+                execute1.stdout.on('data', (data) => {
+                console.log(data);
+                        console.error(data);
+                        // do whatever you want here with data
+                });
+                execute1.stderr.on('data', (data) => {
+                console.error(data);
+                });
+        }
+
+
+        setTimeout(function () {
+        try {
+        const myShellScript = exec(aliwa_app_data_tor_APP);
+                myShellScript.stdout.on('data', (data) => {
+                console.log(data);
+                        // do whatever you want here with data
+                });
+                myShellScript.stderr.on('data', (data) => {
+                console.error(data);
+                });
+        } catch (e) {
+        console.error(e);
+        }
+        }, 1000)
+
+        } catch (e) {
+        console.error(e);
+        }
+
 }
-
 /*setTimeout(function(){
     require(path.join(__dirname,"./ipc_communications"))();
 },500);*/

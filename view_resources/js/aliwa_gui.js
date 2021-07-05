@@ -155,13 +155,27 @@ function view_start_up(){
                 $('#view_start_up_when_wallet_encrypted').slideDown(800,"easeInOutQuad");
                 $('#view_start_up_when_wallet_exists').slideDown(800,"easeInOutQuad");
                 $('#view_start_up_button_open_wallet').off("click").on("click",async function(){
-                    var password=$("#view_startup_input_password").val();
+                    $(this).hide(0);
+                    $("#view_start_up_button_open_wallet_loading").show(0);
+                    
+                    if($("#view_startup_input_password").val()==""){ 
+                        $(this).show(0);
+                        $("#view_start_up_button_open_wallet_loading").hide(0);
+                        $('#view_start_up_button_open_wallet').transition('shake');
+                        show_popup_action(templ_loads,"error","Password must not be empty!");                      
+                        return;
+                    }                    
+                    
+                    var password=$("#view_startup_input_password").val();                    
                     var try_password=await window.electron.ipcRenderer_invoke("load_wallet",password);
                     if(try_password){view_overview();}
                     else{
+                        $(this).show(0);
+                        $("#view_start_up_button_open_wallet_loading").hide(0);
                         $('#view_start_up_button_open_wallet').transition('shake');
                         show_popup_action(templ_loads,"error","Wrong Password");
                         $("#view_startup_input_password").focus();
+                        
                     }
                 });
                 
@@ -249,9 +263,8 @@ function view_import_from_seed() {
      show_dialogue_modal(templ_loads,"Import Wallet Method","You can enter your Backup Phrase or import from file.","Import from File","Enter Backup Prase",null
         ,async function(){                                             
                 setTimeout(async function(){
-                    var import_path=await window.electron.ipcRenderer_invoke('import_file_dialogue');
-                    console.log("import_path:",import_path);
-                    if(!import_path.canceled){                       
+                    var import_path=await window.electron.ipcRenderer_invoke('import_file_dialogue');                 
+                    if(import_path){                       
                         setTimeout(function(){
                             $('.ui.modal').modal("hide");
                             view_start_up();
@@ -2789,7 +2802,8 @@ function view_transactions(){
 
 async function view_set_password(startup=false,seed_words){
     window.scrollTo(0, 0);
-    if(startup){       
+    if(startup){      
+        $("view_set_password_button_setPassword").text("Create Wallet Now");
          $("body").html(templ_loads["set_password"]+"</div>").hide();
          $("body").fadeIn(100,"easeInOutQuad");
          $("#view_set_password_input_OldPassword_fluid,#view_set_password_input_OldPassword_label").hide();
@@ -2980,7 +2994,8 @@ async function view_set_password(startup=false,seed_words){
                 view_overview();
                 return;
             }
-            
+            $(this).hide(0);
+            $("#view_set_password_button_setPassword_loading").show(0);
             var is_set= await window.electron.ipcRenderer_invoke("set_password",new_pw);
             view_settings();
             setTimeout(function(){show_popup_action(templ_loads,"info","Password was set!");},300);
@@ -3151,7 +3166,8 @@ async function view_backup_page_start_up_info(startup,segment,seed_words){
                     var pw_result = await window.electron.ipcRenderer_invoke("compare_password", $("#dialogues_input_input").val());
                     if (pw_result) {
                         $('.ui.modal').modal("hide");
-                        view_backup_page_write_down(startup, segment, seed_words, 1);
+                        setTimeout(function(){view_backup_page_write_down(startup, segment, seed_words, 1);},300);
+                        
                     } else {
                         $("#dialogues_input_yes").transition('shake');
                         show_popup_action(templ_loads, "error", "Wrong password!");

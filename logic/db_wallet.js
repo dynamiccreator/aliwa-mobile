@@ -9,10 +9,31 @@ class db_wallet {
        
        var sep_linux = process.cwd().indexOf("/") > -1;
        var sep = sep_linux ? "/" : "\\";
-       this.default_path = process.cwd() + sep + "aliwa_dat" + sep + "TESTNET_light_wallet.dat";
-       
-        if (!fs.existsSync(process.cwd() + sep + "aliwa_dat")) {
-            fs.mkdirSync(process.cwd() + sep + "aliwa_dat");
+    //WINDOWS or MAC OS   
+        if (process.platform == 'darwin' || process.platform == 'win32') {
+            if (process.platform == 'darwin') {
+                this.default_path = process.env.HOME + sep + "Library" + sep + "Application Support" + sep + "ALiWa" + sep + "aliwa_dat" + sep + "TESTNET_light_wallet.dat";
+
+                if (!fs.existsSync(process.env.HOME + sep + "Library" + sep + "Application Support" + sep + "ALiWa" + sep + "aliwa_dat")) {
+                    fs.mkdirSync(process.env.HOME + sep + "Library" + sep + "Application Support" + sep + "ALiWa" + sep + "aliwa_dat");
+                }
+            }
+
+            if (process.platform == 'win32') {
+                this.default_path = process.env.APPDATA  + sep + "ALiWa" + sep + "aliwa_dat" + sep + "TESTNET_light_wallet.dat";
+
+                if (!fs.existsSync(process.env.APPDATA  + sep + "ALiWa" + sep + "aliwa_dat")) {
+                    fs.mkdirSync(process.env.APPDATA  + sep + "ALiWa" + sep + "aliwa_dat");
+                }
+            }
+        }
+    //LINUX
+       else{
+            this.default_path = process.cwd() + sep + "aliwa_dat" + sep + "TESTNET_light_wallet.dat";
+
+             if (!fs.existsSync(process.cwd() + sep + "aliwa_dat")) {
+                 fs.mkdirSync(process.cwd() + sep + "aliwa_dat");
+             }
         }
        
     }
@@ -87,12 +108,22 @@ class db_wallet {
 
         if (salt == null) {
             salt = crypto.randomBytes(64).toString('hex');
-        }
+        }             
         salt = Buffer.from(salt, "hex");
         try {
-            var hash = await argon2.hash(pw, {salt: salt, timeCost: "12", memoryCost: "24000", type: argon2.argon2id, version: 0x13, raw: true});
+//            var hash = await argon2.hash(pw, {salt: salt, timeCost: "12", memoryCost: "24000", type: argon2.argon2id, version: 0x13, raw: true});           
 //            console.log("get_argon2_password_data:--------------------");
 //            console.log(hash.toString("hex") + " | " + salt.toString("hex"));
+
+             var hash = await hashwasm.argon2id({
+                password: pw,
+                salt, // salt is a buffer containing random bytes
+                parallelism: 1,
+                iterations: 12, //12,
+                memorySize: 24000, // use 24MB memory
+                hashLength: 32, // output size = 32 bytes
+                outputType: 'hex', // return standard encoded string containing parameters needed to verify the key
+            });
             hash = hash.toString("hex");
             salt = salt.toString("hex");
             return {hash: hash, salt: salt};
