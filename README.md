@@ -17,16 +17,16 @@ ALiWa will be supported by all major Desktop and Mobile platforms.
 * Desktop: Windows (7-10+), MacOS, Linux
 * Mobile: Android & iOS under [aliwa-mobile](https://github.com/dynamiccreator/aliwa-mobile)
 *************************************************************************************************
-**WINDOWS** : [ALiWa-WINDOWS-TESTNET-v0.0.7.zip](https://github.com/dynamiccreator/aliwa/releases/download/0.0.7/ALiWa-WINDOWS-TESTNET-v0.0.7.zip)
+**WINDOWS** : [ALiWa-TESTNET-v0.0.8-Setup.exe](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-v0.0.8-Setup.exe)
 
-**MAC OS** : Not yet available
+**MAC OS** :  [ALiWa-TESTNET-MAC-OS-0.0.8.zip](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-MAC-OS-0.0.8.zip)
 
-**LINUX DEB** (Debian based, Debian,Ubuntu, ...) : [ALiWa-DEBIAN-Debian-Ubuntu-TESTNET-v0.0.7.deb](https://github.com/dynamiccreator/aliwa/releases/download/0.0.7/ALiWa-DEBIAN-Debian-Ubuntu-TESTNET-v0.0.7.deb)
+**LINUX DEB** (Debian based, Debian,Ubuntu, ...) : [.deb package](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-DEBIAN-0.0.8.deb)
 
-**Linux RPM** (Red Hat based, Fedora, Suse, ...) : [ALiWa-RED-HAT-Suse-Fedora-TESTNET-v0.0.7.rpm](https://github.com/dynamiccreator/aliwa/releases/download/0.0.7/ALiWa-RED-HAT-Suse-Fedora-TESTNET-v0.0.7.rpm)
+**Linux RPM** (Red Hat based, Fedora, Suse, ...) : [.rpm package](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-RAT_HAT-0.0.8.rpm)
 *************************************************************************************************
 
-## Build from source (electron.js with electron-forge)
+## Build from source (Linux)
 
 ### Requirements
 
@@ -44,4 +44,4 @@ ALiWa will be supported by all major Desktop and Mobile platforms.
    the "config" object of an electron maker ("@electron-forge/maker-deb" for the .deb package)
 6. `npm run make`
 
-
+## Build from source (MAC OS & WINDOWS --> coming soon)
