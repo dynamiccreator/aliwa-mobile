@@ -1,24 +1,100 @@
 const { app, BrowserWindow} = require('electron');
 const path = require('path');
 
-//start tor
+//start tor on windows or mac 
+if(process.platform == 'darwin' || process.platform == 'win32'){
 try {
-const exec = require('child_process').exec;
-var sep_linux = process.cwd().indexOf("/") > -1;
-var sep = sep_linux ? "/" : "\\";
-const myShellScript = exec(process.cwd() + sep +'tor'+sep+'Tor'+sep+'tor.exe');
+    const fs = require('fs');
+    const exec = require('child_process').exec;
+//    var sep_linux = process.cwd().indexOf("/") > -1;
+//    var sep = sep_linux ? "/" : "\\";
 
-myShellScript.stdout.on('data', (data)=>{
-    console.log(data); 
-    // do whatever you want here with data
-});
-myShellScript.stderr.on('data', (data)=>{
-    console.error(data);
-});
-} catch (e) {
-    
+        var aliwa_tor_folder = "";
+        var aliwa_app_data = "";
+        var aliwa_app_data_tor_DIR = "";
+        var aliwa_app_data_tor_APP = "";
+
+
+        if (process.platform == 'darwin') {
+            aliwa_tor_folder = 'tor-for-mac';
+            aliwa_app_data = path.join(process.env.HOME, "Library", '"Application Support"', "ALiWa");
+            aliwa_app_data_tor_DIR = path.join(aliwa_app_data, aliwa_tor_folder);
+            aliwa_app_data_tor_APP = path.join(aliwa_app_data_tor_DIR, "Contents", "MacOS", "Tor", 'tor.real');
+        }
+       
+        
+        if(process.platform == 'win32'){
+            aliwa_tor_folder="tor-for-win";
+            aliwa_app_data=path.join(process.env.APPDATA,"ALiWa");
+            aliwa_app_data_tor_DIR=path.join(aliwa_app_data,aliwa_tor_folder);
+            aliwa_app_data_tor_APP=path.join(aliwa_app_data_tor_DIR,'Tor','tor.exe');
+        }
+
+        if (!fs.existsSync(aliwa_app_data_tor_DIR)) {
+            if(process.platform == 'darwin'){
+                 const execute1 = exec("cp -R " + path.join(__dirname,aliwa_tor_folder) + ' ' + aliwa_app_data);
+                execute1.stdout.on('data', (data) => {
+                console.log(data);
+                        console.error(data);
+                        // do whatever you want here with data
+                });
+                execute1.stderr.on('data', (data) => {
+                console.error(data);
+                });
+            }
+            
+            if(process.platform == 'win32'){
+                const execute1 = exec('xcopy "'+__dirname+'\\..\\..\\'+aliwa_tor_folder+'" "'+aliwa_app_data+'\\'+aliwa_tor_folder+'\\" /E/H');
+                execute1.stdout.on('data', (data) => {
+                console.log(data);
+                        console.error(data);
+                        // do whatever you want here with data
+                });
+                execute1.stderr.on('data', (data) => {
+                console.error(data);
+                });	
+            }
+       
+        }
+        
+        if(process.platform == 'darwin'){
+            setTimeout(function () {
+        try {          
+        const execute2 = exec("chmod +x "+aliwa_app_data_tor_APP);
+                execute2.stdout.on('data', (data) => {
+                console.log(data);
+                        // do whatever you want here with data
+                });
+                execute2.stderr.on('data', (data) => {
+                console.error(data);
+                });
+        } catch (e) {
+        console.error(e);
+        }
+        }, 1000);
+        }
+
+
+        setTimeout(function () {
+        try {          
+        const myShellScript = exec(aliwa_app_data_tor_APP);
+                myShellScript.stdout.on('data', (data) => {
+                console.log(data);
+                        // do whatever you want here with data
+                });
+                myShellScript.stderr.on('data', (data) => {
+                console.error(data);
+                });
+        } catch (e) {
+        console.error(e);
+        }
+        }, 1500);
+
+        } catch (e) {
+        console.error(e);
+        }
+
 }
-
 /*setTimeout(function(){
     require(path.join(__dirname,"./ipc_communications"))();
 },500);*/
