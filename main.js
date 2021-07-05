@@ -12,7 +12,7 @@ try {
         var aliwa_tor_folder='tor-for-mac';
         var aliwa_app_data=path.join(process.env.HOME ,"Library",'"Application Support"',"ALiWa");
         var aliwa_app_data_tor_DIR=path.join(aliwa_app_data,aliwa_tor_folder);
-        var aliwa_app_data_tor_APP=path.join(aliwa_app_data_tor_DIR,"Contents","Resources","TorBrowser","Tor",'tor');
+        var aliwa_app_data_tor_APP=path.join(aliwa_app_data_tor_DIR,"Contents","MacOS","Tor",'tor.real');
        
         
         if(process.platform == 'win32'){
@@ -33,10 +33,27 @@ try {
                 console.error(data);
                 });
         }
+        
+        if(process.platform == 'darwin'){
+            setTimeout(function () {
+        try {          
+        const execute2 = exec("chmod +x "+aliwa_app_data_tor_APP);
+                execute2.stdout.on('data', (data) => {
+                console.log(data);
+                        // do whatever you want here with data
+                });
+                execute2.stderr.on('data', (data) => {
+                console.error(data);
+                });
+        } catch (e) {
+        console.error(e);
+        }
+        }, 1000);
+        }
 
 
         setTimeout(function () {
-        try {
+        try {          
         const myShellScript = exec(aliwa_app_data_tor_APP);
                 myShellScript.stdout.on('data', (data) => {
                 console.log(data);
@@ -48,7 +65,7 @@ try {
         } catch (e) {
         console.error(e);
         }
-        }, 1000)
+        }, 1500);
 
         } catch (e) {
         console.error(e);
