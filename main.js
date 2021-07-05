@@ -10,7 +10,7 @@ try {
 //    var sep = sep_linux ? "/" : "\\";
 
         var aliwa_tor_folder='tor-for-mac';
-        var aliwa_app_data=path.join(process.env.HOME ,"Library","Application Support","ALiWa");
+        var aliwa_app_data=path.join(process.env.HOME ,"Library",'"Application Support"',"ALiWa");
         var aliwa_app_data_tor_DIR=path.join(aliwa_app_data,aliwa_tor_folder);
         var aliwa_app_data_tor_APP=path.join(aliwa_app_data_tor_DIR,"Contents","Resources","TorBrowser","Tor",'tor');
        
