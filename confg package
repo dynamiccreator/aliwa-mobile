@@ -7,8 +7,7 @@
   "license": "(MIT) UNLICENSED",
   "contributors": [],
 "dependencies": {
-    "aes256": "*",
-    "argon2": "*",
+    "aes256": "*",    
     "bip39": "*",
     "bs58": "*",
     "bs58check": "*",
