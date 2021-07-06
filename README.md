@@ -94,6 +94,7 @@ Now you're able to build on windows!
 
 * Node.js >=12.0.0
 * Git
+* Tor (Only for getting a connection running the app)
 
 ### Steps
 
