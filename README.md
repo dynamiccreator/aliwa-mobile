@@ -63,7 +63,7 @@ Now you're able to build on windows!
 6. `npm install`  
 7. `npm run make`
 8. Download [tor-jul-2021.zip](https://github.com/dynamiccreator/aliwa-resources/raw/main/tor-jul-2021.zip) from the [aliwa-resources repository](https://github.com/dynamiccreator/aliwa-resources)
-9. Unzip it and copy the folder `tor-for-win` into the folder where your build is located (ALiWa.exe is in here)
+9. Unzip it and copy the folder `tor-for-win` into the folder where your build is located (ALiWa.exe is in there)
 10. Use your preferred software (e.g. Inno Setup) to make an Windows Installer or zip it for shipping.
 
 ## Build from source (Mac Os)
