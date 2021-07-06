@@ -96,7 +96,7 @@ Now you're able to build on windows!
 * Git
 * Tor (Only for getting a connection running the app)
 
-### Steps
+### Building Steps
 
 **Step 2 and 3 are only required once**
 
