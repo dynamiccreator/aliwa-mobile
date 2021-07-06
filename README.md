@@ -31,6 +31,7 @@ ALiWa will be supported by all major Desktop and Mobile platforms.
 ### Requirements
 
 * Node.js >=12.0.0
+* Git
 
 ### Steps
 
@@ -40,8 +41,65 @@ ALiWa will be supported by all major Desktop and Mobile platforms.
 2. `npm i --save-dev electron`
 3. `npm i -g @electron-forge/cli` (install electron-forge)
 4. `electron-forge import`
-5. (optional for logo) copy the inside of `"config": {}` from  "confg package" file into "package.json" into 
-   the "config" object of an electron maker ("@electron-forge/maker-deb" for the .deb package)
+5. (For ALiWa icon) Follow the **APP ICON INSTRUCTIONS** from the file `confg package`
 6. `npm run make`
 
-## Build from source (MAC OS & WINDOWS --> coming soon)
+## Build from source (Windows)
+
+### Requirements
+
+* C/C++ Compiler
+* Node.js
+* Python
+* Git 
+
+**It is recommended to install VisualStudio and select the above packages at the Installation process.**
+(I believe everything but Git can be selected there)
+
+### Windows Preparation Steps
+
+To build on Windows it is required to open a powershell as administrator and give "RemoteSigned" rights.
+
+To do this: 
+1. Open a power shell.
+2. `Start-Process powershell -Verb runAs`
+3. Confirm
+4. In admin Power shell: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned`
+5. Confirm with Yes
+
+Now you're able to build on windows!
+
+### Building Steps
+
+**Step 2 and 3 are only required once**
+
+1. `npm init -y`
+2. `npm i --save-dev electron`
+3. `npm i -g @electron-forge/cli` (install electron-forge)
+4. `electron-forge import`
+5. (For ALiWa icon) Follow the **APP ICON INSTRUCTIONS** from the file `confg package`
+6. `npm install`  
+7. `npm run make`
+8. Download [tor-jul-2021.zip](https://github.com/dynamiccreator/aliwa-resources/raw/main/tor-jul-2021.zip)
+9. Unzip it and copy the folder `tor-for-`
+
+## Build from source (Mac Os)
+
+### Requirements
+
+* Xcode & Xcode Comand Line Tools
+* Node.js
+* Git 
+
+### Building Steps
+
+**Step 2 and 3 are only required once**
+
+1. `npm init -y`
+2. `npm i --save-dev electron`
+3. `npm i -g @electron-forge/cli` (install electron-forge)
+4. `electron-forge import`
+5. (For ALiWa icon) Follow the **APP ICON INSTRUCTIONS** from the file `confg package`
+6.   
+7. `npm install`  
+8. `npm run make`
