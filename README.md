@@ -26,24 +26,6 @@ ALiWa will be supported by all major Desktop and Mobile platforms.
 **Linux RPM** (Red Hat based, Fedora, Suse, ...) : [.rpm package](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-RAT_HAT-0.0.8.rpm)
 *************************************************************************************************
 
-## Build from source (Linux)
-
-### Requirements
-
-* Node.js >=12.0.0
-* Git
-
-### Steps
-
-**Step 2 and 3 are only required once**
-
-1. `npm init -y`
-2. `npm i --save-dev electron`
-3. `npm i -g @electron-forge/cli` (install electron-forge)
-4. `electron-forge import`
-5. (For ALiWa icon) Follow the **APP ICON INSTRUCTIONS** from the file `confg package`
-6. `npm run make`
-
 ## Build from source (Windows)
 
 ### Requirements
@@ -81,7 +63,8 @@ Now you're able to build on windows!
 6. `npm install`  
 7. `npm run make`
 8. Download [tor-jul-2021.zip](https://github.com/dynamiccreator/aliwa-resources/raw/main/tor-jul-2021.zip)
-9. Unzip it and copy the folder `tor-for-`
+9. Unzip it and copy the folder `tor-for-win` into the folder where your build is located (ALiWa.exe is in here)
+10. Use your preferred software (e.g. Inno Setup) to make an Windows Installer or zip it for shipping.
 
 ## Build from source (Mac Os)
 
@@ -100,6 +83,25 @@ Now you're able to build on windows!
 3. `npm i -g @electron-forge/cli` (install electron-forge)
 4. `electron-forge import`
 5. (For ALiWa icon) Follow the **APP ICON INSTRUCTIONS** from the file `confg package`
-6.   
+8. Download [tor-jul-2021.zip](https://github.com/dynamiccreator/aliwa-resources/raw/main/tor-jul-2021.zip)
+9. Unzip it and copy the folder `tor-for-mac` into the repository folder  
 7. `npm install`  
 8. `npm run make`
+
+## Build from source (Linux)
+
+### Requirements
+
+* Node.js >=12.0.0
+* Git
+
+### Steps
+
+**Step 2 and 3 are only required once**
+
+1. `npm init -y`
+2. `npm i --save-dev electron`
+3. `npm i -g @electron-forge/cli` (install electron-forge)
+4. `electron-forge import`
+5. (For ALiWa icon) Follow the **APP ICON INSTRUCTIONS** from the file `confg package`
+6. `npm run make`
