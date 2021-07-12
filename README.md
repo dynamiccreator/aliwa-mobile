@@ -17,7 +17,7 @@ ALiWa will be supported by all major Desktop and Mobile platforms.
 * Desktop: Windows (7-10+), MacOS, Linux
 * Mobile: Android & iOS under [aliwa-mobile](https://github.com/dynamiccreator/aliwa-mobile)
 *************************************************************************************************
-**WINDOWS** : [ALiWa-TESTNET-v0.0.8-Setup.exe](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-v0.0.8-Setup.exe), 32 bit :  [ALiWa-TESTNET-v0.0.8-Setup-32bit.exe](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-v0.0.8-Setup-32bit.exe)
+**WINDOWS** : [ALiWa-TESTNET-v0.0.8-Setup.exe](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-v0.0.8-Setup.exe), 32 bit :  [ALiWa-TESTNET-v0.0.8-Setup-32bit-T32.exe](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-v0.0.8-Setup-32bit-T32.exe)
 
 **MAC OS** :  [ALiWa-TESTNET-MAC-OS-0.0.8.zip](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-MAC-OS-0.0.8.zip)
 
