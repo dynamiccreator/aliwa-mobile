@@ -17,7 +17,8 @@ ALiWa will be supported by all major Desktop and Mobile platforms.
 * Desktop: Windows (7-10+), MacOS, Linux
 * Mobile: Android & iOS under [aliwa-mobile](https://github.com/dynamiccreator/aliwa-mobile)
 *************************************************************************************************
-**WINDOWS** : [ALiWa-TESTNET-v0.0.8-Setup.exe](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-v0.0.8-Setup.exe)
+**WINDOWS** : [ALiWa-TESTNET-v0.0.8-Setup.exe](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-v0.0.8-Setup.exe),
+
 	      [ALiWa-TESTNET-v0.0.8-Setup-32bit.exe](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-v0.0.8-Setup-32bit.exe)
 
 **MAC OS** :  [ALiWa-TESTNET-MAC-OS-0.0.8.zip](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-MAC-OS-0.0.8.zip)
@@ -72,6 +73,7 @@ Now you're able to build on windows!
 Use the steps above but instead of step 7 use these steps:
 
 7a. `install --save-dev electron-packager` (only once)
+
 7b. `npx electron-packager . ALiWa-32 --platform=win32 --arch=ia32 --icon=view_resources/img/aliwa_light.ico`
 
 ## Build from source (Mac Os)
