@@ -68,17 +68,45 @@ jobs:
 
       - name: npm init
         run: npm init -y
+
       - name: Install dependencies
         run: yarn
+
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
-      - run: npm run make
-      - name: Deploy binaries
-        run: >
-          echo "To be done..."
-        env:
-          GITHUB_CI_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure app icon
+        run: |
+          jq '(.config.forge.makers[] | select(.name == "@electron-forge/maker-deb") | .config.icon) |= "view_resources/img/aliwa_light.png" |
+              (.config.forge.makers[] | select(.name == "@electron-forge/maker-deb") | .config.setupIcon) |= "view_resources/img/aliwa_light.png" |
+              (.config.forge.makers[] | select(.name == "@electron-forge/maker-rpm") | .config.icon) |= "view_resources/img/aliwa_light.png" |
+              (.config.forge.makers[] | select(.name == "@electron-forge/maker-rpm") | .config.setupIcon) |= "view_resources/img/aliwa_light.png"' package.json > package.json.tmp
+          rm -f package.json
+          mv package.json.tmp package.json
+
+      - name: Build app
+        run: npm run make
+
+      - name: Upload DEB
+        id: upload-release-asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/out/make/deb/x64/aliwa*.deb
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}_amd64.deb
+          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+          overwrite: true
+
+      - name: Upload RPM
+        id: upload-release-asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/out/make/rpm/x64/aliwa*.rpm
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}.x86_64.rpm
+          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+          overwrite: true
 
   # ==========================================================================
   # Build MacOS version
