@@ -150,11 +150,22 @@ jobs:
 
       - name: npm init
         run: npm init -y
+
       - name: Install dependencies
         run: yarn
+
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
+
+      - name: Install app icon
+        run: |
+          powershell (Get-Content package.json) -replace '"packagerConfig": {},', '"packagerConfig": {"asar": true, "icon": "view_resources/img/aliwa_light.ico", "setupIcon": "view_resources/img/aliwa_light.ico"},' | Out-File package.json.updated
+          powershell Remove-Item package.json
+          powershell Rename-Item package.json.updated package.json
+
+      - name: Build application
+        run: npm install
       - run: npm run make
 
 #      - name: Create zip archive and sha256 checksum
