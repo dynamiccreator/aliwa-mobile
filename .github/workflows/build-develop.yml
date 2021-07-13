@@ -88,6 +88,13 @@ jobs:
       - name: Build app
         run: npm run make
 
+      - name: Check results
+        run: |
+          pwd
+          ls -la
+          find . -name "*.deb"
+          find . -name "*.rpm"
+
       - name: Upload DEB
         id: upload-deb-release-asset
         uses: svenstaro/upload-release-action@v2
