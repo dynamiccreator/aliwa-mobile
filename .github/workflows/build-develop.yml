@@ -168,29 +168,34 @@ jobs:
         run: npm install
       - run: npm run make
 
-#      - name: Create zip archive and sha256 checksum
-#        run: |
-#          powershell Compress-Archive build/delivery/Alias Alias.zip
-#          powershell "(Get-FileHash Alias.zip).Hash > Alias.sha256"
-#          powershell "(Get-Content Alias.sha256) | Out-File Alias.sha256 -Encoding ascii"
-#          type Alias.sha256
-#
-#      - name: Upload Windows Build
-#        id: upload-release-asset
-#        uses: svenstaro/upload-release-action@v2
-#        with:
-#          repo_token: ${{ secrets.GITHUB_TOKEN }}
-#          file: ${{ github.workspace }}/Alias.zip
-#          asset_name: Alias-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Win64.zip
-#          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
-#          overwrite: true
-#
-#      - name: Upload Windows checksum file
-#        id: upload-release-checksum
-#        uses: svenstaro/upload-release-action@v2
-#        with:
-#          repo_token: ${{ secrets.GITHUB_TOKEN }}
-#          file: ${{ github.workspace }}/Alias.sha256
-#          asset_name: Alias-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Win64.sha256
-#          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
-#          overwrite: true
+      - name: Include Tor binaries
+        run: |
+          powershell Invoke-WebRequest -Uri "https://github.com/aliascash/resources/blob/master/resources/Tor.libraries.Win64.zip" -OutFile Tor.libraries.Win64.zip
+          powershell Expand-Archive Tor.libraries.Win64.zip
+
+      - name: Create zip archive and sha256 checksum
+        run: |
+          powershell Compress-Archive . ALiWa.zip
+          powershell "(Get-FileHash ALiWa.zip).Hash > ALiWa.sha256"
+          powershell "(Get-Content ALiWa.sha256) | Out-File ALiWa.sha256 -Encoding ascii"
+          type ALiWa.sha256
+
+      - name: Upload Windows Build
+        id: upload-release-asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/Alias.zip
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Win64.zip
+          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+          overwrite: true
+
+      - name: Upload Windows checksum file
+        id: upload-release-checksum
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/ALiWa.sha256
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Win64.sha256
+          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+          overwrite: true
