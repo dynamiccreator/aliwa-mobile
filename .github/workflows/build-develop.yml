@@ -158,12 +158,19 @@ jobs:
 
       - name: npm init
         run: npm init -y
+
       - name: Install dependencies
         run: yarn
+
       - run: npm i --save-dev electron
       - run: npm i -g @electron-forge/cli
       - run: electron-forge import
-      - run: npm run make
+
+      - name: Configure app icon
+        run: |
+          jq '(.config.forge.packagerConfig | .icon) |= "view_resources/img/icon.icns"' package.json > package.json.tmp
+          rm -f package.json
+          mv package.json.tmp package.json
 
 #      - name: Create MacOS sha256 checksum file
 #        run: |
