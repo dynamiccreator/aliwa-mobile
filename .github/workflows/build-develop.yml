@@ -263,9 +263,7 @@ jobs:
 
       - name: Install app icon
         run: |
-          powershell jq '(.config.forge.packagerConfig | .asar) |= true |
-                         (.config.forge.packagerConfig | .icon) |= \"view_resources/img/aliwa_light.ico\" |
-                         (.config.forge.packagerConfig | .setupIcon) |= \"view_resources/img/aliwa_light.ico\"' package.json > package.json.tmp
+          powershell jq -f jq-win-query.txt package.json > package.json.tmp
           powershell Remove-Item package.json
           powershell Rename-Item package.json.tmp package.json
 
