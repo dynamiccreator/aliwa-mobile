@@ -280,7 +280,8 @@ jobs:
 
       - name: Create zip archive and sha256 checksum
         run: |
-          powershell Compress-Archive . ALiWa.zip
+          powershell Rename-Item out\ALiWa-win32-x64 out\ALiWa
+          powershell Compress-Archive out\ALiWa ALiWa.zip
           powershell "(Get-FileHash ALiWa.zip).Hash > ALiWa.sha256"
           powershell "(Get-Content ALiWa.sha256) | Out-File ALiWa.sha256 -Encoding ascii"
           type ALiWa.sha256
