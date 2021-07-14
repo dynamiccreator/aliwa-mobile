@@ -107,7 +107,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ github.workspace }}/${{ steps.find_deliveries.outputs.aliwa_deb }}
-          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}_amd64.deb
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}.deb
           tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
           overwrite: true
 
@@ -117,7 +117,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ github.workspace }}/ALiWa.deb.sha256
-          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}_amd64.sha256
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}.deb.sha256
           tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
           overwrite: true
 
@@ -127,7 +127,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ github.workspace }}/${{ steps.find_deliveries.outputs.aliwa_rpm }}
-          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}.x86_64.rpm
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}.rpm
           tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
           overwrite: true
 
@@ -137,7 +137,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ github.workspace }}/ALiWa.rpm.sha256
-          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}.x86_64.sha256
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}.rpm.sha256
           tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
           overwrite: true
 
