@@ -21,7 +21,7 @@ jobs:
       - name: Set ALiWa release/tag name
         id: determine_release
         run: |
-          aliwaVersion=$(jq '.version' package.json)
+          aliwaVersion=$(jq '.version' package.json | xargs)
           echo "::set-output name=aliwa_release::${aliwaVersion}"
 
       # First create the plain release, so the upload URL could be exported
