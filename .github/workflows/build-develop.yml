@@ -181,6 +181,7 @@ jobs:
           pwd
           ls -la
           find . -name "*.dmg"
+          tree out
           echo "::set-output name=aliwa_dmg::$(find . -name '*.dmg')"
 
       - name: Create MacOS sha256 checksum file
@@ -203,7 +204,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ github.workspace }}/cmake-build-cmdline-mac/aliaswallet/ALiWa.sha256
+          file: ${{ github.workspace }}/ALiWa.sha256
           asset_name: Alias-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Mac.sha256
           tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
           overwrite: true
