@@ -183,7 +183,9 @@ jobs:
           unzip ${{ github.workspace }}/Tor.libraries.MacOS.zip
 
       - name: Build app
-        run: npm run make
+        run: |
+          npm install
+          npm run make
 
       - name: Temp install of brew tree
         run: |
@@ -201,7 +203,7 @@ jobs:
       - name: Create delivery archive
         run: |
           cd out/ALiWa-darwin-x64
-          zip -r -X ../../ALiWa.zip ALiWa.app
+          zip -r -X ${{ github.workspace }}/ALiWa.zip ALiWa.app
 
       - name: Create MacOS sha256 checksum file
         run: |
