@@ -153,6 +153,9 @@ jobs:
           powershell Expand-Archive Tor.libraries.Win64.zip
           powershell Copy-Item -Path "Tor.libraries.Win64\Tor" -Destination "out\ALiWa-win32-x64\Tor" -Recurse
 
+      - name: Create installer
+        run: iscc inno-setup.iss
+
       - name: Create zip archive and sha256 checksum
         run: |
           powershell Rename-Item out\ALiWa-win32-x64 ALiWa
@@ -160,6 +163,3 @@ jobs:
           powershell "(Get-FileHash ALiWa.zip).Hash > ALiWa.sha256"
           powershell "(Get-Content ALiWa.sha256) | Out-File ALiWa.sha256 -Encoding ascii"
           type ALiWa.sha256
-
-      - name: Create installer
-        run: iscc inno-setup.iss
