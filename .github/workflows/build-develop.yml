@@ -191,7 +191,7 @@ jobs:
       - name: Create delivery archive
         run: |
           cd out/ALiWa-darwin-x64
-          zip ../../ALiWa.zip ALiWa.app
+          zip -r -X ../../ALiWa.zip ALiWa.app
 
       - name: Create MacOS sha256 checksum file
         run: |
@@ -214,7 +214,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ github.workspace }}/ALiWa.sha256
-          asset_name: Alias-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Mac.sha256
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Mac.zip.sha256
           tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
           overwrite: true
 
