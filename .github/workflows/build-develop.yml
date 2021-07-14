@@ -72,9 +72,11 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      - run: npm i --save-dev electron
-      - run: npm i -g @electron-forge/cli
-      - run: electron-forge import
+      - name: Electron preparation
+        run: |
+          npm i --save-dev electron
+          npm i -g @electron-forge/cli
+          electron-forge import
 
       - name: Configure app icon
         run: |
@@ -162,9 +164,11 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      - run: npm i --save-dev electron
-      - run: npm i -g @electron-forge/cli
-      - run: electron-forge import
+      - name: Electron preparation
+        run: |
+          npm i --save-dev electron
+          npm i -g @electron-forge/cli
+          electron-forge import
 
       - name: Configure app icon
         run: |
@@ -243,9 +247,11 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      - run: npm i --save-dev electron
-      - run: npm i -g @electron-forge/cli
-      - run: electron-forge import
+      - name: Electron preparation
+        run: |
+          npm i --save-dev electron
+          npm i -g @electron-forge/cli
+          electron-forge import
 
       - name: Install app icon
         run: |
