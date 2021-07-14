@@ -265,13 +265,19 @@ jobs:
           powershell Expand-Archive Tor.libraries.Win64.zip
           powershell Copy-Item -Path "Tor.libraries.Win64\Tor" -Destination "out\ALiWa-win32-x64\Tor" -Recurse
 
-      - name: Create zip archive and sha256 checksum
+      - name: Create installer
+        run: iscc inno-setup.iss
+
+      - name: Create zip archive and sha256 checksums
         run: |
           powershell Rename-Item out\ALiWa-win32-x64 ALiWa
           powershell Compress-Archive out\ALiWa ALiWa.zip
           powershell "(Get-FileHash ALiWa.zip).Hash > ALiWa.sha256"
           powershell "(Get-Content ALiWa.sha256) | Out-File ALiWa.sha256 -Encoding ascii"
           type ALiWa.sha256
+          powershell "(Get-FileHash Output\ALiWa-Setup.exe).Hash > ALiWa-Setup.sha256"
+          powershell "(Get-Content ALiWa-Setup.sha256) | Out-File ALiWa-Setup.sha256 -Encoding ascii"
+          type ALiWa-Setup.sha256
 
       - name: Upload Windows Build
         id: upload-release-asset
@@ -290,5 +296,25 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ github.workspace }}/ALiWa.sha256
           asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Win64.zip.sha256
+          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+          overwrite: true
+
+      - name: Upload Windows installer
+        id: upload-installer-asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/Output/ALiWa-Setup.exe
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Installer-Win64.exe
+          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+          overwrite: true
+
+      - name: Upload Windows installer checksum file
+        id: upload-installer-checksum
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/ALiWa-Setup.sha256
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}-Installer-Win64.exe.sha256
           tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
           overwrite: true
