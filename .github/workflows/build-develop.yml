@@ -187,19 +187,6 @@ jobs:
           cd out/ALiWa-darwin-x64/ALiWa.app
           unzip ${{ github.workspace }}/Tor.libraries.MacOS.zip
 
-      - name: Temp install of brew tree
-        run: |
-          brew install tree
-
-      - name: Check results
-        id: find_deliveries
-        run: |
-          pwd
-          ls -la
-          find . -name "*.dmg"
-          tree out
-          echo "::set-output name=aliwa_dmg::$(find . -name '*.dmg')"
-
       - name: Create delivery archive
         run: |
           cd out/ALiWa-darwin-x64
