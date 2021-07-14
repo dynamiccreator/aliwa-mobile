@@ -18,13 +18,11 @@ jobs:
       - name: Get short SHA
         id: slug
         run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M:%S')"
       - name: Set ALiWa release/tag name
         id: determine_release
         run: |
-          echo "::set-output name=aliwa_release::Build${{ github.run_number }}"
+          aliwaVersion=$(jq '.version' package.json)
+          echo "::set-output name=aliwa_release::${aliwaVersion}"
 
       # First create the plain release, so the upload URL could be exported
       - name: Create release
@@ -37,17 +35,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Releasenotes from Develop
-        id: create_release_develop
+      - name: Releasenotes from master
+        id: create_release_master
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.determine_release.outputs.aliwa_release }}
-          name: "Continuous build #${{ github.run_number }}"
-          body: |
-            Build #${{ github.run_number }} from ${{ steps.date.outputs.date }}
-            - To verify checksums see dedicated checksum files for each download
+          name: "Release ${{ steps.determine_release.outputs.aliwa_release }} (Build #${{ github.run_number }})"
+          body_path: ${{ github.workspace }}/ReleaseNotes.md
           draft: false
-          prerelease: true
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
