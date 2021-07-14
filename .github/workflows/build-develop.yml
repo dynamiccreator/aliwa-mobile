@@ -175,6 +175,10 @@ jobs:
       - name: Build app
         run: npm run make
 
+      - name: Temp install of brew tree
+        run: |
+          brew install tree
+
       - name: Check results
         id: find_deliveries
         run: |
