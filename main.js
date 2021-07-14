@@ -1,7 +1,7 @@
 const { app, BrowserWindow} = require('electron');
 const path = require('path');
 
-//start tor on windows or mac 
+//start tor on windows or mac
 if(process.platform == 'darwin' || process.platform == 'win32'){
 try {
     const fs = require('fs');
@@ -9,25 +9,21 @@ try {
 //    var sep_linux = process.cwd().indexOf("/") > -1;
 //    var sep = sep_linux ? "/" : "\\";
 
-        var aliwa_tor_folder = "";
+        var aliwa_tor_folder = "Tor";
         var aliwa_app_data = "";
         var aliwa_app_data_tor_DIR = "";
         var aliwa_app_data_tor_APP = "";
 
-
         if (process.platform == 'darwin') {
-            aliwa_tor_folder = 'tor-for-mac';
             aliwa_app_data = path.join(process.env.HOME, "Library", '"Application Support"', "ALiWa");
             aliwa_app_data_tor_DIR = path.join(aliwa_app_data, aliwa_tor_folder);
             aliwa_app_data_tor_APP = path.join(aliwa_app_data_tor_DIR, "Contents", "MacOS", "Tor", 'tor.real');
         }
-       
-        
+
         if(process.platform == 'win32'){
-            aliwa_tor_folder="tor-for-win";
             aliwa_app_data=path.join(process.env.APPDATA,"ALiWa");
             aliwa_app_data_tor_DIR=path.join(aliwa_app_data,aliwa_tor_folder);
-            aliwa_app_data_tor_APP=path.join(aliwa_app_data_tor_DIR,'Tor','tor.exe');
+            aliwa_app_data_tor_APP=path.join(aliwa_app_data_tor_DIR,'tor.exe');
         }
 
         if (!fs.existsSync(aliwa_app_data_tor_DIR)) {
@@ -42,7 +38,7 @@ try {
                 console.error(data);
                 });
             }
-            
+
             if(process.platform == 'win32'){
                 const execute1 = exec('xcopy "'+__dirname+'\\..\\..\\'+aliwa_tor_folder+'" "'+aliwa_app_data+'\\'+aliwa_tor_folder+'\\" /E/H');
                 execute1.stdout.on('data', (data) => {
@@ -52,14 +48,14 @@ try {
                 });
                 execute1.stderr.on('data', (data) => {
                 console.error(data);
-                });	
+                });
             }
-       
+
         }
-        
+
         if(process.platform == 'darwin'){
             setTimeout(function () {
-        try {          
+        try {
         const execute2 = exec("chmod +x "+aliwa_app_data_tor_APP);
                 execute2.stdout.on('data', (data) => {
                 console.log(data);
@@ -76,7 +72,7 @@ try {
 
 
         setTimeout(function () {
-        try {          
+        try {
         const myShellScript = exec(aliwa_app_data_tor_APP);
                 myShellScript.stdout.on('data', (data) => {
                 console.log(data);
@@ -125,21 +121,21 @@ function createWindow () {
 //  win.setIcon(__dirname+"/view_resources/img/aliwa_icon_256.png") // no crash but default icon remains | __dirname is needed here
 
     }
- 
 
- 
+
+
 app.whenReady().then(createWindow);
- 
-app.on('window-all-closed', async() => {    
+
+app.on('window-all-closed', async() => {
      save_on_exit();
-     
+
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
 //prevent external links
-app.on('web-contents-created', (event, contents) => { 
+app.on('web-contents-created', (event, contents) => {
         contents.on('will-navigate', (event, navigationUrl) => {
             event.preventDefault()});
         //prevent open new window
@@ -147,17 +143,17 @@ app.on('web-contents-created', (event, contents) => {
             event.defaultPrevented = true;
         });
     });
-    
-app.on('activate', () => {   
+
+app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }
-    
-    
-    
 
-    
-   
+
+
+
+
+
 //    contextBridge.exposeInMainWorld("app", {}
 //        ipcRenderer_invoke: (channel) => ipcRenderer.invoke("channel",channel)
 //        );
@@ -175,7 +171,7 @@ app.on('activate', () => {
 
 //    const electron = require('electron'),
 //            ipc = electron.ipcMain;
-//    require(".logic/wallet")();        
+//    require(".logic/wallet")();
 //    /* remaining code
 //     .
 //     .
