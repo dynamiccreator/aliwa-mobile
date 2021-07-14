@@ -89,18 +89,21 @@ jobs:
         run: npm run make
 
       - name: Check results
+        id: find_deliveries
         run: |
           pwd
           ls -la
           find . -name "*.deb"
           find . -name "*.rpm"
+          echo "::set-output name=aliwa_deb::$(find . -name '*.deb')"
+          echo "::set-output name=aliwa_rpm::$(find . -name '*.rpm')"
 
       - name: Upload DEB
         id: upload-deb-release-asset
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ github.workspace }}/out/make/deb/x64/aliwa*.deb
+          file: ${{ github.workspace }}/${{  steps.find_deliveries.outputs.aliwa_deb  }}
           asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}_amd64.deb
           tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
           overwrite: true
@@ -110,7 +113,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ github.workspace }}/out/make/rpm/x64/aliwa*.rpm
+          file: ${{ github.workspace }}/${{  steps.find_deliveries.outputs.aliwa_rpm  }}
           asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}.x86_64.rpm
           tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
           overwrite: true
