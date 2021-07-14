@@ -160,3 +160,6 @@ jobs:
           powershell "(Get-FileHash ALiWa.zip).Hash > ALiWa.sha256"
           powershell "(Get-Content ALiWa.sha256) | Out-File ALiWa.sha256 -Encoding ascii"
           type ALiWa.sha256
+
+      - name: Create installer
+        run: iscc inno-setup.iss
