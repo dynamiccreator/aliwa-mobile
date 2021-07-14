@@ -210,7 +210,7 @@ jobs:
           shasum -a 256 ${{ github.workspace }}/ALiWa.zip | awk '{ print $1 }' > ${{ github.workspace }}/ALiWa.sha256
           cat ${{ github.workspace }}/ALiWa.sha256
 
-      - name: Upload DMG
+      - name: Upload MacOS archive
         id: upload-dmg-release-asset
         uses: svenstaro/upload-release-action@v2
         with:
@@ -276,6 +276,7 @@ jobs:
         run: |
           powershell Invoke-WebRequest -Uri "https://github.com/aliascash/resources/raw/master/resources/Tor.libraries.Win64.zip" -OutFile Tor.libraries.Win64.zip
           powershell Expand-Archive Tor.libraries.Win64.zip
+          powershell Copy-Item -Path "Tor.libraries.Win64\Tor" -Destination "out\ALiWa-win32-x64\Tor" -Recurse
 
       - name: Create zip archive and sha256 checksum
         run: |
