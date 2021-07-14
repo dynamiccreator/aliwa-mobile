@@ -91,20 +91,33 @@ jobs:
       - name: Check results
         id: find_deliveries
         run: |
-          pwd
-          ls -la
-          find . -name "*.deb"
-          find . -name "*.rpm"
           echo "::set-output name=aliwa_deb::$(find . -name '*.deb')"
           echo "::set-output name=aliwa_rpm::$(find . -name '*.rpm')"
+
+      - name: Create sha256 checksum files
+        run: |
+          sha256sum ${{ github.workspace }}/${{ steps.find_deliveries.outputs.aliwa_deb }} | awk '{ print $1 }' > ${{ github.workspace }}/ALiWa.deb.sha256
+          cat ${{ github.workspace }}/ALiWa.deb.sha256
+          sha256sum ${{ github.workspace }}/${{ steps.find_deliveries.outputs.aliwa_rpm }} | awk '{ print $1 }' > ${{ github.workspace }}/ALiWa.rpm.sha256
+          cat ${{ github.workspace }}/ALiWa.rpm.sha256
 
       - name: Upload DEB
         id: upload-deb-release-asset
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ github.workspace }}/${{  steps.find_deliveries.outputs.aliwa_deb  }}
+          file: ${{ github.workspace }}/${{ steps.find_deliveries.outputs.aliwa_deb }}
           asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}_amd64.deb
+          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+          overwrite: true
+
+      - name: Upload DEB Checksum file
+        id: upload-deb-checksum-asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/ALiWa.deb.sha256
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}_amd64.sha256
           tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
           overwrite: true
 
@@ -113,8 +126,18 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ github.workspace }}/${{  steps.find_deliveries.outputs.aliwa_rpm  }}
+          file: ${{ github.workspace }}/${{ steps.find_deliveries.outputs.aliwa_rpm }}
           asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}.x86_64.rpm
+          tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
+          overwrite: true
+
+      - name: Upload RPM Checksum file
+        id: upload-rpm-checksum-asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/ALiWa.rpm.sha256
+          asset_name: ALiWa-${{ needs.prepareRelease.outputs.aliwa_release }}-${{ needs.prepareRelease.outputs.github_sha_short }}.x86_64.sha256
           tag: ${{ needs.prepareRelease.outputs.aliwa_release }}
           overwrite: true
 
