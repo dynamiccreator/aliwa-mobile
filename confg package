@@ -1,7 +1,7 @@
 --------fresh package.json---------
 {
   "name": "ALiWa",
-  "version": "0.0.8-TESTNET",
+  "version": "0.0.9-TESTNET",
   "author": "dynamiccreator",
   "description": "ALiWa (alpha) - A light wallet for the Alias crpytocurrency.",
   "main": "main.js",
