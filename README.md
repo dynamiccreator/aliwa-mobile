@@ -10,9 +10,11 @@ A light wallet for the [ALIAS](https://alias.cash/) cryptocurrency.
 
 ## Donations
 The easiest way to contribute to the Alias Light Wallet: Donate with ALIAS! 
-	
-	Public ALIAS address: SSq7CjsPzfanmCkcN9XhKHg7yMn3bXj8i5
-	Private ALIAS address: smYhZCsqgJdRkWB64GaLZ165HejRCL3tAkmDmxdCrG2McnuH7gReE3LjDoXLRqf3txrwiuE3BCpFFAADDbU1oYW4fr7y9MnU37U3AD
+
+```
+Public ALIAS address: SSq7CjsPzfanmCkcN9XhKHg7yMn3bXj8i5
+Private ALIAS address: smYhZCsqgJdRkWB64GaLZ165HejRCL3tAkmDmxdCrG2McnuH7gReE3LjDoXLRqf3txrwiuE3BCpFFAADDbU1oYW4fr7y9MnU37U3AD
+```
 
 ## WARNING: Experimental ALPHA Software
 **Please put no funds on this wallet, you're not willing to lose.
@@ -59,12 +61,18 @@ Now you're able to build on windows!
 2. `npm i --save-dev electron`
 3. `npm i -g @electron-forge/cli` (install electron-forge)
 4. `electron-forge import`
-5. (For ALiWa icon) Follow the **APP ICON INSTRUCTIONS** from the file `confg package`
-6. `npm install`  
+5. To setup the ALiWa icon follow the **APP ICON INSTRUCTIONS** from the file [confg package](confg%20package)
+6. `npm install`
 7. `npm run make`
-8. Download [tor-jul-2021.zip](https://github.com/dynamiccreator/aliwa-resources/raw/main/tor-jul-2021.zip) from the [aliwa-resources repository](https://github.com/dynamiccreator/aliwa-resources)
-9. Unzip it and copy the folder `tor-for-win` into the folder where your build is located (ALiWa.exe is in there)
-10. Use your preferred software (e.g. Inno Setup) to make an Windows Installer or zip it for shipping.
+8. Download [Tor.libraries.Win64.zip](https://github.com/aliascash/resources/blob/master/resources/Tor.libraries.Win64.zip) from the [Alias resources repository](https://github.com/aliascash/resources/tree/master/resources)
+9. Unzip it into the build folder `out/ALiWa-win32-x64`, where `ALiWa.exe is located.
+10. Zip folder `out/ALiWa-win32-x64` to create a simple archive with all required files.
+
+With [Inno Setup](https://jrsoftware.org/isinfo.php) and by using the configuration file [inno-setup.iss](), you're able to build an easy to use installer:
+
+```
+iscc inno-setup.iss
+```
 
 ### Windows 32 bit
 
@@ -90,11 +98,12 @@ Use the steps above but instead of step 7 use these steps:
 2. `npm i --save-dev electron`
 3. `npm i -g @electron-forge/cli` (install electron-forge)
 4. `electron-forge import`
-5. (For ALiWa icon) Follow the **APP ICON INSTRUCTIONS** from the file `confg package`
-8. Download [tor-jul-2021.zip](https://github.com/dynamiccreator/aliwa-resources/raw/main/tor-jul-2021.zip) from the [aliwa-resources repository](https://github.com/dynamiccreator/aliwa-resources)
-9. Unzip it and copy the folder `tor-for-mac` into the repository folder  
-7. `npm install`  
-8. `npm run make`
+5. To setup the ALiWa icon follow the **APP ICON INSTRUCTIONS** from the file [confg package](confg%20package)
+6. `npm install`
+7. `npm run make`
+8. Download [Tor.libraries.MacOS.zip](https://github.com/aliascash/resources/blob/master/resources/Tor.libraries.MacOS.zip) from the [Alias resources repository](https://github.com/aliascash/resources/tree/master/resources)
+9. Unzip it into the build folder `out/ALiWa-darwin-x64/ALiWa.app`.
+10. Zip folder `out/ALiWa-darwin-x64` to create a simple archive with all required files.
 
 ## Linux
 
@@ -112,5 +121,5 @@ Use the steps above but instead of step 7 use these steps:
 2. `npm i --save-dev electron`
 3. `npm i -g @electron-forge/cli` (install electron-forge)
 4. `electron-forge import`
-5. (For ALiWa icon) Follow the **APP ICON INSTRUCTIONS** from the file `confg package`
+5. To setup the ALiWa icon follow the **APP ICON INSTRUCTIONS** from the file [confg package](confg%20package)
 6. `npm run make`
