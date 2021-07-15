@@ -1,4 +1,11 @@
-# aliwa
+# ALiWa - Alias Light Wallet
+[![Latest release](https://img.shields.io/github/v/release/aliascash/aliwa?label=Release&color=%2300bf00)](https://github.com/aliascash/aliwa/releases/latest)
+[![Build Status Master](https://github.com/aliascash/aliwa/actions/workflows/build-master.yml/badge.svg)](https://github.com/aliascash/aliwa/actions)
+[![Latest develop build](https://img.shields.io/github/v/release/aliascash/aliwa?include_prereleases&label=Develop-Build)](https://github.com/aliascash/aliwa/releases)
+[![Build Status Develop](https://github.com/aliascash/aliwa/actions/workflows/build-develop.yml/badge.svg)](https://github.com/aliascash/aliwa/actions)
+[![Discord](https://img.shields.io/discord/426769724018524161?logo=discord)](https://discord.gg/ckkrb8m)
+[![Reddit](https://img.shields.io/badge/reddit-join-orange?logo=reddit)](https://www.reddit.com/r/AliasCash/)
+
 A light wallet for the [ALIAS](https://alias.cash/) cryptocurrency.
 
 ## Donations
@@ -14,19 +21,12 @@ Also don't restore from seeds which contains funds you're not willing to lose.**
 ## Download Binaries (public testnet)
 ALiWa will be supported by all major Desktop and Mobile platforms.
 
-* Desktop: Windows (7-10+), MacOS, Linux
+* **Windows** - **macOS** - **Linux DEB** - **Linux RPM**: [See latest release](https://github.com/aliascash/aliwa/releases/latest)
 * Mobile: Android & iOS under [aliwa-mobile](https://github.com/dynamiccreator/aliwa-mobile)
-*************************************************************************************************
-**WINDOWS** : [ALiWa-TESTNET-v0.0.8-Setup.exe](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-v0.0.8-Setup.exe), 32 bit :  [ALiWa-TESTNET-v0.0.8-Setup-32bit-T32.exe](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-v0.0.8-Setup-32bit-T32.exe)
 
-**MAC OS** :  [ALiWa-TESTNET-MAC-OS-0.0.8.zip](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-MAC-OS-0.0.8.zip)
+# Build
 
-**LINUX DEB** (Debian based, Debian,Ubuntu, ...) : [.deb package](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-DEBIAN-0.0.8.deb)
-
-**Linux RPM** (Red Hat based, Fedora, Suse, ...) : [.rpm package](https://github.com/dynamiccreator/aliwa/releases/download/0.0.8/ALiWa-TESTNET-RAT_HAT-0.0.8.rpm)
-*************************************************************************************************
-
-## Build from source (Windows)
+## Windows
 
 ### Requirements
 
@@ -38,7 +38,7 @@ ALiWa will be supported by all major Desktop and Mobile platforms.
 **It is recommended to install VisualStudio and select the above packages at the Installation process.**
 (I believe everything but Git can be selected there)
 
-### Windows Preparation Steps
+### Preparation Steps
 
 To build on Windows it is required to open a powershell as administrator and give "RemoteSigned" rights.
 
@@ -74,7 +74,7 @@ Use the steps above but instead of step 7 use these steps:
 
 7b. `npx electron-packager . ALiWa-32 --platform=win32 --arch=ia32 --icon=view_resources/img/aliwa_light.ico`
 
-## Build from source (Mac Os)
+## macOs
 
 ### Requirements
 
@@ -96,7 +96,7 @@ Use the steps above but instead of step 7 use these steps:
 7. `npm install`  
 8. `npm run make`
 
-## Build from source (Linux)
+## Linux
 
 ### Requirements
 
