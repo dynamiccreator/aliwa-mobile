@@ -74,7 +74,7 @@ Use the steps above but instead of step 7 use these steps:
 
 7b. `npx electron-packager . ALiWa-32 --platform=win32 --arch=ia32 --icon=view_resources/img/aliwa_light.ico`
 
-## macOs
+## macOS
 
 ### Requirements
 
