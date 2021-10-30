@@ -112,6 +112,24 @@ module.exports = function () {
         }
         return out;
     }
+    
+    minimal_zeros = function (num,min_z,max_z){
+        var s_num=num.toString();  
+        s_num=s_num.replace(",",".");
+        s_num_split=s_num.split(".");
+        var l=min_z;
+        if(s_num_split[1]!=undefined){      
+            for(var i=s_num_split[1].length-1;i>=min_z;i--){         
+                if(s_num_split[1][i]!=0){                  
+                    l=i+1;
+                    break;
+                }           
+            }
+        }
+        l=l>max_z ? max_z : l;
+        return new Big(num).toFixed(l);  
+    
+    }  
 
 };
 

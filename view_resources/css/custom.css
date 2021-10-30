@@ -180,6 +180,10 @@ background:#f38320;
     display:none !important;
 }
 
+.actions{
+    text-align: center !important;
+}
+
 @media only screen and (max-width: 767.98px){
     tr{
         border-bottom: 0.5rem solid #382b3f !important;  
@@ -192,6 +196,14 @@ background:#f38320;
     #view_transactions_table td:nth-child(1) {
     display:none !important;
   }
+  
+ /*  #view_transactions_table thead th:nth-child(3) {
+    display:none !important;
+  }
+    
+    #view_transactions_table td:nth-child(3) {
+    display:none !important;
+  }*/
   
    #view_transactions_table th:nth-child(4) {
     display:none !important;

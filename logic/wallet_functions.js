@@ -62,7 +62,7 @@ class wallet_functions {
         var output_hex = "" + int_toVarint8_fd(tx_input_data.outputs.length + narr_count); // output num
 
         for (var o = 0; o < tx_input_data.outputs.length; o++) {
-            output_hex += int_toVarint_byte(Math.floor(numeral(tx_input_data.outputs[o].amount).multiply(100000000).value()), 8); // Math.floor because of javascript adding some 0.000000000001 at the end after multiplying 
+            output_hex += int_toVarint_byte(Math.floor(new Big(tx_input_data.outputs[o].amount).times(100000000).toNumber()), 8); // Math.floor because of javascript adding some 0.000000000001 at the end after multiplying 
             output_hex += int_toVarint_byte(25, 1);// script length  
             output_hex += "76a914" + bs58_2.decode(tx_input_data.outputs[o].destination_address).toString("hex").substr(2, 40) + "88ac";//output script            
             //build narration if available

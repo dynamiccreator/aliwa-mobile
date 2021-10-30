@@ -339,9 +339,9 @@ class db_wallet {
         
         var tx_list_arr = temp_tx_list.find();
 //       console.log(tx_list_arr);process.exit(); 
-        var tx_sum = numeral(0);      
-        var balance_available= numeral(0);
-        var balance_total= numeral(0);
+        var tx_sum = new Big(0);      
+        var balance_available= new Big(0);
+        var balance_total= new Big(0);        
         for (var i = 0; i < tx_list_arr.length; i++) {
             try {
                 var temp_tx = temp_tx_list.findOne({'tx': {'$aeq': tx_list_arr[i].tx}});
@@ -351,8 +351,8 @@ class db_wallet {
 
 
                 temp_tx.wallet.tx = tx_list_arr[i].tx;
-                temp_tx.wallet.self_balance = numeral(0);
-                temp_tx.wallet.fee = numeral(0);
+                temp_tx.wallet.self_balance = new Big(0);
+                temp_tx.wallet.fee = new Big(0);
                 temp_tx.wallet.is_self = false;
                 temp_tx.wallet.mature = -1;
 
@@ -366,7 +366,7 @@ class db_wallet {
                         temp_tx.inputs[j].scriptPubKey = matching_output.scriptPubKey;
 
                         //fee
-                        temp_tx.wallet.fee.add(temp_tx.inputs[j].value);
+                        temp_tx.wallet.fee=temp_tx.wallet.fee.plus(temp_tx.inputs[j].value);
                     } else {
 //                        console.error("no output found for tx:" + tx_list_arr[i].tx + " | input index: " + j);
                     }
@@ -395,11 +395,11 @@ class db_wallet {
                         }
                     }
                     if (is_self) {
-                        temp_tx.wallet.self_balance.subtract(temp_tx.inputs[j].value);
+                        temp_tx.wallet.self_balance=temp_tx.wallet.self_balance.minus(temp_tx.inputs[j].value);
                         temp_tx.wallet.is_self = true;
 
-                        balance_total.subtract(temp_tx.inputs[j].value);
-                        balance_available.subtract(temp_tx.inputs[j].value);                      
+                        balance_total=balance_total.minus(temp_tx.inputs[j].value);                                              
+                        balance_available=balance_available.minus(temp_tx.inputs[j].value);                      
                     }
                     temp_tx.wallet.send_from.push({from_address: temp_tx.inputs[j].from_address, value: temp_tx.inputs[j].value, self: is_self,address_type:address_type});
 
@@ -408,7 +408,7 @@ class db_wallet {
                 for (var j = 0; j < temp_tx.outputs.length; j++) {
 
                     //fee
-                    temp_tx.wallet.fee.subtract(temp_tx.outputs[j].value);
+                    temp_tx.wallet.fee=temp_tx.wallet.fee.minus(temp_tx.outputs[j].value);
 
                     var is_self = false;
                     var address_type=-1;
@@ -447,18 +447,18 @@ class db_wallet {
                     temp_tx.wallet.mature = temp_tx.outputs[j].mature;
 
                     if (is_self) {
-                        temp_tx.wallet.self_balance.add(temp_tx.outputs[j].value);
+                        temp_tx.wallet.self_balance=temp_tx.wallet.self_balance.add(temp_tx.outputs[j].value);
                         temp_tx.wallet.is_self = true;
                                                
-                        balance_total.add(temp_tx.outputs[j].value);
+                        balance_total=balance_total.plus(temp_tx.outputs[j].value);                                              
                         if ((temp_tx.wallet.mature == 0 && temp_tx.wallet.height < (data.to - 450)) || (temp_tx.wallet.mature == 1 && temp_tx.wallet.height <= data.to) /*|| (temp_tx.wallet.mature == 1 && temp_tx.wallet.height < (data.to - 6))*/) {
-                            balance_available.add(temp_tx.outputs[j].value);
+                            balance_available=balance_available.plus(temp_tx.outputs[j].value);
                         } 
                     }
                 }
 
-                temp_tx.wallet.self_balance = temp_tx.wallet.self_balance.format('0.00000000');
-                temp_tx.wallet.fee = temp_tx.wallet.fee.format('0.00000000');
+                temp_tx.wallet.self_balance = temp_tx.wallet.self_balance.toFixed(8);
+                temp_tx.wallet.fee = temp_tx.wallet.fee.toFixed(8);
 
 
                 temp_tx_list.update(temp_tx);
@@ -486,8 +486,8 @@ class db_wallet {
                 if(temp_tx.wallet.is_self && is_new_tx && temp_tx.wallet.time > (Math.floor((new Date()).getTime() / 1000)-24*3600))
                 {
                     notification_txs.push({time:temp_tx.wallet.time,
-                    title:("ALIAS "+(numeral(temp_tx.wallet.self_balance).value()>0 ? "received" : "sent")),
-                    body:((numeral(temp_tx.wallet.self_balance).value()>0 ? "+" : "")+numeral(temp_tx.wallet.self_balance).format("0.00[000000]"))});
+                    title:("ALIAS "+(new Big(temp_tx.wallet.self_balance).toNumber()>0 ? "received" : "sent")),
+                    body:((new Big(temp_tx.wallet.self_balance).toNumber()>0 ? "+" : "")+minimal_zeros(temp_tx.wallet.self_balance,2,8))});
                 }
                 
                 
@@ -497,16 +497,16 @@ class db_wallet {
             }
 //            console.log("tx:" + tx_list_arr[i].tx + "############################");
             var my_self_balance = temp_tx_list.findOne({tx: {'$aeq': tx_list_arr[i].tx}}).wallet.self_balance;
-            tx_sum.add(parseFloat(my_self_balance));
+            tx_sum=tx_sum.plus(parseFloat(my_self_balance));
         }
         
-        var balance_unconfirmed= numeral(0);
-        balance_unconfirmed.add(balance_total.value());
-        balance_unconfirmed.subtract(balance_available.value());
+        var balance_unconfirmed= new Big(0);
+        balance_unconfirmed=balance_unconfirmed.plus(balance_total.toNumber());
+        balance_unconfirmed=balance_unconfirmed.minus(balance_available.toNumber());
 //        console.log("balance_unconfirmed: "+balance_unconfirmed.format('0.00000000'));
 //        console.log("balance_available: "+balance_available.format('0.00000000'));
 //        console.log("balance_total: "+balance_total.format('0.00000000'));
-        this.update_config({balance:{unconfirmed:balance_unconfirmed.format('0.00000000'),available:balance_available.format('0.00000000'),total:balance_total.format('0.00000000')}});
+        this.update_config({balance:{unconfirmed:balance_unconfirmed.toFixed(8),available:balance_available.toFixed(8),total:balance_total.toFixed(8)}});
         
 
      /*   var trans_arr = transactions.chain().find().simplesort("height", {desc: true}).data({forceClones: true});
@@ -721,6 +721,10 @@ class db_wallet {
     }
     
     update_transaction_views(transactions){
+        var contact_addresses = this.get_contact_addresses();
+        var receive_addresses = this.get_receive_addresses();
+        
+        
         var db_transaction_views = this.db.getCollection("transaction_views");
         if (db_transaction_views == null) {           
             db_transaction_views = this.db.addCollection("transaction_views", {unique: ["combined_key"]});
@@ -738,16 +742,16 @@ class db_wallet {
                     if (destinations != null) {
                         var has_note=false;
                         for (var j = 0; j < destinations.length; j++) {
-                            if(destinations[j].self && destinations[j].note!=undefined){
-                                db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + 0), time: trans_copy[i].time, human_time: (new Date(numeral(trans_copy[i].time).multiply(1000).value()).toLocaleString()),height: trans_copy[i].height,
-                                    type: "self sent", address: "(n/a)", value: ((value>=0 ? "+" : "")+numeral(value).format("0.00[000000]")),note:destinations[j].note, mature:trans_copy[i].mature,blockhash:trans_copy[i].blockhash});
+                            if(destinations[j].self && destinations[j].note!=undefined){                                 
+                                db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + 0), time: trans_copy[i].time, human_time: (new Date(parseInt(new Big(trans_copy[i].time).times(1000).toNumber())).toLocaleString()),height: trans_copy[i].height,
+                                    type: "self sent", address: "(n/a)", value: ((value>=0 ? "+" : "")+minimal_zeros(value,2,8)),note:destinations[j].note, mature:trans_copy[i].mature,blockhash:trans_copy[i].blockhash});
                                 has_note=true;
                                 break;
                             }
                         }
                         if(!has_note){
-                            db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + 0), time: trans_copy[i].time, human_time: (new Date(numeral(trans_copy[i].time).multiply(1000).value()).toLocaleString()),height: trans_copy[i].height,
-                                type: "self sent", address: "(n/a)", value: ((value>=0 ? "+" : "")+numeral(value).format("0.00[000000]")), mature:trans_copy[i].mature,blockhash:trans_copy[i].blockhash});
+                            db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + 0), time: trans_copy[i].time, human_time: (new Date(parseInt(new Big(trans_copy[i].time).times(1000).toNumber())).toLocaleString()),height: trans_copy[i].height,
+                                type: "self sent", address: "(n/a)", value: ((value>=0 ? "+" : "")+minimal_zeros(value,2,8)), mature:trans_copy[i].mature,blockhash:trans_copy[i].blockhash});
                             }
                         }
                     }
@@ -757,8 +761,8 @@ class db_wallet {
                         var first_used = false;
                         for (var j = 0; j < destinations.length; j++) {
                             if (destinations[j].self && destinations[j].address_type==0) {
-                                db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + j), time: trans_copy[i].time, human_time: (new Date(numeral(trans_copy[i].time).multiply(1000).value()).toLocaleString()), height: trans_copy[i].height,
-                                type: trans_copy[i].mature== 0 ? "staked" : "received", address: destinations[j].address, value: "+"+numeral(destinations[j].value).format("0.00[000000]"),note:destinations[j].note, mature:trans_copy[i].mature,blockhash:trans_copy[i].blockhash});
+                                db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + j), time: trans_copy[i].time, human_time: (new Date(new Big(trans_copy[i].time).times(1000).toNumber()).toLocaleString()), height: trans_copy[i].height,
+                                type: trans_copy[i].mature== 0 ? "staked" : "received", address: destinations[j].address,address_label:this.get_label(destinations[j].address,contact_addresses,receive_addresses) ,value: "+"+minimal_zeros(destinations[j].value,2,8),note:destinations[j].note, mature:trans_copy[i].mature,blockhash:trans_copy[i].blockhash});
                             }
                         }
                     }
@@ -772,11 +776,11 @@ class db_wallet {
                             if (!destinations[j].self) {
                                 var value = destinations[j].value;
                                 if (!first_used) {
-                                    value = numeral(destinations[j].value).add(trans_copy[i].fee).value();
+                                    value = new Big(destinations[j].value).plus(trans_copy[i].fee).toNumber();
                                     first_used = true;
                                 }
-                                db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + j), time: trans_copy[i].time, human_time: (new Date(numeral(trans_copy[i].time).multiply(1000).value()).toLocaleString()), height: trans_copy[i].height,
-                                    type: "sent", address: destinations[j].address, value: "-"+numeral(value).format("0.00[000000]"),note:destinations[j].note, mature:trans_copy[i].mature,blockhash:trans_copy[i].blockhash});
+                                db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + j), time: trans_copy[i].time, human_time: (new Date(new Big(trans_copy[i].time).times(1000).toNumber()).toLocaleString()), height: trans_copy[i].height,
+                                    type: "sent", address: destinations[j].address,address_label:this.get_label(destinations[j].address,contact_addresses,receive_addresses), value: "-"+minimal_zeros(value,2,8),note:destinations[j].note, mature:trans_copy[i].mature,blockhash:trans_copy[i].blockhash});                           
                             }
                         }//end of j-for
                     }
@@ -861,14 +865,14 @@ class db_wallet {
         var collector={};
         
         
-        collector.sum=numeral(0);
+        collector.sum=new Big(0);
         collector.array=[];
         
         //first try to select only from fully confirmed utxos
         //try to find exact match
         for (var i = 0; i < unspent_arr_fully.length; i++) {
             if (unspent_arr_fully[i].value == amount) {
-                collector.sum.add(unspent_arr_fully[i].value);
+                collector.sum=collector.sum.plus(unspent_arr_fully[i].value);
                 collector.array.push(unspent_arr_fully[i]);
                 collector.is_total = false;
                 return collector;
@@ -876,17 +880,17 @@ class db_wallet {
         }
                
         var i=0;
-        while((collector.sum.value()<amount || (collector.sum.value()-amount)<dust_threshold && i<4) && collector.sum.value()!=balance && collector.sum.value()!=amount && i<unspent_arr_fully.length){
-            collector.sum.add(unspent_arr_fully[i].value);
+        while((collector.sum.toNumber()<amount || (collector.sum.toNumber()-amount)<dust_threshold && i<4) && collector.sum.toNumber()!=balance && collector.sum.toNumber()!=amount && i<unspent_arr_fully.length){
+            collector.sum=collector.sum.plus(unspent_arr_fully[i].value);
             collector.array.push(unspent_arr_fully[i]);     
             i++;           
         }
         collector.is_total=false;
-        if(collector.sum.value()>=amount){return collector;}
+        if(collector.sum.toNumber()>=amount){return collector;}
         
              
         //*** select from all available utxo (1 conf. min.)
-        collector.sum=numeral(0);
+        collector.sum=new Big(0);
         collector.array=[];
         
         if(amount>balance){
@@ -896,7 +900,7 @@ class db_wallet {
         //try to find exact match
         for (var i = 0; i < unspent_arr.length; i++) {
             if (unspent_arr[i].value == amount) {
-                collector.sum.add(unspent_arr[i].value);
+                collector.sum=collector.sum.plus(unspent_arr[i].value);
                 collector.array.push(unspent_arr[i]);
                 collector.is_total = (collector.array.length == unspent_arr.length);
                 return collector;
@@ -904,8 +908,8 @@ class db_wallet {
         }
               
         var i=0;
-        while((collector.sum.value()<amount || (collector.sum.value()-amount)<dust_threshold) && collector.sum.value()!=balance && collector.sum.value()!=amount && i<unspent_arr.length){
-            collector.sum.add(unspent_arr[i].value);
+        while((collector.sum.toNumber()<amount || (collector.sum.toNumber()-amount)<dust_threshold) && collector.sum.toNumber()!=balance && collector.sum.toNumber()!=amount && i<unspent_arr.length){
+            collector.sum=collector.sum.plus(unspent_arr[i].value);
             collector.array.push(unspent_arr[i]);     
             i++;           
         }
@@ -1100,6 +1104,21 @@ class db_wallet {
         }
         
         return db_aliwa_server_addresses;
+    }
+    
+    get_label(address,contact_addresses,receive_addresses) {       
+        var result = address;
+        var label = contact_addresses.findOne({'address': {'$aeq': address}});
+        if (label == null) {
+            label = receive_addresses.findOne({'address': {'$aeq': address}});
+        }
+
+        if (label == null) {         
+        } else {
+            result=label.label;
+        }
+
+        return result;
     }
     
                
