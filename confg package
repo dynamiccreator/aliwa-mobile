@@ -16,7 +16,7 @@
     "elliptic": "*",
     "hdkey": "*",
     "lokijs": "*",
-    "numeral": "*",
+    "big.js" : "*",
     "path": "*",
     "socket.io-client": "*",
     "socks-proxy-agent": "*"
