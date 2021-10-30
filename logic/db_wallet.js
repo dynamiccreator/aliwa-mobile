@@ -447,7 +447,7 @@ class db_wallet {
                     temp_tx.wallet.mature = temp_tx.outputs[j].mature;
 
                     if (is_self) {
-                        temp_tx.wallet.self_balance=temp_tx.wallet.self_balance.add(temp_tx.outputs[j].value);
+                        temp_tx.wallet.self_balance=temp_tx.wallet.self_balance.plus(temp_tx.outputs[j].value);
                         temp_tx.wallet.is_self = true;
                                                
                         balance_total=balance_total.plus(temp_tx.outputs[j].value);                                              
@@ -743,14 +743,14 @@ class db_wallet {
                         var has_note=false;
                         for (var j = 0; j < destinations.length; j++) {
                             if(destinations[j].self && destinations[j].note!=undefined){                                 
-                                db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + 0), time: trans_copy[i].time, human_time: (new Date(parseInt(new Big(trans_copy[i].time).times(1000).toNumber())).toLocaleString()),height: trans_copy[i].height,
+                                db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + 0), time: trans_copy[i].time, human_time: (new Date(new Big(trans_copy[i].time).times(1000).toNumber()).toLocaleString()),height: trans_copy[i].height,
                                     type: "self sent", address: "(n/a)", value: ((value>=0 ? "+" : "")+minimal_zeros(value,2,8)),note:destinations[j].note, mature:trans_copy[i].mature,blockhash:trans_copy[i].blockhash});
                                 has_note=true;
                                 break;
                             }
                         }
                         if(!has_note){
-                            db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + 0), time: trans_copy[i].time, human_time: (new Date(parseInt(new Big(trans_copy[i].time).times(1000).toNumber())).toLocaleString()),height: trans_copy[i].height,
+                            db_transaction_views.insert({tx: trans_copy[i].tx, num: j, combined_key: (tx + ":" + 0), time: trans_copy[i].time, human_time: (new Date(new Big(trans_copy[i].time).times(1000).toNumber()).toLocaleString()),height: trans_copy[i].height,
                                 type: "self sent", address: "(n/a)", value: ((value>=0 ? "+" : "")+minimal_zeros(value,2,8)), mature:trans_copy[i].mature,blockhash:trans_copy[i].blockhash});
                             }
                         }

@@ -1160,13 +1160,13 @@ async function get_max_amount(destinations_for_send){
      
      
         var base_fee=0.0001;
-        destinations[transaction_current_send_number].amount=new Big(destinations[transaction_current_send_number].amount).minus(base_fee).toFixed(8); 
+        destinations[transaction_current_send_number].amount=new Big(destinations[transaction_current_send_number].amount).minus(base_fee).toNumber(); 
 //        var start=new Date().getUTCMilliseconds();
         
         
         var fee=await window.electron.ipcRenderer_invoke("get_fee",destinations);
         if(fee.exceed!=undefined){
-           destinations[transaction_current_send_number].amount=new Big(destinations[transaction_current_send_number].amount).minus(fee.exceed).toFixed(8);
+           destinations[transaction_current_send_number].amount=new Big(destinations[transaction_current_send_number].amount).minus(fee.exceed).toNumber();
            var max=destinations[transaction_current_send_number].amount;
 //            console.log("wait: "+(new Date().getUTCMilliseconds()-start));
            return {max:max,fee:new Big(base_fee).plus(fee.exceed).toFixed(8)};
@@ -3622,27 +3622,7 @@ function autocomplete_bip39(input,seed_words){
     return outlist;   
 }
 
-/*function bug_fixed_numeral_format(value,format){         
-        var final_converted_value=numeral(value).format(format);
-        if(final_converted_value == "NaN" || final_converted_value== NaN ){
-			try {
-				final_converted_value=value;
-				var string_f_value=final_converted_value.toString();
-				var zeros=string_f_value.split("-")[1];
-				var val=string_f_value.split("e")[0];
-				var zeros_t="0.";for(var i=0;i<zeros-1;i++){zeros_t+="0";}
-				final_converted_value=zeros_t+val.replace(".","");
-				var round_value=0;
-				if(parseInt(final_converted_value.substring(10,11)) >=5){round_value=1;}
-				final_converted_value=final_converted_value.substring(0,9)+(parseInt(final_converted_value.substring(9,10))+round_value);
-				
-				}
-			catch(e){}
-			
-			}
-        return final_converted_value;     
-}*/
-                                                
+                                             
 function minimal_zeros(num,min_z,max_z){
     var s_num=num.toString();  
     s_num=s_num.replace(",",".");
