@@ -265,6 +265,8 @@ class aliwa_wallet{
     update_from_server(data){        
         var cnf=this.db_wallet.get_config_values(); 
         
+        this.db_wallet.update_config({server_mode:data.server_mode});
+        
         //prices and server donation
         this.db_wallet.update_config({alias_prices:data.alias_prices}); 
         if(data.server_donation_address!=null){
@@ -673,6 +675,7 @@ class aliwa_wallet{
         info.server_name=cnf.aliwa_server_address_label;
         info.server_address=cnf.aliwa_server_address;
         info.is_over_tor=cnf.aliwa_server_address.includes(".onion");
+        info.server_mode=cnf.server_mode;
             
         return info;
         
