@@ -396,6 +396,7 @@ async function set_about() {
     $("#view_about_server_label").text(server_infos.server_name);
     $("#view_about_server_address").text(server_infos.server_address);
     $("#view_about_is_tor").text((server_infos.is_over_tor ? "Yes" : "No"));
+    $("#view_about_server_type").text(server_infos.server_mode);
 }
 
 async function set_balance() {
