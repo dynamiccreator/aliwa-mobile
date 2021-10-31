@@ -558,8 +558,9 @@ function view_send(user_inputs){
     $("body").fadeIn(100,"easeInOutQuad");
     
     $("#view_back_overview").off("click").on("click",function(){
-        fill_send_form(false);
-         view_overview();
+       /* fill_send_form(false);
+         view_overview();*/
+        clear_send_form();  
      });
      $("#view_back_current").off("click").on("click",function(){
          fill_send_form(false);
@@ -2364,7 +2365,8 @@ async function transactions_pagination(){
         line.find("td:nth-child(1) h4 div div").text(""+(confirmations>0 ? (confirmations>1 ? "Confirmations" : "Confirmation") : "Unknown"));
         
                
-        line.find("td:nth-child(2) ").html('<i class="ui '+confirm_symbol+' icon large desktop_hide"></i>'+date);
+        line.find("td:nth-child(2) ").html('<i class="ui '+confirm_symbol+' icon large desktop_hide"></i>'+date
+                +'<button class="ui icon button right huge desktop_hide view_transaction_list_chevron"> <i class="icon inverted white right  chevron"></i></button>');
         //line.find("td:nth-child(2) ").html('<i class="ui '+confirm_symbol+' icon large desktop_hide right"></i>'+"&nbsp;&nbsp;"+'<span class="desktop_hide" style="font-size:1.2rem;">'+value+"</span>"+"&nbsp;&nbsp;"+date);
         
         //value

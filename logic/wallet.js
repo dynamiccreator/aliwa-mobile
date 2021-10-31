@@ -822,7 +822,7 @@ class aliwa_wallet{
 
                     var tx_size_2 = build_tx_2.length / 2; // 2 hex len  -> 1 byte len 
                     var total_fee_2=new Big((Math.ceil((tx_size_2+10)/1000))).times(this.const_fee).toNumber();
-                    if(new Big(total_fee).subtract(total_fee_2).toNumber() == this.const_fee){
+                    if(new Big(total_fee).minus(total_fee_2).toNumber() == this.const_fee){
 //                        console.log("destinations:",destinations)
                         return {hex:build_tx_2,
                                fee: new Big(total_fee_2).plus( new Big(change_amount).minus(this.const_fee).toNumber() ).toNumber(),
