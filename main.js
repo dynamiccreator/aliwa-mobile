@@ -101,8 +101,8 @@ app.commandLine.appendSwitch("use-gl","desktop"); //prevent graphical glitches (
 
 function createWindow () {
   const win = new BrowserWindow({
-    width: 800,
-    height: 960,
+    width: 400,
+    height: 750,
  //   resizable: false,
 //        frame: false ,
     webPreferences: {

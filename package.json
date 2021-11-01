@@ -1,8 +1,8 @@
 {
   "name": "ALiWa",
-  "version": "0.0.8-TESTNET",
+  "version": "0.0.9-TESTNET",
   "author": "dynamiccreator",
-  "description": "ALiWa (alpha) - A light wallet for the Alias crpytocurrency.",
+  "description": "ALiWa (alpha) - A light wallet for the Alias cryptocurrency.",
   "main": "main.js",
   "license": "(MIT) UNLICENSED",
   "contributors": [],
@@ -15,7 +15,7 @@
     "elliptic": "*",
     "hdkey": "*",
     "lokijs": "*",
-    "numeral": "*",
+    "big.js" : "*",
     "path": "*",
     "socket.io-client": "*",
     "socks-proxy-agent": "*"

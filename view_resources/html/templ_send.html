@@ -1,48 +1,48 @@
-<div class="ui segment" style="background: #594663;margin: auto;width:95%;max-width: 50rem;margin-top:6rem">
+<div class="ui segment" style="background: #594663;margin: auto;width:95%;max-width: 50rem;margin-top:5rem;height:calc(100vh - 5.5rem);">
     <div style="margin: auto;text-align: center;">
     <div style="text-align: left">
 
-            <span class="aliwa_input_label">Send To</span> <br>
-        <div style="float:left; width:75%;">
+       <!--     <span class="aliwa_input_label">Send To</span> <br>-->
+        <div style="float:left; width:calc(100% - 10rem);">
             <div class="ui input large fluid" style="margin-top:0.5rem;">
-                <input id="view_send_input_destination" type="text" value="" class="aliwa_input_field" placeholder="Destination Address">
+                <input id="view_send_input_destination" type="text" value="" class="aliwa_input_field" placeholder="Send To">
                 <i id="view_send_input_destination_clear" class="times link icon white inverted large" style="margin-top: 0.5rem"></i>
             </div>    
         </div>
-        <div style="float:left;text-align: right; width:25%;">                      
-            <button id="view_send_button_copy" class="ui teal right icon button massive" style="background: none;">
+        <div style="float:left;text-align: right; width:10rem;">                      
+            <button id="view_send_button_copy" class="ui teal right icon button huge" style="background: none;">
                 <i class="inverted copy icon"></i>
             </button>
             <!--<button id="view_send_button_scan" class="ui teal right icon button massive disabled" style="background: none;">
                 <i class="inverted expand icon"></i>
 
             </button> -->
-            <button id="view_send_button_address_book" class="ui teal right icon button massive" style="background: none;">
+            <button id="view_send_button_address_book" class="ui teal right icon button huge" style="background: none;">
                 <i class="book icon"></i>
             </button>
         </div>
         <div style="clear: both"></div>
 
-         <span class="aliwa_input_label aliwa_input_label_distance">Label</span> <br>
+         <!--<span class="aliwa_input_label aliwa_input_label_distance">Label</span> <br>-->
 
         <div class="ui input large fluid" style="margin-top:0.5rem;">
-            <input id="view_send_input_label" type="text" value="" class="aliwa_input_field" placeholder="(optional)">
+            <input id="view_send_input_label" type="text" value="" class="aliwa_input_field" placeholder="Label (optional)">
             <i id="view_send_input_label_clear" class="times link icon white inverted large" style="margin-top: 0.5rem"></i>
         </div>
 
-        <br>
-         <span class="aliwa_input_label aliwa_input_label_distance">Note</span> <br>
+        
+        <!-- <span class="aliwa_input_label aliwa_input_label_distance">Note</span> <br>-->
 
         <div class="ui input large fluid" style="margin-top:0.5rem;">
-            <input id="view_send_input_note" type="text" value="" class="aliwa_input_field" placeholder="(optional) max. 24 characters">
+            <input id="view_send_input_note" type="text" value="" class="aliwa_input_field" placeholder="Note (optional) - max. 24 characters">
             <i id="view_send_input_note_clear" class="times link icon white inverted large" style="margin-top: 0.5rem"></i>
         </div>
 
         <br>
 
-        <div style="float: left;width: 55%;">
-          <span class="aliwa_input_label aliwa_input_label_distance">Amount</span>  
-            <br>
+        <div style="float: left;width: calc(100% - 9rem);">
+         <!-- <span class="aliwa_input_label aliwa_input_label_distance">Amount</span>  
+            <br>-->
 
             <div class="ui input large fluid" style="margin-top:0.5rem;">
                 <input id="view_send_input_amount" type="text" value="" class="aliwa_input_field" style= "font-family:aliwa_mono;" placeholder="0.00000000">
@@ -53,18 +53,18 @@
 
         </div>
 
-        <div style="float: left;width: 45%;">            
+        <div style="float: left;width: 9rem;">            
             <div style="float:left;margin-left: 0.5rem;">              
-                <span style="color: #f38320;font-size: 1.5rem;margin-top: 4.0rem;display: inline-block;">ALIAS</span> <br>
-                <span id="send_currency_label" style="color: #8a8c8e;font-size: 1.5rem;margin-top: 1.3rem;display: inline-block;">
+                <span style="color: #f38320;font-size: 1.1rem;margin-top: 1.3rem;display: inline-block;">ALIAS</span> <br>
+                <span id="send_currency_label" style="color: #8a8c8e;font-size: 1.1rem;margin-top: 1.3rem;display: inline-block;">
                      
                 <!-- <button class="ui icon button">
                    
                 </button> -->
                 </span> 
             </div>
-            <div id="view_send_button_max_amount" style="float:right;"> <button class="ui right icon button large white" style="background: #fff;margin-top: 1.5rem;">
-                  <i class="white sort amount up icon"></i>  Max.
+            <div id="view_send_button_max_amount" style="float:right;"> <button class="ui right icon button medium white" style="background: #fff;margin-top: 1.5rem;">
+                  <i class="white sort amount up icon"></i>All
                 </button></div>  
 
         </div>                  
@@ -82,24 +82,25 @@
             <div style="clear: both;"></div>
          </div>
 
-        <button id="view_send_button_clear" class="ui icon button white large" style="background: #fff;margin-top:1.5rem;margin-left:2rem;">
+    <!--    <button id="view_send_button_clear" class="ui icon button white large" style="background: #fff;margin-top:1.5rem;margin-left:2rem;">
                 <i class="times icon"></i> Clear
-            </button>
-            <button id="view_send_button_add" class="ui icon button white large" style="background: #fff;margin-top:1.5rem;margin-left:2rem;float:right;">
-                <i class="plus icon"></i><span>&nbsp;Add</span>
-            </button>
-            <div id="view_send_button_show_list" class="ui labeled button" tabindex="0" style="background: #fff;margin-top:1.5rem;margin-left:2rem;float:right;">
+            </button> -->
+            <div id="view_send_button_show_list" class="ui labeled button" tabindex="0" style="background: #fff;margin-top:0rem;float:left;">
                 <div class="ui icon button white large" style="background: #fff;">
                     <i class="list icon"></i>  Show List
                 </div>
                 <a id="view_send_button_show_list_number" class="ui basic left pointing label">
                     0
                 </a>
-            </div>     
+            </div>
+            <button id="view_send_button_add" class="ui icon button white large" style="background: #fff;margin-top:0rem;float:right;">
+                <i class="plus icon"></i><span>&nbsp;Add</span>
+            </button>          
             <br>
-        
-        <div style="margin: auto;text-align: center;">                       
-            <button id="view_send_button_send_transaction" class="ui icon button alias_orange_button2 massive" style="margin-top:1.5rem;width:20rem;">
+            <div style="clear: both;"></div>
+            
+        <div style="margin: auto;text-align: center;margin-top:1rem;">                       
+            <button id="view_send_button_send_transaction" class="ui icon button alias_orange_button2 massive" style="margin-top:calc(100vh - 40rem);width:20rem;">
                 Send
             </button>
         </div>

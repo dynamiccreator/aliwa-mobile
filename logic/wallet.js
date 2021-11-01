@@ -4,7 +4,8 @@ aes256 = require("aes256");
 
 crypto = require('crypto');
 
-numeral = require('numeral');
+//numeral = require('numeral');
+Big = require('big.js');
 
 io = require('socket.io-client');
 
@@ -263,6 +264,8 @@ class aliwa_wallet{
     
     update_from_server(data){        
         var cnf=this.db_wallet.get_config_values(); 
+        
+        this.db_wallet.update_config({server_mode:data.server_mode});
         
         //prices and server donation
         this.db_wallet.update_config({alias_prices:data.alias_prices}); 
@@ -672,6 +675,7 @@ class aliwa_wallet{
         info.server_name=cnf.aliwa_server_address_label;
         info.server_address=cnf.aliwa_server_address;
         info.is_over_tor=cnf.aliwa_server_address.includes(".onion");
+        info.server_mode=cnf.server_mode;
             
         return info;
         
@@ -681,6 +685,8 @@ class aliwa_wallet{
         // returns the number of all transactions 
         // + an array of transactions ordered by order_field in acsending or descending order based on direction from page "page" 
         // (e.g. page 1 shows transactions 1-20)
+        order_field = order_field == "address" ? "address_label" : order_field;
+        
         var txs = this.db_wallet.get_txs();
         var result = [];
         if(search==undefined || search==null || search ==""){
@@ -702,6 +708,7 @@ class aliwa_wallet{
                     {"human_time": {'$contains': search}},
                     {"type": {'$contains': search}},
                     {"address": {'$contains': search}},
+                    {"address_label": {'$contains': search}},
                     {"value": {'$contains': search}},
                     {"note": {'$contains': search}},
                     {"blockhash": {'$contains': search}}
@@ -749,20 +756,21 @@ class aliwa_wallet{
         if(fee_only!=true && this.sync_state=="syncing"){            
             return "server_not_synced";
         }       
-        var amount=numeral(0);
+        var amount=new Big(0);
         for(var i=0;i<destinations.length;i++){
-            amount.add(destinations[i].amount);
+            amount=amount.plus(destinations[i].amount);
+            console.log("correct value ? :",(destinations[i].amount));
         }
         if(fee==undefined){fee=this.const_fee;}
-        amount.add(fee);
+        amount=amount.plus(fee);
               
-        if(utxo_result==undefined){utxo_result= this.db_wallet.get_inputs_for_transaction(amount.value());}
+        if(utxo_result==undefined){utxo_result= this.db_wallet.get_inputs_for_transaction(amount.toNumber());}
         var utxo = utxo_result.array;
 //        console.log("utxo_result:"+utxo_result);
-        if(utxo_result != false && amount.value()>utxo_result.sum.value()){
+        if(utxo_result != false && amount.toNumber()>utxo_result.sum.toNumber()){
             if(utxo_result.is_total){
-                console.error("amount exeeds balance("+utxo_result.sum.value()+") by: "+(numeral(amount.value()).subtract(utxo_result.sum.value()).value()));              
-                if(fee_only){return {exceed:numeral(amount.value()).subtract(utxo_result.sum.value()).value()};}
+                console.error("amount exeeds balance("+utxo_result.sum.toNumber()+") by: "+(new Big(amount.toNumber()).minus(utxo_result.sum.toNumber()).toNumber()));              
+                if(fee_only){return {exceed:new Big(amount.toNumber()).minus(utxo_result.sum.toNumber()).toNumber()};}
                 else{return false;}
                 
             }
@@ -795,10 +803,10 @@ class aliwa_wallet{
             
                 
             var dest_copy=JSON.parse(JSON.stringify(destinations));
-            var change_amount=numeral(utxo_result.sum.value()).subtract(amount.value()).value();
+            var change_amount=new Big(utxo_result.sum.toNumber()).minus(amount.toNumber()).toNumber();
 //            console.log("change_amount:"+change_amount);  
             var has_change=false;
-            if(utxo_result.sum.value()!=amount.value()){                              
+            if(utxo_result.sum.toNumber()!=amount.toNumber()){                              
                 dest_copy.push({destination_address: change_address, amount: change_amount}); 
                 has_change=true;
             }    
@@ -808,19 +816,19 @@ class aliwa_wallet{
 //            console.log(build_tx);
             
             var tx_size=build_tx.length/2; // 2 hex len  -> 1 byte len 
-            var total_fee=numeral((Math.ceil((tx_size+10)/1000))).multiply(this.const_fee).value();
+            var total_fee=new Big((Math.ceil((tx_size+10)/1000))).times(this.const_fee).toNumber();
             if(fee!=total_fee){
-                if(has_change && change_amount <= (numeral(this.const_fee).multiply(2).value()) ){
+                if(has_change && change_amount <= (new Big(this.const_fee).times(2).toNumber()) ){
                     var prepared_tx_2 = {inputs: tx_inputs, outputs: destinations};
                     var build_tx_2 = this.wallet_functions.build_hex_transaction(prepared_tx_2);
 //            console.log(build_tx);
 
                     var tx_size_2 = build_tx_2.length / 2; // 2 hex len  -> 1 byte len 
-                    var total_fee_2=numeral((Math.ceil((tx_size_2+10)/1000))).multiply(this.const_fee).value();
-                    if(numeral(total_fee).subtract(total_fee_2).value() == this.const_fee){
+                    var total_fee_2=new Big((Math.ceil((tx_size_2+10)/1000))).times(this.const_fee).toNumber();
+                    if(new Big(total_fee).minus(total_fee_2).toNumber() == this.const_fee){
 //                        console.log("destinations:",destinations)
                         return {hex:build_tx_2,
-                               fee: numeral(total_fee_2).add( numeral(change_amount).subtract(this.const_fee).value() ).value(),
+                               fee: new Big(total_fee_2).plus( new Big(change_amount).minus(this.const_fee).toNumber() ).toNumber(),
                                tx_object:prepared_tx_2};
                     }
                      else{

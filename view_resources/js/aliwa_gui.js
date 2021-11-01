@@ -396,6 +396,7 @@ async function set_about() {
     $("#view_about_server_label").text(server_infos.server_name);
     $("#view_about_server_address").text(server_infos.server_address);
     $("#view_about_is_tor").text((server_infos.is_over_tor ? "Yes" : "No"));
+    $("#view_about_server_type").text(server_infos.server_mode);
 }
 
 async function set_balance() {
@@ -416,23 +417,24 @@ async function set_balance() {
         {selected=selected.toLowerCase()}
         else{selected="usd"}
         try {
-            var calc_total = numeral(global_balance.total).multiply(alias_prices[selected]).value();
-            var format_l = Math.ceil((Math.log(calc_total) / Math.log(9.99999) * -1)) + 2;
+            var calc_total = new Big(global_balance.total).times(alias_prices[selected]).toNumber();
+            var format_l = Math.ceil((Math.log(calc_total) / Math.log(9.99999) * -1)) + 4;
             format_l = format_l > 8 ? 8 : format_l; //infinity memory error !!!!!!!!!!!!!!!!!!!!!!!!!       
             format_l = format_l < 2 ? 2 : format_l;
-            var f_string = "";
-            for (var i = 0; i < format_l; i++) {
-                f_string += "0";   
-            }
-            console.log(calc_total+" | "+f_string)
-//          var formatted_currency_value=numeral(global_balance.total).multiply(alias_prices[selected]).value();
-        
-            $("#balance_currency").text(numeral(global_balance.total).multiply(alias_prices[selected]).format("0."+f_string));
+//            var f_string = "";
+//            for (var i = 0; i < format_l; i++) {
+//                f_string += "0";   
+//            }
+//            console.log(calc_total+" | "+f_string)
+//          
+            var converted_currency_value=new Big(global_balance.total).times(alias_prices[selected]).toFixed(format_l);
+           
+            $("#balance_currency").text(converted_currency_value);
         } catch (e) {}
         $("#currency").text(selected.toUpperCase());
 
         //update send
-        $("#view_send_available_balance").text(numeral(global_balance.available).subtract(transaction_amount_sum).format("0.00000000"));
+        $("#view_send_available_balance").text(new Big(global_balance.available).minus(transaction_amount_sum).toFixed(8));
         $("#send_currency_label").text(selected.toUpperCase());
     }
 }
@@ -557,8 +559,9 @@ function view_send(user_inputs){
     $("body").fadeIn(100,"easeInOutQuad");
     
     $("#view_back_overview").off("click").on("click",function(){
-        fill_send_form(false);
-         view_overview();
+       /* fill_send_form(false);
+         view_overview();*/
+        clear_send_form();  
      });
      $("#view_back_current").off("click").on("click",function(){
          fill_send_form(false);
@@ -605,7 +608,7 @@ function view_send(user_inputs){
      
      //show available balance
      if(global_balance!=null){
-     $("#view_send_available_balance").text(numeral(global_balance.available).subtract(transaction_amount_sum).format("0.00000000"));}
+     $("#view_send_available_balance").text(new Big(global_balance.available).minus(transaction_amount_sum).toFixed(8));}
      
      //max amount
      $("#view_send_button_max_amount").off("click").on("click",async function(){  
@@ -618,7 +621,7 @@ function view_send(user_inputs){
         var max_get=await get_max_amount();
         if(max_get.max>0){
             $("#view_send_input_amount").val(max_get.max);
-            $("#view_send_fee").text(numeral(max_get.fee).format("0.00000000")); 
+            $("#view_send_fee").text(new Big(max_get.fee).toFixed(8)); 
             $("#view_send_input_amount").trigger("change");
         }
         else{
@@ -655,22 +658,22 @@ function view_send(user_inputs){
         }
 
         var fee = tx_info.fee;
-        $("#view_send_fee").text(numeral(fee).format("0.00000000"));
+        $("#view_send_fee").text(new Big(fee).toFixed(8));
         var tx_text = "";
         var temp_tx_text = "";
-        var total_send = numeral(0);
-        total_send.add(fee);
+        var total_send = new Big(0);
+        total_send=total_send.plus(fee);
         for (var i = 0; i < tx_dest.length; i++) {
-            total_send.add(tx_dest[i].amount);
+            total_send=total_send.plus(tx_dest[i].amount);
             temp_tx_text += '<p class="send_list_item"><i value="'+i+'" class="send_list_edit edit icon large aliwa_can_click">'                          
-                     +'</i>'+"&nbsp;<b>Transaction " + (i + 1) + ": </b>" + numeral(tx_dest[i].amount).format("0.00[000000]") + " ALIAS -> " + (tx_dest[i].label!="" ? tx_dest[i].label : tx_dest[i].destination_address) + '&nbsp;<i value="'+i+'" class="send_list_remove times icon large aliwa_can_click" style="float:right;"></i>'+"<br>";
+                     +'</i>'+"&nbsp;<b>Transaction " + (i + 1) + ": </b>" + minimal_zeros(tx_dest[i].amount,2,8) + " ALIAS -> " + (tx_dest[i].label!="" ? tx_dest[i].label : tx_dest[i].destination_address) + '&nbsp;<i value="'+i+'" class="send_list_remove times icon large aliwa_can_click" style="float:right;"></i>'+"<br>";
             if (tx_dest[i].narration != undefined) {
                 temp_tx_text += "Narration: " + tx_dest[i].narration + "<br><br></p>";
             } else {
                 temp_tx_text += "<br></p>";
             }
         }
-        tx_text += '<b id="modal_send_list_send_total">Send Total: ' + numeral(total_send.value()).format("0.00[000000]")  + ' ALIAS </b> <span id="modal_send_list_send_total_fee" style="display:inline-block;">(incl. ' + fee + ' ALIAS fee)</span><div class="ui divider"></div><br>';
+        tx_text += '<b id="modal_send_list_send_total">Send Total: ' + minimal_zeros(total_send.toFixed(8),2,8)  + ' ALIAS </b> <span id="modal_send_list_send_total_fee" style="display:inline-block;">(incl. ' + fee + ' ALIAS fee)</span><div class="ui divider"></div><br>';
         tx_text += temp_tx_text;
         
                   
@@ -689,8 +692,8 @@ function view_send(user_inputs){
                     $("#view_send_input_amount").val(transaction_send_list[i].amount);
                     
                     transaction_current_send_number = i;
-                    transaction_amount_sum=numeral(transaction_amount_sum).subtract(transaction_send_list[i].amount).value();
-                    $("#view_send_available_balance").text(numeral(global_balance.available).subtract(transaction_amount_sum).format("0.00000000"));
+                    transaction_amount_sum=new Big(transaction_amount_sum).minus(transaction_send_list[i].amount).toFixed(8);
+                    $("#view_send_available_balance").text(new Big(global_balance.available).minus(transaction_amount_sum).toFixed(8));
                      $("#navbar_title").text("Send");
                     if(transaction_current_send_number>0){
                         $("#navbar_title").html('<span>Send</span><a id="view_send_transaction_number" class="ui circular label" style="background:#f38320;color:#fff;display: block;margin-left: 8rem;position: fixed;margin-top: -1.6rem !important;">'+(transaction_current_send_number+1)+'</a>');
@@ -750,7 +753,9 @@ function set_view_send_currency(){
         amount=amount.replace(",",".");  
         
         try {
-        $("#send_currency_value").text(numeral((isNaN(amount) ? 0 : amount)).multiply(alias_prices[selected_currency.toString().toLowerCase()]).format("0.00000000"));    
+        //$("#send_currency_value").text(numeral((isNaN(amount) ? 0 : amount)).multiply(alias_prices[selected_currency.toString().toLowerCase()]).format("0.00000000")); 
+        var converted_value= new Big((isNaN(amount) ? 0 : amount)).times(alias_prices[selected_currency.toString().toLowerCase()]).toFixed(8);
+        $("#send_currency_value").text(converted_value); 
         } catch (e) {
             
         }
@@ -772,11 +777,11 @@ async function send_list_remove_items(){
                 clear_send_form();
                 transaction_amount_sum = 0;
                 for (var i = 0; i < transaction_send_list.length; i++) {
-                    transaction_amount_sum = numeral(transaction_amount_sum).add(transaction_send_list[i].amount).value();
+                    transaction_amount_sum = new Big(transaction_amount_sum).plus(transaction_send_list[i].amount).toFixed(8);
                 }
 
                 
-                $("#view_send_available_balance").text(numeral(global_balance.available).subtract(transaction_amount_sum).format("0.00000000"));
+                $("#view_send_available_balance").text(new Big(global_balance.available).minus(transaction_amount_sum).toFixed(8));
 
                 
 
@@ -785,14 +790,14 @@ async function send_list_remove_items(){
                 var tx_info = await window.electron.ipcRenderer_invoke("get_raw_tx", tx_dest);
                 var fee = tx_info.fee;
 
-                var total_send = numeral(0);
-                total_send.add(fee);
+                var total_send = new Big(0);
+                total_send=total_send.plus(fee);
                 for (var i = 0; i < tx_dest.length; i++) {
-                    total_send.add(tx_dest[i].amount);
+                    total_send=total_send.plus(tx_dest[i].amount);
                 }
 
 
-                   $("#modal_send_list_send_total").text("Send Total: " + numeral(total_send.value()).format("0.00[000000]")  + ' ALIAS ');
+                   $("#modal_send_list_send_total").text("Send Total: " + minimal_zeros(total_send.toNumber(),2,8)  + ' ALIAS ');
                    $("#modal_send_list_send_total_fee").text('(incl. ' + fee + ' ALIAS fee)');
 
                 var i = 0;
@@ -803,7 +808,7 @@ async function send_list_remove_items(){
                     $(".send_list_item").each(function () {
                         if (i < tx_dest.length) {
                             var temp_tx_text = '<i value="' + i + '" class="send_list_edit edit icon large aliwa_can_click">'
-                                    + '</i>' + "&nbsp;<b>Transaction " + (i + 1) + ": </b>" + numeral(tx_dest[i].amount).format("0.00[000000]") + " ALIAS -> " + (tx_dest[i].label!="" ? tx_dest[i].label : tx_dest[i].destination_address) + '&nbsp;<i value="' + i + '" class="send_list_remove times icon large aliwa_can_click" style="float:right;"></i>' + "<br>";
+                                    + '</i>' + "&nbsp;<b>Transaction " + (i + 1) + ": </b>" + minimal_zeros(tx_dest[i].amount,2,8) + " ALIAS -> " + (tx_dest[i].label!="" ? tx_dest[i].label : tx_dest[i].destination_address) + '&nbsp;<i value="' + i + '" class="send_list_remove times icon large aliwa_can_click" style="float:right;"></i>' + "<br>";
                             if (tx_dest[i].narration != undefined) {
                                 temp_tx_text += "Narration: " + tx_dest[i].narration + "<br><br>";
                             } else {
@@ -853,7 +858,7 @@ async function add_update_send_list(){
          if(amount.includes(".")){
             var amount_split=amount.split(".");         
             var amount_digits=amount_split[1].length>8 ? amount_split[1].substring(0,8) : amount_split[1];
-            amount=parseFloat(amount_split[0]+"."+amount_digits);
+            amount=Number.parseFloat(amount_split[0]+"."+amount_digits).toFixed(8);//parseFloat(amount_split[0]+"."+amount_digits);
          }
          $("#view_send_input_amount").val(amount);
          
@@ -887,10 +892,10 @@ async function add_update_send_list(){
             clear_send_form();
             transaction_amount_sum=0;
             for(var i=0;i<transaction_send_list.length;i++){
-                transaction_amount_sum=numeral(transaction_amount_sum).add(transaction_send_list[i].amount).value();
+                transaction_amount_sum=new Big(transaction_amount_sum).plus(transaction_send_list[i].amount).toFixed(8);
             }
             
-            $("#view_send_available_balance").text(numeral(global_balance.available).subtract(transaction_amount_sum).format("0.00000000"));
+            $("#view_send_available_balance").text(new Big(global_balance.available).minus(transaction_amount_sum).toFixed(8));
             return true;
          }
          return false;
@@ -916,7 +921,7 @@ async function open_send_dialogue(list_only){
          if(amount.includes(".")){
             var amount_split=amount.split(".");         
             var amount_digits=amount_split[1].length>8 ? amount_split[1].substring(0,8) : amount_split[1];
-            amount=parseFloat(amount_split[0]+"."+amount_digits);
+            amount=Number.parseFloat(amount_split[0]+"."+amount_digits).toFixed(8);//parseFloat(amount_split[0]+"."+amount_digits);
          }
          $("#view_send_input_amount").val(amount);
          
@@ -946,20 +951,20 @@ async function open_send_dialogue(list_only){
              if(tx_info==false){show_popup_action(templ_loads,"error","Unknown error"); return;}
              
              var fee=tx_info.fee;
-             $("#view_send_fee").text(numeral(fee).format("0.00000000")); 
+             $("#view_send_fee").text(new Big(fee).toFixed(8)); 
              var tx_text="";
              var temp_tx_text="";
-             var total_send=numeral(0);
-             total_send.add(fee);
+             var total_send=new Big(0);
+             total_send=total_send.plus(fee);
              for(var i=0;i<tx_dest.length;i++){
-                 total_send.add(tx_dest[i].amount);
-                 temp_tx_text+="<b>Transaction "+(i+1)+": </b>"+ numeral(tx_dest[i].amount).format("0.00[000000]")+" ALIAS -> "+tx_dest[i].destination_address+"<br>";
+                 total_send=total_send.plus(tx_dest[i].amount);
+                 temp_tx_text+="<b>Transaction "+(i+1)+": </b>"+ minimal_zeros(new Big(tx_dest[i].amount).toFixed(8),2,8) +" ALIAS -> "+tx_dest[i].destination_address+"<br>";
                  if(tx_dest[i].narration!=undefined){
                     temp_tx_text+="Narration: "+tx_dest[i].narration+"<br><br>";
                  }
                 else{temp_tx_text+="<br>"}
              }
-             tx_text+="<b>Send Total: "+ numeral(total_send.value()).format("0.00[000000]") +' ALIAS </b> <span style="display:inline-block;">(incl. '+fee+' ALIAS fee)</span><div class="ui divider"></div><br>';
+             tx_text+="<b>Send Total: "+ minimal_zeros(total_send.toFixed(8),2,8) +' ALIAS </b> <span style="display:inline-block;">(incl. '+fee+' ALIAS fee)</span><div class="ui divider"></div><br>';
              tx_text+=temp_tx_text;
              
              var pw_result=await window.electron.ipcRenderer_invoke("compare_password","");
@@ -1069,7 +1074,7 @@ function fill_send_form(empty){
         transaction_current_send_number = 0;
         $("#navbar_title").html('<span>Send</span>');
         $("#view_send_button_show_list_number").text(transaction_send_list.length);
-        $("#view_send_available_balance").text(numeral(global_balance.available).subtract(transaction_amount_sum).format("0.00000000"));
+        $("#view_send_available_balance").text(new Big(global_balance.available).minus(transaction_amount_sum).toFixed(8));
         
         $("#view_send_button_add span").html("&nbsp;Add");
         $("#view_send_button_add").find("i").removeClass("check").addClass("plus");
@@ -1157,21 +1162,21 @@ async function get_max_amount(destinations_for_send){
      
      
         var base_fee=0.0001;
-        destinations[transaction_current_send_number].amount=numeral(destinations[transaction_current_send_number].amount).subtract(base_fee).value(); 
+        destinations[transaction_current_send_number].amount=new Big(destinations[transaction_current_send_number].amount).minus(base_fee).toNumber(); 
 //        var start=new Date().getUTCMilliseconds();
         
         
         var fee=await window.electron.ipcRenderer_invoke("get_fee",destinations);
         if(fee.exceed!=undefined){
-           destinations[transaction_current_send_number].amount=numeral(destinations[transaction_current_send_number].amount).subtract(fee.exceed).value();
+           destinations[transaction_current_send_number].amount=new Big(destinations[transaction_current_send_number].amount).minus(fee.exceed).toNumber();
            var max=destinations[transaction_current_send_number].amount;
 //            console.log("wait: "+(new Date().getUTCMilliseconds()-start));
-           return {max:max,fee:(numeral(base_fee).add(fee.exceed))};
+           return {max:max,fee:new Big(base_fee).plus(fee.exceed).toFixed(8)};
         } 
         else{
            var max=destinations[transaction_current_send_number].amount;
 //           console.log("wait: "+(new Date().getUTCMilliseconds()-start));
-           return {max:max,fee:(numeral(base_fee))};
+           return {max:max,fee:new Big(base_fee).toFixed(8)};
         }      
 }
 
@@ -2361,7 +2366,9 @@ async function transactions_pagination(){
         line.find("td:nth-child(1) h4 div div").text(""+(confirmations>0 ? (confirmations>1 ? "Confirmations" : "Confirmation") : "Unknown"));
         
                
-        line.find("td:nth-child(2) ").html('<i class="ui '+confirm_symbol+' icon large desktop_hide"></i>'+date);
+        line.find("td:nth-child(2) ").html('<i class="ui '+confirm_symbol+' icon large desktop_hide"></i>'+date
+                +'<button class="ui icon button right huge desktop_hide view_transaction_list_chevron"> <i class="icon inverted white right  chevron"></i></button>');
+        //line.find("td:nth-child(2) ").html('<i class="ui '+confirm_symbol+' icon large desktop_hide right"></i>'+"&nbsp;&nbsp;"+'<span class="desktop_hide" style="font-size:1.2rem;">'+value+"</span>"+"&nbsp;&nbsp;"+date);
         
         //value
         if(value>0){
@@ -2664,23 +2671,23 @@ function view_single_transaction_in_dialogue(tx,full_tx,confirmations) {
         //status date fee amount
         $("#single_transaction_dialogue_status").html(confirmations+"&nbsp;"+(confirmations<450 && full_tx.mature==0 && confirmations>0 ? "of 450&nbsp;" : (confirmations<6 && full_tx.mature==1 && confirmations>0 ? "of 6&nbsp;" : ""))
                 +(confirmations>1 || confirmations=="" ? (confirmations=="" ? "Unknown" : "confirmations") : "confirmation"));      
-        $("#single_transaction_dialogue_date").html((new Date(numeral(full_tx.time).multiply(1000).value()).toLocaleString()));
+        $("#single_transaction_dialogue_date").html((new Date(new Big(full_tx.time).times(1000).toNumber()).toLocaleString()));
         if(full_tx.fee!=undefined){
-        $("#single_transaction_dialogue_fee").html(numeral(full_tx.fee).format("0.00[000000]"));}
+        $("#single_transaction_dialogue_fee").html(minimal_zeros(full_tx.fee,2,8));}
         else{$("#single_transaction_dialogue_fee").html("Unknown");}
     
-        $("#single_transaction_dialogue_amount").html(numeral(full_tx.self_balance).format("0.00[000000]"));
+        $("#single_transaction_dialogue_amount").html(minimal_zeros(full_tx.self_balance,2,8));
         if(full_tx.self_balance<0){
           $("#single_transaction_dialogue_amount").css("color","#ff695e");  
         }
         else{
             $("#single_transaction_dialogue_amount").css("color","#2ecc40");
-            $("#single_transaction_dialogue_amount").html("+"+numeral(full_tx.self_balance).format("0.00[000000]"));
+            $("#single_transaction_dialogue_amount").html("+"+minimal_zeros(full_tx.self_balance,2,8));
         }
         
         for(var i=0;i<full_tx.destinations.length;i++){
             if((!full_tx.destinations[i].self && full_tx.self_balance<0) || (full_tx.destinations[i].self && full_tx.self_balance>=0)){
-                $("#single_transaction_dialogue_destinations").append('<div><b>'+(full_tx.self_balance<0 ? "Debit:&nbsp;-" : "Credit:&nbsp;")+'</b>'+numeral(full_tx.destinations[i].value).format("0.00[000000]")+'</div>');               
+                $("#single_transaction_dialogue_destinations").append('<div><b>'+(full_tx.self_balance<0 ? "Debit:&nbsp;-" : "Credit:&nbsp;")+'</b>'+minimal_zeros(full_tx.destinations[i].value,2,8)+'</div>');               
                 $("#single_transaction_dialogue_destinations").append('<div class="" style="color:#f38320;text-align:left;">'
                         +'<button class="ui icon button medium single_transaction_dialogue_destinations_edit_address" style="background:none;padding:0"><i class="edit icon" value="'+full_tx.destinations[i].address+'"></i></button>&nbsp;'
                         +'<span style="max-width:80%;overflow:hidden;text-overflow:ellipsis;display:inline-block;" value="'+i+'">'+((full_tx.destinations[i].label!=null && full_tx.destinations[i].label!="") ? full_tx.destinations[i].label : full_tx.destinations[i].address)+"&nbsp;</span>"
@@ -3040,7 +3047,7 @@ async function view_backup_phrase() {
         
         if (pw_result) {
             var backup_phrase = await window.electron.ipcRenderer_invoke("get_wallet_seed");
-            $("#view_backup_phrase_phrase").html("<b>Seed Words:</b><br>" + backup_phrase.seed_words + "<br><br><b>Seed Password:</b><br>" + (backup_phrase.seed_pw == null ? "<br><br><br>" : (backup_phrase.seed_pw + "<br><br><br>")));
+            $("#view_backup_phrase_phrase").html('<b>Seed Words:</b><br><div style="padding:1rem;background:#382b3f;border-radius: 1rem;width: 97%;margin: auto;">' + backup_phrase.seed_words + '</div><br><b>Seed Password:</b><br><div style="padding:1rem;background:#382b3f;border-radius: 1rem;width: 97%;margin: auto;">' + (backup_phrase.seed_pw == null ? "</div><br><br><br>" : (backup_phrase.seed_pw + "</div><br><br><br>")));
             $("#unhide_backupphrase").remove();
         } else {
 
@@ -3048,7 +3055,7 @@ async function view_backup_phrase() {
                 var pw_result = await window.electron.ipcRenderer_invoke("compare_password", $("#dialogues_input_input").val());
                 if (pw_result) {
                    var backup_phrase = await window.electron.ipcRenderer_invoke("get_wallet_seed");
-                   $("#view_backup_phrase_phrase").html("<b>Seed Words:</b><br>" + backup_phrase.seed_words + "<br><br><b>Seed Password:</b><br>" + (backup_phrase.seed_pw == null ? "<br><br><br>" : (backup_phrase.seed_pw + "<br><br><br>")));
+                   $("#view_backup_phrase_phrase").html('<b>Seed Words:</b><br><div style="padding:1rem;background:#382b3f;border-radius: 1rem;width: 97%;margin: auto;">' + backup_phrase.seed_words + '</div><br><b>Seed Password:</b><br><div style="padding:1rem;background:#382b3f;border-radius: 1rem;width: 97%;margin: auto;">' + (backup_phrase.seed_pw == null ? "</div><br><br><br>" : (backup_phrase.seed_pw + "</div><br><br><br>")));
                    $('.ui.modal').modal("hide");
 //                    clean_modal("input");
                    $("#unhide_backupphrase").remove();
@@ -3618,5 +3625,21 @@ function autocomplete_bip39(input,seed_words){
     return outlist;   
 }
 
-
+                                             
+function minimal_zeros(num,min_z,max_z){
+    var s_num=num.toString();  
+    s_num=s_num.replace(",",".");
+    s_num_split=s_num.split(".");
+    var l=min_z;
+    if(s_num_split[1]!=undefined){      
+        for(var i=s_num_split[1].length-1;i>=min_z;i--){         
+            if(s_num_split[1][i]!=0){             
+                l=i+1;
+                break;
+            }           
+        }
+    }
+    l=l>max_z ? max_z : l;
+    return new Big(num).toFixed(l);  
+}                                                
 

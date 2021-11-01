@@ -180,10 +180,26 @@ background:#f38320;
     display:none !important;
 }
 
+.actions{
+    text-align: center !important;
+}
+
+.view_transaction_list_chevron{
+    background:none !important;
+    border:none !important;
+    position:absolute;
+    right:-1rem;
+    opacity: 0.7;
+}
+
+tr:hover .view_transaction_list_chevron{
+    opacity: 1;
+}
+
 @media only screen and (max-width: 767.98px){
     tr{
-        border-bottom: 0.5rem solid #382b3f !important;  
-        /*padding: 0rem 0rem 0rem 0rem !important;*/  
+        border-bottom: 0.25rem solid #382b3f !important;  
+        padding: 0rem 0rem 0rem 0rem !important;
     }
     #view_transactions_table thead th:nth-child(1) {
     display:none !important;
@@ -192,6 +208,14 @@ background:#f38320;
     #view_transactions_table td:nth-child(1) {
     display:none !important;
   }
+  
+ /*  #view_transactions_table thead th:nth-child(3) {
+    display:none !important;
+  }
+    
+    #view_transactions_table td:nth-child(3) {
+    display:none !important;
+  }*/
   
    #view_transactions_table th:nth-child(4) {
     display:none !important;
