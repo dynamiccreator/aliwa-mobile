@@ -2,7 +2,6 @@
 
 ## Changelog
 ### 0.0.9
-- First automatic release build after transition to Alias Github organization
-
+- Last Test before going mainnet
 ### 0.0.8
 - to be done
