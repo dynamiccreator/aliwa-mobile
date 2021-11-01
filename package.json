@@ -6,7 +6,7 @@
   "main": "main.js",
   "license": "(MIT) UNLICENSED",
   "contributors": [],
-"dependencies": {
+  "dependencies": {
     "aes256": "*",
     "bip39": "*",
     "bs58": "*",
@@ -15,7 +15,7 @@
     "elliptic": "*",
     "hdkey": "*",
     "lokijs": "*",
-    "big.js" : "*",
+    "big.js": "*",
     "path": "*",
     "socket.io-client": "*",
     "socks-proxy-agent": "*"
