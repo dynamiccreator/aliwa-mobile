@@ -656,7 +656,7 @@ function view_send(user_inputs){
             show_popup_action(templ_loads, "error", "Unknown error");
             return;
         }
-
+        if(tx_info=="server_not_synced"){show_popup_action(templ_loads,"error","Not connected or synced with the server!",2500);return;}        
         var fee = tx_info.fee;
         $("#view_send_fee").text(new Big(fee).toFixed(8));
         var tx_text = "";
@@ -947,7 +947,7 @@ async function open_send_dialogue(list_only){
                 }
              }
              var tx_info=await window.electron.ipcRenderer_invoke("get_raw_tx",tx_dest);
-             if(tx_info=="server_not_synced"){show_popup_action(templ_loads,"error","Wallet is not connected or synced with the server!",2500);return;}
+             if(tx_info=="server_not_synced"){show_popup_action(templ_loads,"error","Not connected or synced with the server!",2500);return;}
              if(tx_info==false){show_popup_action(templ_loads,"error","Unknown error"); return;}
              
              var fee=tx_info.fee;
@@ -3214,9 +3214,9 @@ async function view_backup_page_start_up_info(startup,segment,seed_words){
         $("#view_backup_page_start_up_info_message_record_your_backup").html(
               '  <i class="check circle icon"></i>'
           +'  <div class="header">'
-          +'      You seem to have a backup!'
+          +'      You\'ve made a Backup!'
           +'  </div>'
-          +'  You can do another backup if you like or save a "light_wallet.dat" file (a Backup incl. Addressbook and Settings)').removeClass("warning").addClass("info");
+          +'  You can do another Backup or save a "light_wallet.dat" file - a backup <b>incl. address book and settings</b>').removeClass("warning").addClass("info");
     }
      
 }
