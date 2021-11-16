@@ -1,7 +1,7 @@
 --------fresh package.json---------
 {
   "name": "ALiWa",
-  "version": "0.0.9-TESTNET",
+  "version": "0.1.0-TESTNET",
   "author": "dynamiccreator",
   "description": "ALiWa - A light wallet for the Alias cryptocurrency.",
   "main": "main.js",
