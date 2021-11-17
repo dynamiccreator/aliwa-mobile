@@ -19,5 +19,5 @@
     "path": "*",
     "socket.io-client": "*",
     "socks-proxy-agent": "*"
-  }
-}
+          }
+        }
