@@ -15,9 +15,14 @@ try {
         var aliwa_app_data_tor_APP = "";
 
         if (process.platform == 'darwin') {
-            aliwa_app_data = path.join(process.env.HOME, "Library", '"Application Support"', "ALiWa");
-            aliwa_app_data_tor_DIR = path.join(aliwa_app_data, aliwa_tor_folder);
+            aliwa_app_data = path.join(process.env.HOME, "Library", 'Application Support', "ALiWa");
+            aliwa_app_data_tor_DIR = path.join(aliwa_app_data.substring(0,-1), aliwa_tor_folder)+'"';
             aliwa_app_data_tor_APP = path.join(aliwa_app_data_tor_DIR, "Contents", "MacOS", "Tor", 'tor.real');
+            
+            aliwa_app_data='"'+aliwa_app_data+'"';
+            aliwa_app_data_tor_DIR='"'+aliwa_app_data_tor_DIR+'"';
+            aliwa_app_data_tor_APP='"'+aliwa_app_data_tor_APP+'"';
+            
         }
 
         if(process.platform == 'win32'){
@@ -28,7 +33,7 @@ try {
 
         if (!fs.existsSync(aliwa_app_data_tor_DIR)) {
             if(process.platform == 'darwin'){
-                 const execute1 = exec("cp -R " + path.join(__dirname,aliwa_tor_folder) + ' ' + aliwa_app_data);
+                 const execute1 = exec("cp -R " +'"'+path.join(__dirname,aliwa_tor_folder) + '" ' + aliwa_app_data);
                 execute1.stdout.on('data', (data) => {
                 console.log(data);
                         console.error(data);
