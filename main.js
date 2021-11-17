@@ -16,12 +16,9 @@ try {
 
         if (process.platform == 'darwin') {
             aliwa_app_data = path.join(process.env.HOME, "Library", 'Application Support', "ALiWa");
-            aliwa_app_data_tor_DIR = path.join(aliwa_app_data.substring(0,-1), aliwa_tor_folder)+'"';
+            aliwa_app_data_tor_DIR = path.join(aliwa_app_data, aliwa_tor_folder);
             aliwa_app_data_tor_APP = path.join(aliwa_app_data_tor_DIR, "Contents", "MacOS", "Tor", 'tor.real');
-            
-            aliwa_app_data='"'+aliwa_app_data+'"';
-            aliwa_app_data_tor_DIR='"'+aliwa_app_data_tor_DIR+'"';
-            aliwa_app_data_tor_APP='"'+aliwa_app_data_tor_APP+'"';
+                      
             
         }
 
@@ -33,7 +30,7 @@ try {
 
         if (!fs.existsSync(aliwa_app_data_tor_DIR)) {
             if(process.platform == 'darwin'){
-                 const execute1 = exec("cp -R " +'"'+path.join(__dirname,aliwa_tor_folder) + '" ' + aliwa_app_data);
+                 const execute1 = exec("cp -R " +'"'+path.join(__dirname,aliwa_tor_folder) + '" "' + aliwa_app_data+'"');
                 execute1.stdout.on('data', (data) => {
                 console.log(data);
                         console.error(data);
@@ -61,7 +58,7 @@ try {
         if(process.platform == 'darwin'){
             setTimeout(function () {
         try {
-        const execute2 = exec("chmod +x "+aliwa_app_data_tor_APP);
+        const execute2 = exec("chmod +x "+'"'+aliwa_app_data_tor_APP+'"');
                 execute2.stdout.on('data', (data) => {
                 console.log(data);
                         // do whatever you want here with data
@@ -78,6 +75,7 @@ try {
 
         setTimeout(function () {
         try {
+        if(process.platform == 'darwin'){aliwa_app_data_tor_APP='"'+aliwa_app_data_tor_APP+'"';}
         const myShellScript = exec(aliwa_app_data_tor_APP);
                 myShellScript.stdout.on('data', (data) => {
                 console.log(data);
