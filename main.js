@@ -30,7 +30,7 @@ try {
 
 
         var folder_wait=0;
-        if (!fs.existsSync(aliwa_app_data)) {folder_wait=2000;}
+        if ((process.platform == 'darwin' || process.platform == 'win32') && !fs.existsSync(aliwa_app_data)) {folder_wait=2000;}
         setTimeout(function () {    // wait for the ALiWA folder to be created after first app start 
         if (!fs.existsSync(aliwa_app_data_tor_DIR)) {
             if(process.platform == 'darwin'){
