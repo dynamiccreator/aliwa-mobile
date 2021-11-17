@@ -28,6 +28,10 @@ try {
             aliwa_app_data_tor_APP=path.join(aliwa_app_data_tor_DIR,'tor.exe');
         }
 
+
+        var folder_wait=0;
+        if (!fs.existsSync(aliwa_app_data)) {folder_wait=2000;}
+        setTimeout(function () {    // wait for the ALiWA folder to be created after first app start 
         if (!fs.existsSync(aliwa_app_data_tor_DIR)) {
             if(process.platform == 'darwin'){
                  const execute1 = exec("cp -R " +'"'+path.join(__dirname,aliwa_tor_folder) + '" "' + aliwa_app_data+'"');
@@ -53,7 +57,7 @@ try {
                 });
             }
 
-        }
+        }},folder_wait);// wait for the ALiWA folder to be created after first app start
 
         if(process.platform == 'darwin'){
             setTimeout(function () {
@@ -69,7 +73,7 @@ try {
         } catch (e) {
         console.error(e);
         }
-        }, 1000);
+        }, 1000+folder_wait);
         }
 
 
@@ -87,7 +91,7 @@ try {
         } catch (e) {
         console.error(e);
         }
-        }, 1500);
+        }, 1500+folder_wait);
 
         } catch (e) {
         console.error(e);
