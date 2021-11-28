@@ -1,6 +1,6 @@
 {
   "name": "ALiWa",
-  "version": "0.1.0-TESTNET",
+  "version": "0.1.1-TESTNET",
   "author": "dynamiccreator",
   "description": "ALiWa - A light wallet for the Alias cryptocurrency.",
   "main": "main.js",
@@ -19,5 +19,5 @@
     "path": "*",
     "socket.io-client": "*",
     "socks-proxy-agent": "*"
-  }
-}
+          }
+        }

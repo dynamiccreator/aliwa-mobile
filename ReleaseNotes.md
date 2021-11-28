@@ -1,6 +1,8 @@
 # ALiWa - Alias Light Wallet Release Notes
 
 ## Changelog
+### 0.1.1
+MAC BUILD PATCH
 ### 0.1.0
 FINAL TESTNET RELEASE
 ### 0.0.9
