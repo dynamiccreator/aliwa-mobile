@@ -186,7 +186,7 @@ jobs:
       - name: Create delivery archive
         run: |
           cd out/ALiWa-darwin-x64
-          rm -rf ALiWa.app/Contents/Frameworks/Mantle.framework/Versions
+          rm -rf "ALiWa.app/Contents/Frameworks/Electron Framework.framework/Versions"
           zip -r -X ${{ github.workspace }}/ALiWa.zip ALiWa.app
 
       - name: Create MacOS sha256 checksum file
