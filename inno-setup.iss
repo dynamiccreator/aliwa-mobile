@@ -3,8 +3,10 @@
 
 #define MyAppName "ALiWa"
 #define MyAppVersion "0.1.1-TESTNET"
-#define MyAppPublisher "dynamiccreator"
-#define MyAppURL "https://github.com/dynamiccreator/aliwa"
+
+#define MyAppPublisher "Alias Team"
+#define MyAppURL "https://github.com/aliascash/aliwa"
+
 #define MyAppExeName "ALiWa.exe"
 
 [Setup]
@@ -26,6 +28,9 @@ LicenseFile=LICENSE
 OutputBaseFilename={#MyAppName}-Setup
 Compression=lzma
 SolidCompression=yes
+SetupIconFile=view_resources/img/aliwa_light.ico
+WizardImageFile=installer-images/branding.bmp
+WizardSmallImageFile=installer-images/Alias-55x55.bmp,installer-images/Alias-64x68.bmp,installer-images/Alias-83x80.bmp,installer-images/Alias-92x97.bmp,installer-images/Alias-110x106.bmp,installer-images/Alias-119x123.bmp,installer-images/Alias-138x140.bmp
 WizardStyle=modern
 
 [Languages]
