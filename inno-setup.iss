@@ -3,8 +3,10 @@
 
 #define MyAppName "ALiWa"
 #define MyAppVersion "0.1.1-TESTNET"
+
 #define MyAppPublisher "Alias Team"
 #define MyAppURL "https://github.com/aliascash/aliwa"
+
 #define MyAppExeName "ALiWa.exe"
 
 [Setup]
