@@ -17,7 +17,7 @@ try {
         if (process.platform == 'darwin') {
             aliwa_app_data = path.join(process.env.HOME, "Library", 'Application Support', "ALiWa");
             aliwa_app_data_tor_DIR = path.join(aliwa_app_data, aliwa_tor_folder);
-            aliwa_app_data_tor_APP = path.join(aliwa_app_data_tor_DIR, "Contents", "MacOS", "Tor", 'tor.real');
+            aliwa_app_data_tor_APP = path.join(aliwa_app_data_tor_DIR, 'tor.real');
                       
             
         }
