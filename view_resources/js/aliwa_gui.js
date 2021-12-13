@@ -2636,7 +2636,7 @@ function view_single_transaction_in_dialogue(tx,full_tx,confirmations) {
      
         
         //tx
-        $("#single_transaction_dialogue_tx_link a").attr("href", 'https://chainz.cryptoid.info/alias-test/tx.dws?' + tx + '.htm');
+        $("#single_transaction_dialogue_tx_link a").attr("href", 'https://chainz.cryptoid.info/alias/tx.dws?' + tx + '.htm');
         $("#single_transaction_dialogue_tx_link a").text(tx);
 
         $("#single_transaction_dialogue_tx_link").off("click").on("click", function () {
@@ -2652,7 +2652,7 @@ function view_single_transaction_in_dialogue(tx,full_tx,confirmations) {
         });
         
         //blockhash
-        $("#single_transaction_dialogue_blockhash_link a").attr("href", 'https://chainz.cryptoid.info/alias-test/block.dws?' + full_tx.blockhash + '.htm');
+        $("#single_transaction_dialogue_blockhash_link a").attr("href", 'https://chainz.cryptoid.info/alias/block.dws?' + full_tx.blockhash + '.htm');
         $("#single_transaction_dialogue_blockhash_link a").text(full_tx.blockhash);
 
         $("#single_transaction_dialogue_blockhash_link").off("click").on("click", function () {
