@@ -34,7 +34,7 @@ try {
         setTimeout(function () {    // wait for the ALiWA folder to be created after first app start 
         if (!fs.existsSync(aliwa_app_data_tor_DIR)) {
             if(process.platform == 'darwin'){
-                 const execute1 = exec("cp -R " +'"'+path.join(__dirname,aliwa_tor_folder) + '" "' + aliwa_app_data+'"');
+                 const execute1 = exec("cp -R " +'"'+path.join(__dirname,"..","..","MacOS",aliwa_tor_folder) + '" "' + aliwa_app_data+'"');
                 execute1.stdout.on('data', (data) => {
                 console.log(data);
                         console.error(data);
