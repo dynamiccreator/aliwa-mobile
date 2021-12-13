@@ -124,7 +124,7 @@ function createWindow () {
   });
 
   win.loadFile('index.html')
-//  win.setMenu(null)
+  win.setMenu(null)
 //  win.setIcon(__dirname+"/view_resources/img/aliwa_icon_256.png") // no crash but default icon remains | __dirname is needed here
 
     }

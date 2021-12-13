@@ -12,7 +12,7 @@ class db_wallet {
     //WINDOWS or MAC OS   
         if (process.platform == 'darwin' || process.platform == 'win32') {
             if (process.platform == 'darwin') {
-                this.default_path = process.env.HOME + sep + "Library" + sep + "Application Support" + sep + "ALiWa" + sep + "aliwa_dat" + sep + "TESTNET_light_wallet.dat";
+                this.default_path = process.env.HOME + sep + "Library" + sep + "Application Support" + sep + "ALiWa" + sep + "aliwa_dat" + sep + "light_wallet.dat";
 
                 if (!fs.existsSync(process.env.HOME + sep + "Library" + sep + "Application Support" + sep + "ALiWa" + sep + "aliwa_dat")) {
                     fs.mkdirSync(process.env.HOME + sep + "Library" + sep + "Application Support" + sep + "ALiWa" + sep + "aliwa_dat");
@@ -20,7 +20,7 @@ class db_wallet {
             }
 
             if (process.platform == 'win32') {
-                this.default_path = process.env.APPDATA  + sep + "ALiWa" + sep + "aliwa_dat" + sep + "TESTNET_light_wallet.dat";
+                this.default_path = process.env.APPDATA  + sep + "ALiWa" + sep + "aliwa_dat" + sep + "light_wallet.dat";
 
                 if (!fs.existsSync(process.env.APPDATA  + sep + "ALiWa" + sep + "aliwa_dat")) {
                     fs.mkdirSync(process.env.APPDATA  + sep + "ALiWa" + sep + "aliwa_dat");
@@ -29,7 +29,7 @@ class db_wallet {
         }
     //LINUX
        else{
-            this.default_path = process.cwd() + sep + "aliwa_dat" + sep + "TESTNET_light_wallet.dat";
+            this.default_path = process.cwd() + sep + "aliwa_dat" + sep + "light_wallet.dat";
 
              if (!fs.existsSync(process.cwd() + sep + "aliwa_dat")) {
                  fs.mkdirSync(process.cwd() + sep + "aliwa_dat");
