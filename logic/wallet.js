@@ -22,7 +22,7 @@ hashwasm= require('./argon2.umd.min');
 
 //intial states & data
 //  ->serverlist
-var aliwa_serverlist=[{label:"Default Server (onion)",address:"ws://w6g3ns6okuqxwjhqlmuatinuxryo4ie5m3zv5fwdjw4776fizkffg4qd.onion:6657"},                                          
+var aliwa_serverlist=[{label:"Default Server (onion)",address:"ws://mumdrm3iakrhu5uu2kau5j6t6bm3vz5qwi236pv2tubyunhjqlstipid.onion:6657"},                                          
                       {label:"localhost example",address:"ws://localhost:3000"},
                       {label:"ssl example",address:"wss://your_domain:port"}];
 
