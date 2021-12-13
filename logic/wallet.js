@@ -22,10 +22,8 @@ hashwasm= require('./argon2.umd.min');
 
 //intial states & data
 //  ->serverlist
-var aliwa_serverlist=[{label:"Default Server (onion)",address:"ws://fastyy35vqxve2vwo6rz6x5upbiqaazpyvymspkf4shzdzcohls2hvid.onion:3000"},                     
-                      {label:"Default Server #2 (onion)",address:"ws://fastgnwu34hphgehucqx54jlkwjysx3su66bxpx5zljgvdzsiho5jgad.onion:3000"},
-                      {label:"ALiWA Test server (onion)",address:"ws://aliwa5ld6pm66lbwb2kfyzvqzco24ihnmzoknvaqg4uqhpdtelnfa4id.onion:3000"},   
-                      {label:"localhost",address:"ws://localhost:3000"},
+var aliwa_serverlist=[{label:"Default Server (onion)",address:"ws://w6g3ns6okuqxwjhqlmuatinuxryo4ie5m3zv5fwdjw4776fizkffg4qd.onion:6657"},                                          
+                      {label:"localhost example",address:"ws://localhost:3000"},
                       {label:"ssl example",address:"wss://your_domain:port"}];
 
 
