@@ -49,7 +49,7 @@ Look for this part of "package.json":
           "name": "@electron-forge/maker-deb",
           "config": {
             options: {
-                        depends:["tor"]
+                        "depends":["tor"]
            }
           }
         },
@@ -57,7 +57,7 @@ Look for this part of "package.json":
           "name": "@electron-forge/maker-rpm",
            "config": {
             options: {
-                        depends:["tor"]
+                        "depends":["tor"]
            }
           }
         }
