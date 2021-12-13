@@ -47,19 +47,11 @@ Look for this part of "package.json":
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {
-            options: {
-                        "depends":["tor"]
-           }
-          }
+          "config": {}
         },
         {
           "name": "@electron-forge/maker-rpm",
-           "config": {
-            options: {
-                        "depends":["tor"]
-           }
-          }
+          "config": {}
         }
       ]
     }
@@ -88,7 +80,10 @@ Linux .deb:
 "name": "@electron-forge/maker-deb",
 "config": {
         "icon": "view_resources/img/aliwa_light.png",
-        "setupIcon": "view_resources/img/aliwa_light.png"
+        "setupIcon": "view_resources/img/aliwa_light.png",
+        "options": {
+                    "depends":["tor"]
+        }
     }
 ------------------------------------
 
@@ -97,6 +92,9 @@ Linux .rpm:
 "name": "@electron-forge/maker-rpm",
 "config": {
         "icon": "view_resources/img/aliwa_light.png",
-        "setupIcon": "view_resources/img/aliwa_light.png"
+        "setupIcon": "view_resources/img/aliwa_light.png",
+        "options": {
+                    "depends":["tor"]
+        }
     }
 ------------------------------------
