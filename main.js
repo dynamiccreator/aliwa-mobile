@@ -15,9 +15,11 @@ try {
         var aliwa_app_data_tor_APP = "";
 
         if (process.platform == 'darwin') {
-            aliwa_app_data = path.join(process.env.HOME, "Library", '"Application Support"', "ALiWa");
+            aliwa_app_data = path.join(process.env.HOME, "Library", 'Application Support', "ALiWa");
             aliwa_app_data_tor_DIR = path.join(aliwa_app_data, aliwa_tor_folder);
-            aliwa_app_data_tor_APP = path.join(aliwa_app_data_tor_DIR, "Contents", "MacOS", "Tor", 'tor.real');
+            aliwa_app_data_tor_APP = path.join(aliwa_app_data_tor_DIR, 'tor.real');
+                      
+            
         }
 
         if(process.platform == 'win32'){
@@ -26,9 +28,13 @@ try {
             aliwa_app_data_tor_APP=path.join(aliwa_app_data_tor_DIR,'tor.exe');
         }
 
+
+        var folder_wait=0;
+        if ((process.platform == 'darwin' || process.platform == 'win32') && !fs.existsSync(aliwa_app_data)) {folder_wait=2000;}
+        setTimeout(function () {    // wait for the ALiWA folder to be created after first app start 
         if (!fs.existsSync(aliwa_app_data_tor_DIR)) {
             if(process.platform == 'darwin'){
-                 const execute1 = exec("cp -R " + path.join(__dirname,aliwa_tor_folder) + ' ' + aliwa_app_data);
+                 const execute1 = exec("cp -R " +'"'+path.join(__dirname,"..","..","MacOS",aliwa_tor_folder) + '" "' + aliwa_app_data+'"');
                 execute1.stdout.on('data', (data) => {
                 console.log(data);
                         console.error(data);
@@ -51,12 +57,12 @@ try {
                 });
             }
 
-        }
+        }},folder_wait);// wait for the ALiWA folder to be created after first app start
 
         if(process.platform == 'darwin'){
             setTimeout(function () {
         try {
-        const execute2 = exec("chmod +x "+aliwa_app_data_tor_APP);
+        const execute2 = exec("chmod +x "+'"'+aliwa_app_data_tor_APP+'"');
                 execute2.stdout.on('data', (data) => {
                 console.log(data);
                         // do whatever you want here with data
@@ -67,12 +73,13 @@ try {
         } catch (e) {
         console.error(e);
         }
-        }, 1000);
+        }, 1000+folder_wait);
         }
 
 
         setTimeout(function () {
         try {
+        if(process.platform == 'darwin'){aliwa_app_data_tor_APP='"'+aliwa_app_data_tor_APP+'"';}
         const myShellScript = exec(aliwa_app_data_tor_APP);
                 myShellScript.stdout.on('data', (data) => {
                 console.log(data);
@@ -84,7 +91,7 @@ try {
         } catch (e) {
         console.error(e);
         }
-        }, 1500);
+        }, 1500+folder_wait);
 
         } catch (e) {
         console.error(e);
@@ -117,7 +124,7 @@ function createWindow () {
   });
 
   win.loadFile('index.html')
-//  win.setMenu(null)
+  win.setMenu(null)
 //  win.setIcon(__dirname+"/view_resources/img/aliwa_icon_256.png") // no crash but default icon remains | __dirname is needed here
 
     }

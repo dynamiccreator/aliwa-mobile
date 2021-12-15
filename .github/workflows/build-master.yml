@@ -78,8 +78,10 @@ jobs:
         run: |
           jq '(.config.forge.makers[] | select(.name == "@electron-forge/maker-deb") | .config.icon) |= "view_resources/img/aliwa_light.png" |
               (.config.forge.makers[] | select(.name == "@electron-forge/maker-deb") | .config.setupIcon) |= "view_resources/img/aliwa_light.png" |
+              (.config.forge.makers[] | select(.name == "@electron-forge/maker-deb") | .config.options.depends) |= [ "tor" ] |
               (.config.forge.makers[] | select(.name == "@electron-forge/maker-rpm") | .config.icon) |= "view_resources/img/aliwa_light.png" |
-              (.config.forge.makers[] | select(.name == "@electron-forge/maker-rpm") | .config.setupIcon) |= "view_resources/img/aliwa_light.png"' package.json > package.json.tmp
+              (.config.forge.makers[] | select(.name == "@electron-forge/maker-rpm") | .config.setupIcon) |= "view_resources/img/aliwa_light.png" |
+              (.config.forge.makers[] | select(.name == "@electron-forge/maker-rpm") | .config.options.depends) |= [ "tor" ]' package.json > package.json.tmp
           rm -f package.json
           mv package.json.tmp package.json
 
@@ -186,7 +188,7 @@ jobs:
       - name: Create delivery archive
         run: |
           cd out/ALiWa-darwin-x64
-          zip -r -X ${{ github.workspace }}/ALiWa.zip ALiWa.app
+          zip --symlinks -r -X ${{ github.workspace }}/ALiWa.zip ALiWa.app
 
       - name: Create MacOS sha256 checksum file
         run: |
