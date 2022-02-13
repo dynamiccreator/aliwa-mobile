@@ -599,6 +599,7 @@ function view_send(user_inputs){
      input_clear_button_func("#view_send_input_label","#view_send_input_label_clear");
      input_clear_button_func("#view_send_input_note","#view_send_input_note_clear");
      input_clear_button_func("#view_send_input_amount","#view_send_input_amount_clear");
+     input_clear_button_func("#send_currency_input_value","#send_currency_input_value_clear");
      
      
      set_view_send_currency();
@@ -606,6 +607,8 @@ function view_send(user_inputs){
      if(typeof selected_currency!="string"){selected_currency="USD"}
      $("#send_currency_label").text(selected_currency);
      
+     set_view_send_currency_value();
+     $("#send_currency_input_value").trigger("change");
      //show available balance
      if(global_balance!=null){
      $("#view_send_available_balance").text(new Big(global_balance.available).minus(transaction_amount_sum).toFixed(8));}
@@ -747,15 +750,50 @@ function set_view_send_currency(){
             return;
         }
         
-        input_clear_button_func("#view_send_input_amount","#view_send_input_amount_clear");
+               
         if(typeof selected_currency!="string"){selected_currency="USD"}
         var amount=($("#view_send_input_amount").val()=="" ? "0" : $("#view_send_input_amount").val()); 
         amount=amount.replace(",",".");  
-        
+                   
         try {
         //$("#send_currency_value").text(numeral((isNaN(amount) ? 0 : amount)).multiply(alias_prices[selected_currency.toString().toLowerCase()]).format("0.00000000")); 
         var converted_value= new Big((isNaN(amount) ? 0 : amount)).times(alias_prices[selected_currency.toString().toLowerCase()]).toFixed(8);
-        $("#send_currency_value").text(converted_value); 
+        $("#send_currency_input_value").val(converted_value);  
+        if(converted_value<=0){$("#send_currency_input_value").val("");}
+        
+        input_clear_button_func("#view_send_input_amount","#view_send_input_amount_clear");
+        input_clear_button_func("#send_currency_input_value","#send_currency_input_value_clear");
+        
+        } catch (e) {
+         
+        }
+              
+     });
+}
+
+function set_view_send_currency_value(){
+    $("#send_currency_input_value").off("change").on("change",function(){
+        set_view_send_currency_value();
+        if(global_balance==null){
+            $("#view_send").transition('shake');
+//            show_popup_action(templ_loads,"error","Not synced!",250);
+            return;
+        }
+               
+        if(typeof selected_currency!="string"){selected_currency="USD"}
+        var value=($("#send_currency_input_value").val()=="" ? "0" : $("#send_currency_input_value").val()); 
+        value=value.replace(",",".");  
+        
+        try {
+        //$("#send_currency_value").text(numeral((isNaN(amount) ? 0 : amount)).multiply(alias_prices[selected_currency.toString().toLowerCase()]).format("0.00000000")); 
+        var converted_amount= new Big((isNaN(value) ? 0 : value)).div(alias_prices[selected_currency.toString().toLowerCase()]).toFixed(8);
+        $("#view_send_input_amount").val(converted_amount);
+        if(converted_amount<=0){$("#view_send_input_amount").val("");}
+        
+        input_clear_button_func("#view_send_input_amount","#view_send_input_amount_clear");
+        input_clear_button_func("#send_currency_input_value","#send_currency_input_value_clear");
+        
+        
         } catch (e) {
             
         }
