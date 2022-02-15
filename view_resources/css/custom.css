@@ -115,6 +115,11 @@ html * {
   opacity: 0.6 !important; /* Firefox */
 }
 
+.aliwa_input_field_secondary::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #ccc !important;
+  opacity: 0.6 !important; /* Firefox */
+}
+
 .aliwa_input_field_search{
      padding: 0.5rem 0.5rem 0.5rem 2rem !important;
 }
