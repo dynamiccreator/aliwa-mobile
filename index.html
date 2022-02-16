@@ -2,11 +2,12 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>ALiWa v0.1.2 - Alias Light Wallet</title>
+    <title>ALiWa Mobile v0.1.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="aliwa_current_site" content="null">
     <!-- You MUST include jQuery before Fomantic -->
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
+  <!--  <meta http-equiv="Content-Security-Policy" content="script-src 'self';">-->
+     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval';object-src 'self'">
         <script src="view_resources/js/jquery.min.js"></script>
         <script src="view_resources/js/jquery-ui.min.js"></script>
            
@@ -21,6 +22,19 @@
         <script src="view_resources/js/logic_functions.js"></script>
         
         <script src="view_resources/js/aliwa_gui.js"></script>
+        
+        
+        <script src="logic/browserify_bundle.js"></script>
+        <script src="logic/browserify_buffer.js"></script>
+      
+        
+        <script src="logic/argon2.umd.min.js"></script>
+        <script src="logic/helper_functions.js"></script>
+        <script src="logic/wallet_functions.js"></script>
+        <script src="logic/db_wallet.js"></script>
+        <script src="logic/wallet.js"></script>
+        <script src="logic/my_event_handler.js"></script>
+        <script src="ipc_communications.js"></script>  
 </head>
 <body style="background:#382b3f;height: auto"></body>
 </html>

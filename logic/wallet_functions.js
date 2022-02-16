@@ -1,4 +1,3 @@
-require("./helper_functions")();
 class wallet_functions {  
     constructor() {          
     }
@@ -161,5 +160,3 @@ class wallet_functions {
 
    
 }
-
-exports.wallet_functions = wallet_functions;

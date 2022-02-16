@@ -2,55 +2,52 @@ class db_wallet {
     constructor() { 
         this.wallet_loaded=false;
         this.db = new loki("no_path.db");
-           
-       const wallet_functions_r=require("./wallet_functions");
-       this.wallet_functions=new wallet_functions_r.wallet_functions();
-       
-       
-       var sep_linux = process.cwd().indexOf("/") > -1;
-       var sep = sep_linux ? "/" : "\\";
-    //WINDOWS or MAC OS   
-        if (process.platform == 'darwin' || process.platform == 'win32') {
-            if (process.platform == 'darwin') {
-                this.default_path = process.env.HOME + sep + "Library" + sep + "Application Support" + sep + "ALiWa" + sep + "aliwa_dat" + sep + "light_wallet.dat";
+                  
+       this.wallet_functions=new wallet_functions();
 
-                if (!fs.existsSync(process.env.HOME + sep + "Library" + sep + "Application Support" + sep + "ALiWa" + sep + "aliwa_dat")) {
-                    fs.mkdirSync(process.env.HOME + sep + "Library" + sep + "Application Support" + sep + "ALiWa" + sep + "aliwa_dat");
-                }
-            }
-
-            if (process.platform == 'win32') {
-                this.default_path = process.env.APPDATA  + sep + "ALiWa" + sep + "aliwa_dat" + sep + "light_wallet.dat";
-
-                if (!fs.existsSync(process.env.APPDATA  + sep + "ALiWa" + sep + "aliwa_dat")) {
-                    fs.mkdirSync(process.env.APPDATA  + sep + "ALiWa" + sep + "aliwa_dat");
-                }
-            }
-        }
-    //LINUX
-       else{
-            this.default_path = process.cwd() + sep + "aliwa_dat" + sep + "light_wallet.dat";
-
-             if (!fs.existsSync(process.cwd() + sep + "aliwa_dat")) {
-                 fs.mkdirSync(process.cwd() + sep + "aliwa_dat");
-             }
-        }
-       
+       this.default_path = "light_wallet.dat";
+        
     }
 
-    read_database(path) {
+   async read_database(path) {
         if (path == null) {
             path = this.default_path;
         }
 
 
-        try {
-            var database_string = fs.readFileSync(path).toString();
+        try {          
+            window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,function (fs) {
+
+                console.log('file system open: ' + fs.name);
+                fs.root.getFile(path, {create: false, exclusive: false}, function (fileEntry) {
+
+                    console.log("fileEntry is file?" + fileEntry.isFile.toString());
+                    console.log("fileEntry.fullPath:", fileEntry.fullPath)
+                    // fileEntry.name == 'someFile.txt'
+                    // fileEntry.fullPath == '/someFile.txt'
+                    readFile(fileEntry);                  
+                }, function (e) {                    
+                    console.log("onErrorReadFile", e);
+                    temp_wallet_saver="---read error---";
+                });
+            }, function (e) {               
+                console.log("onErrorLoadFs", e);
+                temp_wallet_saver="---read error---";
+            });
+
+
         } catch (err) {
             console.error(err);
             return "file not found";
+        } 
+        while(temp_wallet_saver=="file not found"){
+            await sync_sleep(5); 
+            if(temp_wallet_saver=="---read error---"){
+                return "file not found";
+            }
         }
-        return database_string;
+//        console.log("database_string: ",temp_wallet_saver)
+        return temp_wallet_saver;
     }
 
     async load_database(data, pw) {
@@ -96,7 +93,22 @@ class db_wallet {
         }
 
         try {
-            fs.writeFileSync(path, database_string);
+            //fs.writeFileSync(path, database_string);
+              temp_wallet_saver=database_string;
+          window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function (fs) {
+
+                console.log('file system open: ' + fs.name);
+                fs.root.getFile(path, {create: true, exclusive: false}, function (fileEntry) {
+
+                    console.log("fileEntry is file?" + fileEntry.isFile.toString());
+                    console.log("fileEntry.fullPath:",fileEntry.fullPath)
+                    // fileEntry.name == 'someFile.txt'
+                    // fileEntry.fullPath == '/someFile.txt'
+                   writeFile(fileEntry, database_string);
+
+                }, function(e){console.log("onErrorCreateFile",e);});
+
+            }, function(e){console.log("onErrorLoadFs",e);});
         } catch (err) {
             console.error(err);
             return false;
@@ -107,9 +119,11 @@ class db_wallet {
     async get_argon2_password_data(pw, salt) {
 
         if (salt == null) {
-            salt = crypto.randomBytes(64).toString('hex');
+            var my_number_array = new Uint8Array(64);
+            salt = crypto.getRandomValues(my_number_array);    
+            salt=intArray_to_hex_string(salt);  
         }             
-        salt = Buffer.from(salt, "hex");
+        salt =hexStringToByte(salt);      
         try {
 //            var hash = await argon2.hash(pw, {salt: salt, timeCost: "12", memoryCost: "24000", type: argon2.argon2id, version: 0x13, raw: true});           
 //            console.log("get_argon2_password_data:--------------------");
@@ -124,8 +138,8 @@ class db_wallet {
                 hashLength: 32, // output size = 32 bytes
                 outputType: 'hex', // return standard encoded string containing parameters needed to verify the key
             });
-            hash = hash.toString("hex");
-            salt = salt.toString("hex");
+            //hash = hash.toString("hex");
+            salt = intArray_to_hex_string(salt);
             return {hash: hash, salt: salt};
 
         } catch (err) {
@@ -856,9 +870,11 @@ class db_wallet {
         
         var unspent_arr_fully=db_unspent.find({'$or':
                     [{'$and': [{'mature': {'$aeq': 1}},{'create_height': {'$gt': (config.sync_height-5)}}]},
-                     {'mature' : {'$aeq': 0}}]})
-                    .sort( () => (crypto.randomInt(0,(Math.pow(2,48)-2))/(Math.pow(2,48)-1)) - 0.5) ;
-        var unspent_arr=db_unspent.find().sort( () => (crypto.randomInt(0,(Math.pow(2,48)-2))/(Math.pow(2,48)-1)) - 0.5) ;
+                     {'mature' : {'$aeq': 0}}]});
+                    //.sort( () => (crypto.randomInt(0,(Math.pow(2,48)-2))/(Math.pow(2,48)-1)) - 0.5) ;
+                    shuffleArray(unspent_arr_fully);
+        var unspent_arr=db_unspent.find();//.sort( () => (crypto.randomInt(0,(Math.pow(2,48)-2))/(Math.pow(2,48)-1)) - 0.5) ;
+        shuffleArray(unspent_arr);
                
         var balance=config.balance.available;
         var dust_threshold=balance < 0.002 ? 0 : (balance < 0.02 ? 0.001 : (balance < 0.2 ? 0.01 : (balance < 2 ? 0.1 : (balance < 20 ? 0.1 : 1)))); 
@@ -1123,4 +1139,3 @@ class db_wallet {
     
                
 }
-exports.db_wallet = db_wallet;
