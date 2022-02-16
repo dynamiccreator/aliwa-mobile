@@ -1,6 +1,8 @@
 # ALiWa - Alias Light Wallet Release Notes
 
 ## Changelog
+Adding type native currency for sending & receiving
+### 0.1.2
 ### 0.1.1
 MAC BUILD PATCH
 ### 0.1.0

@@ -93,7 +93,7 @@ html * {
     color: #db2828;
 }
 
-.aliwa_input_field,.aliwa_input_field_search,.aliwa_input_field_white,.aliwa_input_field_red{
+.aliwa_input_field,.aliwa_input_field_search,.aliwa_input_field_white,.aliwa_input_field_red,.aliwa_input_field_secondary{
     background: none !important;
     border:none !important;
     color:#f38320 !important;
@@ -104,8 +104,19 @@ html * {
     text-overflow: ellipsis !important;
 }
 
+.aliwa_input_field_secondary{
+    border-bottom: none !important;
+    color:#ccc !important;
+    padding: 0.5rem 0.5rem 0.0rem 0 !important;
+}
+
 .aliwa_input_field::placeholder,.aliwa_input_field_search::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: #f38320 !important;
+  opacity: 0.6 !important; /* Firefox */
+}
+
+.aliwa_input_field_secondary::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #ccc !important;
   opacity: 0.6 !important; /* Firefox */
 }
 

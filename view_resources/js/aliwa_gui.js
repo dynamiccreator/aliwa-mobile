@@ -599,6 +599,7 @@ function view_send(user_inputs){
      input_clear_button_func("#view_send_input_label","#view_send_input_label_clear");
      input_clear_button_func("#view_send_input_note","#view_send_input_note_clear");
      input_clear_button_func("#view_send_input_amount","#view_send_input_amount_clear");
+     input_clear_button_func("#send_currency_input_value","#send_currency_input_value_clear");
      
      
      set_view_send_currency();
@@ -606,6 +607,8 @@ function view_send(user_inputs){
      if(typeof selected_currency!="string"){selected_currency="USD"}
      $("#send_currency_label").text(selected_currency);
      
+     set_view_send_currency_value();
+    // $("#send_currency_input_value").trigger("change");
      //show available balance
      if(global_balance!=null){
      $("#view_send_available_balance").text(new Big(global_balance.available).minus(transaction_amount_sum).toFixed(8));}
@@ -613,8 +616,8 @@ function view_send(user_inputs){
      //max amount
      $("#view_send_button_max_amount").off("click").on("click",async function(){  
         if(global_balance==null){
-            $("#view_send").transition('shake');
-            show_popup_action(templ_loads,"error","Not synced!",250);
+            $("#view_send_button_max_amount").transition('shake');
+            show_popup_action(templ_loads,"error","Not synced!",500);
             return;
         }
             
@@ -637,16 +640,21 @@ function view_send(user_inputs){
      
      //add transaction
      $("#view_send_button_add").off("click").on("click",async function(){
+        if(global_balance==null){
+            $("#view_send_button_add").transition('shake');
+            show_popup_action(templ_loads,"error","Not synced!",500);
+            return;
+        }                
         add_update_send_list();
      });
      
      //show transaction list
      $("#view_send_button_show_list").off("click").on("click", async function () {
          
-        if(transaction_current_send_number<transaction_send_list.length){   
+        /*if(transaction_current_send_number<transaction_send_list.length){   
             var list_update=await add_update_send_list();
             if(!list_update){return;}
-        }
+        }*/
          
          
         var tx_dest = JSON.parse(JSON.stringify(transaction_send_list));
@@ -740,27 +748,135 @@ function view_send(user_inputs){
 
 function set_view_send_currency(){
     $("#view_send_input_amount").off("change").on("change",function(){
-        set_view_send_currency();
+        set_view_send_currency();     
         if(global_balance==null){
-            $("#view_send").transition('shake');
-//            show_popup_action(templ_loads,"error","Not synced!",250);
+            $("#view_send_button_send_transaction").transition('shake');
+            setTimeout(function(){show_popup_action(templ_loads,"error","Not synced!",500);},500);
+//            show_popup_action(templ_loads,"error","Not synced!",500);
             return;
         }
         
-        input_clear_button_func("#view_send_input_amount","#view_send_input_amount_clear");
+               
         if(typeof selected_currency!="string"){selected_currency="USD"}
         var amount=($("#view_send_input_amount").val()=="" ? "0" : $("#view_send_input_amount").val()); 
         amount=amount.replace(",",".");  
+                   
+        try {
+        //$("#send_currency_value").text(numeral((isNaN(amount) ? 0 : amount)).multiply(alias_prices[selected_currency.toString().toLowerCase()]).format("0.00000000")); 
+         var num_result=new Big((isNaN(amount) ? 0 : amount)).times(alias_prices[selected_currency.toString().toLowerCase()]).toNumber();
+        var format_l = Math.ceil((Math.log(num_result) / Math.log(9.99999) * -1)) + 4;
+            format_l = format_l > 8 ? 8 : format_l; //infinity memory error !!!!!!!!!!!!!!!!!!!!!!!!!       
+            format_l = format_l < 2 ? 2 : format_l;
+        var converted_value= new Big((isNaN(amount) ? 0 : amount)).times(alias_prices[selected_currency.toString().toLowerCase()]).toFixed(format_l);
+        $("#send_currency_input_value").val(converted_value);  
+        if(converted_value<=0){$("#send_currency_input_value").val("");}
+        
+        input_clear_button_func("#view_send_input_amount","#view_send_input_amount_clear");
+        input_clear_button_func("#send_currency_input_value","#send_currency_input_value_clear");
+        
+        } catch (e) {
+         
+        }
+              
+     });
+}
+
+function set_view_send_currency_value(){
+    $("#send_currency_input_value").off("change").on("change",function(){
+        set_view_send_currency_value();
+        if(global_balance==null){
+            $("#view_send_button_send_transaction").transition('shake');
+            setTimeout(function(){show_popup_action(templ_loads,"error","Not synced!",500);},500);
+//            show_popup_action(templ_loads,"error","Not synced!",500);
+            return;
+        }
+               
+        if(typeof selected_currency!="string"){selected_currency="USD"}
+        var value=($("#send_currency_input_value").val()=="" ? "0" : $("#send_currency_input_value").val()); 
+        value=value.replace(",",".");  
         
         try {
         //$("#send_currency_value").text(numeral((isNaN(amount) ? 0 : amount)).multiply(alias_prices[selected_currency.toString().toLowerCase()]).format("0.00000000")); 
-        var converted_value= new Big((isNaN(amount) ? 0 : amount)).times(alias_prices[selected_currency.toString().toLowerCase()]).toFixed(8);
-        $("#send_currency_value").text(converted_value); 
+        var converted_amount= new Big((isNaN(value) ? 0 : value)).div(alias_prices[selected_currency.toString().toLowerCase()]).toFixed(8);
+        $("#view_send_input_amount").val(converted_amount);
+        if(converted_amount<=0){$("#view_send_input_amount").val("");}
+        
+        input_clear_button_func("#view_send_input_amount","#view_send_input_amount_clear");
+        input_clear_button_func("#send_currency_input_value","#send_currency_input_value_clear");
+        
+        
         } catch (e) {
             
         }
               
      });
+}
+
+function set_view_receive_payment_currency() {
+    if (global_balance == null) {
+        $("#view_receive_payment_value_input").val(''); 
+        input_clear_button_func("#view_receive_payment_amount_input", "#view_receive_payment_amount_input_clear");
+        input_clear_button_func("#view_receive_payment_value_input", "#view_receive_payment_value_input_clear");
+        return;
+    }
+
+
+    if (typeof selected_currency != "string") {
+        selected_currency = "USD"
+    }
+    var amount = ($("#view_receive_payment_amount_input").val() == "" ? "0" : $("#view_receive_payment_amount_input").val());
+    amount = amount.replace(",", ".");
+
+    try {
+        //$("#send_currency_value").text(numeral((isNaN(amount) ? 0 : amount)).multiply(alias_prices[selected_currency.toString().toLowerCase()]).format("0.00000000"));
+        var num_result=new Big((isNaN(amount) ? 0 : amount)).times(alias_prices[selected_currency.toString().toLowerCase()]).toNumber();
+        var format_l = Math.ceil((Math.log(num_result) / Math.log(9.99999) * -1)) + 4;
+            format_l = format_l > 8 ? 8 : format_l; //infinity memory error !!!!!!!!!!!!!!!!!!!!!!!!!       
+            format_l = format_l < 2 ? 2 : format_l;
+        var converted_value = new Big((isNaN(amount) ? 0 : amount)).times(alias_prices[selected_currency.toString().toLowerCase()]).toFixed(format_l);
+        $("#view_receive_payment_value_input").val(converted_value);
+        if (converted_value <= 0) {
+            $("#view_receive_payment_value_input").val("");
+        }
+
+        input_clear_button_func("#view_receive_payment_amount_input", "#view_receive_payment_amount_input_clear");
+        input_clear_button_func("#view_receive_payment_value_input", "#view_receive_payment_value_input_clear");
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+function set_view_receive_payment_value() {
+    if (global_balance == null) {
+        $("#view_receive_payment_amount_input").val('');
+        input_clear_button_func("#view_receive_payment_amount_input", "#view_receive_payment_amount_input_clear");
+        input_clear_button_func("#view_receive_payment_value_input", "#view_receive_payment_value_input_clear");
+        return;
+    }
+
+
+    if (typeof selected_currency != "string") {
+        selected_currency = "USD"
+    }
+    var amount = ($("#view_receive_payment_value_input").val() == "" ? "0" : $("#view_receive_payment_value_input").val());
+    amount = amount.replace(",", ".");
+
+    try {
+        //$("#send_currency_value").text(numeral((isNaN(amount) ? 0 : amount)).multiply(alias_prices[selected_currency.toString().toLowerCase()]).format("0.00000000")); 
+        var converted_value = new Big((isNaN(amount) ? 0 : amount)).div(alias_prices[selected_currency.toString().toLowerCase()]).toFixed(8);
+        $("#view_receive_payment_amount_input").val(converted_value);
+        if (converted_value <= 0) {
+            $("#view_receive_payment_amount_input").val("");
+        }
+
+        input_clear_button_func("#view_receive_payment_amount_input", "#view_receive_payment_amount_input_clear");
+        input_clear_button_func("#view_receive_payment_value_input", "#view_receive_payment_value_input_clear");
+
+
+    } catch (e) {
+
+    }
 }
 
 async function send_list_remove_items(){
@@ -843,8 +959,8 @@ async function send_list_remove_items(){
 
 async function add_update_send_list(){
     if(global_balance==null){
-            $("#view_send").transition('shake');
-            show_popup_action(templ_loads,"error","Not synced!",250);
+            $("#view_send_button_send_transaction").transition('shake');
+            setTimeout(function(){show_popup_action(templ_loads,"error","Not synced!",500);},500);
             return false;
         }
     
@@ -862,7 +978,7 @@ async function add_update_send_list(){
          }
          $("#view_send_input_amount").val(amount);
          
-         var is_valid_form=await check_send_form(address,narration,amount,"#view_send_button_add");
+         var is_valid_form=await check_send_form(address,label,narration,amount,"#view_send_button_add");
          if(is_valid_form){
              $("#view_send_button_add span").html("&nbsp;Add");
              $("#view_send_button_add").find("i").removeClass("check").addClass("plus");
@@ -905,8 +1021,8 @@ async function add_update_send_list(){
 
 async function open_send_dialogue(list_only){
     if(global_balance==null){
-            $("#view_send").transition('shake');
-            show_popup_action(templ_loads,"error","Not synced!",250);
+            $("#view_send_button_send_transaction").transition('shake');
+            setTimeout(function(){show_popup_action(templ_loads,"error","Not synced!",500);},500);
             return false;
         }
     
@@ -925,7 +1041,7 @@ async function open_send_dialogue(list_only){
          }
          $("#view_send_input_amount").val(amount);
          
-         var is_valid_form=await check_send_form(address,narration,amount,"#view_send_button_send_transaction");
+         var is_valid_form=await check_send_form(address,label,narration,amount,"#view_send_button_send_transaction");
          }
          if(is_valid_form || list_only){
              if(transaction_current_send_number<transaction_send_list.length && !list_only){                
@@ -1025,7 +1141,7 @@ function clear_send_form() {
     input_clear_button_func("#view_send_input_label","#view_send_input_label_clear");
     input_clear_button_func("#view_send_input_note","#view_send_input_note_clear");
     input_clear_button_func("#view_send_input_amount","#view_send_input_amount_clear");
-    
+       
     $("#view_send_input_amount").trigger("change");
 }
 
@@ -1088,7 +1204,7 @@ function fill_send_form(empty){
     }
 }
 
-async function check_send_form(address,narration,amount,shake_id){
+async function check_send_form(address,label,narration,amount,shake_id){
 //         var address=$("#view_send_input_destination").val();
 //         var narration=$("#view_send_input_note").val();
 //         var amount=$("#view_send_input_amount").val();
@@ -1098,6 +1214,14 @@ async function check_send_form(address,narration,amount,shake_id){
             show_popup_action(templ_loads,"error","Invalid Alias Address");
             return false;
          }
+         
+         if(!await check_label(address,label)){
+            $(shake_id).transition('shake');
+            show_popup_action(templ_loads,"error","Label used by different address!");
+            return false;
+         }  
+         
+         
          if(narration.length>24){
             $(shake_id).transition('shake'); 
             show_popup_action(templ_loads,"error","Narration too long! Max. 24 characters allowed."); 
@@ -1127,6 +1251,16 @@ async function check_send_form(address,narration,amount,shake_id){
          
          
          return true;
+}
+
+async function check_label(address,label) {
+    var label_list = await window.electron.ipcRenderer_invoke('list_contact_addresses', 0, "pos", false, label);
+    if (label_list.result[0] != undefined && label_list.result[0] != null) {      
+        if(label==label_list.result[0].label && label_list.result[0].address!=address){         
+            return false;
+        }      
+    }   
+    return true;
 }
 
 async function get_max_amount(destinations_for_send){
@@ -1275,8 +1409,12 @@ async function view_receive_payment(address_obj){
      input_clear_button_func("#view_receive_payment_label_input","#view_receive_payment_label_input_clear");
      input_clear_button_func("#view_receive_payment_amount_input","#view_receive_payment_amount_input_clear");
      input_clear_button_func("#view_receive_payment_note_input","#view_receive_payment_note_input_clear");
+     input_clear_button_func("#view_receive_payment_value_input","#view_receive_payment_value_input_clear");
      
      
+     if(typeof selected_currency!="string"){selected_currency="USD"}
+     $("#view_receive_payment_value_input_currency").text(selected_currency);
+          
 //     encodeURIComponent
      
      $("#view_receive_payment_label_input").off("change").on("change",async function(){         
@@ -1317,7 +1455,23 @@ async function view_receive_payment(address_obj){
      $("#view_receive_payment_amount_input").off("change").on("change",async function(){
          $("#view_receive_payment_qr_loader").addClass("active");
          payment_last_update_time=(new Date().getTime());
-              setTimeout(async function(){
+              set_view_receive_payment_currency();    
+              setTimeout(async function(){                 
+               if(new Date().getTime()-payment_last_update_time > 400){
+                    payment_last_update_time=(new Date().getTime());                                      
+                    $("#view_receive_payment_qr_loader").removeClass("active"); 
+                    var qr_text="alias:"+address_obj.address+"?label="+encodeURIComponent($("#view_receive_payment_address_label").text())+"&narration="+encodeURIComponent($("#view_receive_payment_note_input").val())+"&amount="+encodeURIComponent($("#view_receive_payment_amount_input").val())+"";
+                    qrcode.makeCode(qr_text); 
+                    console.log(qr_text);
+               }   
+              },500); 
+     });
+     
+     $("#view_receive_payment_value_input").off("change").on("change",async function(){
+         $("#view_receive_payment_qr_loader").addClass("active");
+         payment_last_update_time=(new Date().getTime());
+              set_view_receive_payment_value();    
+              setTimeout(async function(){                 
                if(new Date().getTime()-payment_last_update_time > 400){
                     payment_last_update_time=(new Date().getTime());                                      
                     $("#view_receive_payment_qr_loader").removeClass("active"); 

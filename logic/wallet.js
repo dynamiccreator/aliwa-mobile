@@ -50,6 +50,9 @@ class aliwa_wallet{
        this.db_wallet=new db_wallet_r.db_wallet();
        const wallet_functions_r=require("./wallet_functions");
        this.wallet_functions=new wallet_functions_r.wallet_functions();
+    
+     this.last_send_tx_hash=null;
+     this.last_send_tx_object=null;
     }
     
        
@@ -170,14 +173,25 @@ class aliwa_wallet{
             var message = JSON.parse(result.message);
             if (message.result == undefined || message.result == null) {
                 this.gui_was_updated = "failed_send";
+                this.last_send_tx_hash=null;
+                this.last_send_tx_object=null;
                 return false;
             }
             if (message.result.length == 64) {    //only if result is a valid tx
 
-                //update self sent                                                   
-                this.db_wallet.update_self_sent_txs(message.result, result.data.inputs, result.data.outputs);
-                //update transactions
-
+                //update self sent
+                if(this.last_send_tx_hash!=result.data && this.last_send_tx_hash!=null){                   
+                    this.last_send_tx_hash=null;
+                    this.last_send_tx_object=null;
+                    
+                    this.gui_was_updated = "failed_send";
+                    return false;
+                }                             
+                this.db_wallet.update_self_sent_txs(message.result, this.last_send_tx_object.inputs, this.last_send_tx_object.outputs);
+                this.last_send_tx_hash=null;
+                this.last_send_tx_object=null;
+                
+                //update address list                
                 var cnf = this.db_wallet.get_config_values();
                 var private_standard_address_list = this.db_wallet.get_wallet_addresses(0, 0, (cnf.used_pos.standard + 20));
                 var private_change_address_list = this.db_wallet.get_wallet_addresses(1, 0, (cnf.used_pos.change + 20));
@@ -187,6 +201,8 @@ class aliwa_wallet{
             } else {
                 console.error(message.error);
                 this.gui_was_updated = "failed_send";
+                this.last_send_tx_hash=null;
+                this.last_send_tx_object=null;
                 return message.error;
             }
 
@@ -747,7 +763,10 @@ class aliwa_wallet{
       
     
     async send_transaction(hex,tx_object){
-        this.socket.emit("send_raw_tx",hex,tx_object);             
+        this.last_send_tx_hash= createHash('sha256').update(hex).digest().toString("hex");
+        this.last_send_tx_object=tx_object;
+        //console.log("send_raw_tx",hex,this.last_send_tx_hash);
+        this.socket.emit("send_raw_tx",hex,this.last_send_tx_hash);         
     }
     
     create_transaction(destinations,fee,utxo_result,fee_only) { 
@@ -757,7 +776,7 @@ class aliwa_wallet{
         var amount=new Big(0);
         for(var i=0;i<destinations.length;i++){
             amount=amount.plus(destinations[i].amount);
-            console.log("correct value ? :",(destinations[i].amount));
+            //console.log("correct value ? :",(destinations[i].amount));
         }
         if(fee==undefined){fee=this.const_fee;}
         amount=amount.plus(fee);

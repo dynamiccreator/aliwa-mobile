@@ -49,14 +49,19 @@
                 <i id="view_send_input_amount_clear" class="times link icon white inverted large" style="margin-top: 0.5rem"></i>
             </div>
 
-            <span id="send_currency_value" style="color:#8a8c8e;font-size: 1.5rem;margin-top: 0.7rem;display: inline-block;font-family:aliwa_mono;">0.00</span> 
+            <!--<span id="send_currency_value" style="color:#8a8c8e;font-size: 1.5rem;margin-top: 0.7rem;display: inline-block;font-family:aliwa_mono;">0.00</span> -->
+            
+            <div class="ui input large fluid">
+                <input id="send_currency_input_value" type="text" value="" class="aliwa_input_field_secondary" style= "font-family:aliwa_mono;" placeholder="0.00000000">
+                <i id="send_currency_input_value_clear" class="times link icon white inverted large" style="margin-top: 0.5rem"></i>
+            </div>
 
         </div>
 
         <div style="float: left;width: 9rem;">            
             <div style="float:left;margin-left: 0.5rem;">              
                 <span style="color: #f38320;font-size: 1.1rem;margin-top: 1.3rem;display: inline-block;">ALIAS</span> <br>
-                <span id="send_currency_label" style="color: #8a8c8e;font-size: 1.1rem;margin-top: 1.3rem;display: inline-block;">
+                <span id="send_currency_label" style="color: #ccc;font-size: 1.1rem;margin-top: 1.3rem;display: inline-block;">
                      
                 <!-- <button class="ui icon button">
                    
@@ -100,7 +105,7 @@
             <div style="clear: both;"></div>
             
         <div style="margin: auto;text-align: center;margin-top:1rem;">                       
-            <button id="view_send_button_send_transaction" class="ui icon button alias_orange_button2 massive" style="margin-top:calc(100vh - 40rem);width:20rem;">
+            <button id="view_send_button_send_transaction" class="ui icon button alias_orange_button2 massive" style="margin-top:calc(100vh - 41rem);width:20rem;">
                 Send
             </button>
         </div>
