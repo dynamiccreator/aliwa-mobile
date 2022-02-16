@@ -1,7 +1,10 @@
-# ALiWa - Alias Light Wallet Release Notes
+# ALiWa - Mobile
 
 ## Changelog
-Adding type native currency for sending & receiving
+
+ALIWA MOBILE starts here
+---------------------------------
+-END OF ALIWA
 ### 0.1.2
 ### 0.1.1
 MAC BUILD PATCH
