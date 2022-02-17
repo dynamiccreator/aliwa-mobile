@@ -18,4 +18,5 @@ bs58_2 = require("bs58");
 EC = require("elliptic").ec;
 
 
-hashwasm= require('./argon2.umd.min');
+//hashwasm= require('./argon2.umd.min');
+SocksProxyAgent = require('socks-proxy-agent');

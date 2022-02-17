@@ -260,3 +260,6 @@ tr:hover .view_transaction_list_chevron{
 
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
+canvas{
+    max-width:75%;
+}

@@ -15,38 +15,31 @@ class db_wallet {
         }
 
 
-        try {          
-            window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,function (fs) {
-
-                console.log('file system open: ' + fs.name);
-                fs.root.getFile(path, {create: false, exclusive: false}, function (fileEntry) {
-
-                    console.log("fileEntry is file?" + fileEntry.isFile.toString());
-                    console.log("fileEntry.fullPath:", fileEntry.fullPath)
-                    // fileEntry.name == 'someFile.txt'
-                    // fileEntry.fullPath == '/someFile.txt'
-                    readFile(fileEntry);                  
-                }, function (e) {                    
-                    console.log("onErrorReadFile", e);
-                    temp_wallet_saver="---read error---";
-                });
-            }, function (e) {               
-                console.log("onErrorLoadFs", e);
-                temp_wallet_saver="---read error---";
-            });
-
-
+        try {       
+         /*   console.log(Capacitor.Plugins.Filesystem)
+            console.log(Capacitor)
+//            var test=await Capacitor.Plugins.Filesystem.getUri("");
+//            console.log(test)
+                temp_wallet_saver = await Capacitor.Plugins.Filesystem.readFile({
+                path: "context:///"+path,
+//                directory: Directory.Data,
+            //    encoding: Capacitor.Plugins.Filesystem.Encoding.UTF8
+                encoding:"utf8"
+            });*/
+            temp_wallet_saver="file not found";
+            temp_wallet_saver = await Capacitor.Plugins.Storage.get({key: 'light_wallet.dat'});
+            temp_wallet_saver=temp_wallet_saver.value;
+//           console.log(temp_wallet_saver);
+            
+            
         } catch (err) {
             console.error(err);
             return "file not found";
-        } 
-        while(temp_wallet_saver=="file not found"){
-            await sync_sleep(5); 
-            if(temp_wallet_saver=="---read error---"){
-                return "file not found";
-            }
-        }
+        }        
 //        console.log("database_string: ",temp_wallet_saver)
+        if(temp_wallet_saver==null)  {
+           temp_wallet_saver= "file not found";
+        }  
         return temp_wallet_saver;
     }
 
@@ -80,7 +73,7 @@ class db_wallet {
         return true;
     }
 
-    save_database(path, pw_hash, pw_salt) {        
+    async save_database(path, pw_hash, pw_salt) {        
         if (path == null) {
             path = this.default_path;
         }
@@ -94,25 +87,40 @@ class db_wallet {
 
         try {
             //fs.writeFileSync(path, database_string);
-              temp_wallet_saver=database_string;
-          window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function (fs) {
+//              temp_wallet_saver=database_string;
+//          window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function (fs) {
+//
+//                console.log('file system open: ' + fs.name);
+//                fs.root.getFile(path, {create: true, exclusive: false}, function (fileEntry) {
+//
+//                    console.log("fileEntry is file?" + fileEntry.isFile.toString());
+//                    console.log("fileEntry.fullPath:",fileEntry.fullPath)
+//                    // fileEntry.name == 'someFile.txt'
+//                    // fileEntry.fullPath == '/someFile.txt'
+//                   writeFile(fileEntry, database_string);
+//
+//                }, function(e){console.log("onErrorCreateFile",e);});
+//
+//            }, function(e){console.log("onErrorLoadFs",e);});
+         /*   await Capacitor.Plugins.Filesystem.writeFile({
+                  path: "context:///"+path,
+                  data: database_string,
+             //   directory: Directory.Data,
+               // encoding: Capacitor.Plugins.filesystem.Encoding.UTF8
+                  encoding:"utf8"
+            });*/
+            await Capacitor.Plugins.Storage.set({
+            key: "light_wallet.dat",
+            value: database_string
+          });
+            
 
-                console.log('file system open: ' + fs.name);
-                fs.root.getFile(path, {create: true, exclusive: false}, function (fileEntry) {
 
-                    console.log("fileEntry is file?" + fileEntry.isFile.toString());
-                    console.log("fileEntry.fullPath:",fileEntry.fullPath)
-                    // fileEntry.name == 'someFile.txt'
-                    // fileEntry.fullPath == '/someFile.txt'
-                   writeFile(fileEntry, database_string);
-
-                }, function(e){console.log("onErrorCreateFile",e);});
-
-            }, function(e){console.log("onErrorLoadFs",e);});
         } catch (err) {
             console.error(err);
             return false;
         }
+        temp_wallet_saver=database_string;
         return true;
     }
 

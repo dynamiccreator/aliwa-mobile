@@ -77,6 +77,9 @@ var addressbook_contacts_last_search_time=0;
 var last_backactionfunc=null;
 var backactionfunc=null;
 
+var last_swipeleftfunc=null;
+var swipeleftfunc=null;
+
 
 
 
@@ -486,10 +489,26 @@ async function load_balance(){
                     if(notifications_enabled){
                         var notifications= await my_invoke("get_notifications");
                         for(var i=0;i<notifications.length;i++){
-                            new Notification(notifications[i].title, {
+                        /*    new Notification(notifications[i].title, {
                                 icon: 'view_resources/img/aliwa_light.png',
                                 body: notifications[i].body
-                            });
+                            });*/
+                            
+                    Capacitor.Plugins.LocalNotifications.schedule({
+                        notifications: [
+                            {
+                                title: notifications[i].title,
+                                body: notifications[i].body,
+                                id: 2,
+                                schedule: null,
+                                sound: null,
+                                attachments: null,
+                                actionTypeId: "",
+                                extra: null
+                            }
+                        ]
+                    });
+                            
                         }
                     }
                 }
@@ -569,7 +588,7 @@ function view_send(user_inputs){
          fill_send_form(false);
          view_overview();
      });
-     
+             
      if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
      document.addEventListener("backbutton", backactionfunc = function(e){
          e.preventDefault();
@@ -578,10 +597,18 @@ function view_send(user_inputs){
          document.removeEventListener("backbutton",backactionfunc);
      });
      
+     if(swipeleftfunc!=null){document.removeEventListener("swipeleft",swipeleftfunc);}
+     document.addEventListener("swipeleft", swipeleftfunc = function(e){
+         e.preventDefault();
+         fill_send_form(false);
+         view_overview();
+         document.removeEventListener("swipeleft",swipeleftfunc);
+     });
+     
      $("#view_send_button_copy").off("click").on("click",async function(){
-          var clip_text=await navigator.clipboard.readText();
+          var clip_text={ type, value}=await Capacitor.Plugins.Clipboard.read();
 //          console.log(clip_text);
-          $("#view_send_input_destination").val(clip_text.trim());
+          $("#view_send_input_destination").val(clip_text.value.trim());
 //          await set_label_from_contacts(); 
           $("#view_send_input_destination").trigger("change");            
      });
@@ -1403,8 +1430,8 @@ async function view_receive(){
 //         $("#view_receive_address_label").text($("#view_receive_address_label_input").val());
 //     });
      
-     $("#view_receive_copy_button").off("click").on("click",function(){
-          navigator.clipboard.writeText($("#view_receive_address_address").text());
+     $("#view_receive_copy_button").off("click").on("click",async function(){
+         await Capacitor.Plugins.Clipboard.write({string: $("#view_receive_address_address").text()});
          show_popup_action(templ_loads,"info","Address copied");
      });
      
@@ -1537,8 +1564,9 @@ async function view_receive_payment(address_obj){
 //         $("#view_receive_payment_address_label").text($("#view_receive_payment_address_label_input").val());
 //     });
      
-     $("#view_receive_payment_copy_button").off("click").on("click",function(){        
-         navigator.clipboard.writeText("alias:"+address_obj.address+"?label="+encodeURIComponent($("#view_receive_payment_address_label").text())+"&narration="+encodeURIComponent($("#view_receive_payment_note_input").val())+"&amount="+encodeURIComponent($("#view_receive_payment_amount_input").val())+"");
+     $("#view_receive_payment_copy_button").off("click").on("click",async function(){        
+        // navigator.clipboard.writeText("alias:"+address_obj.address+"?label="+encodeURIComponent($("#view_receive_payment_address_label").text())+"&narration="+encodeURIComponent($("#view_receive_payment_note_input").val())+"&amount="+encodeURIComponent($("#view_receive_payment_amount_input").val())+"");
+         await Capacitor.Plugins.Clipboard.write({string: "alias:"+address_obj.address+"?label="+encodeURIComponent($("#view_receive_payment_address_label").text())+"&narration="+encodeURIComponent($("#view_receive_payment_note_input").val())+"&amount="+encodeURIComponent($("#view_receive_payment_amount_input").val())+""});
          show_popup_action(templ_loads,"info","Payment copied");                           
      });
             
@@ -2211,11 +2239,33 @@ async function view_settings(){
             notifications_enabled = true;
             
             
-                new Notification("ALiWa Wallet", {
-                    icon: 'view_resources/img/aliwa_light.png',
-                    body: "Notifications enabled"
-                });
-                                
+//                new Notification("ALiWa Wallet", {
+//                    icon: 'view_resources/img/aliwa_light.png',
+//                    body: "Notifications enabled"
+//                });
+//                
+//                 Capacitor.Plugins.notification.local.schedule({
+//                    smallIcon: 'view_resources/img/aliwa_light.png',
+//                    title: 'ALiWa Wallet',
+//                    text: 'Notifications enabled',
+//                    foreground: true
+//                  });
+                  
+            Capacitor.Plugins.LocalNotifications.schedule({
+                notifications: [
+                    {
+                        title: "ALiWa Wallet",
+                        body: 'Notifications enabled',
+                        id: 1,
+                        schedule: null,
+                        sound: null,
+                        attachments: null,
+                        actionTypeId: "",
+                        extra: null
+                    }
+                ]
+            });  
+            
             await my_invoke("set_notifications_enabled", true);
             await my_invoke("save_wallet", null);
             
@@ -2925,9 +2975,10 @@ function view_single_transaction_in_dialogue(tx,full_tx,confirmations) {
             }
         }
         
-        $(".single_transaction_dialogue_destinations_copy_address").off("click").on("click", function () {
+        $(".single_transaction_dialogue_destinations_copy_address").off("click").on("click",async function () {
             var clip_text=$(this).find("i").attr("value");                  
-           navigator.clipboard.writeText(clip_text);
+//           navigator.clipboard.writeText(clip_text);
+           await Capacitor.Plugins.Clipboard.write({string: clip_text});
            show_popup_action(templ_loads,"info","Address copied");
         });
         

@@ -23,12 +23,13 @@ function show_dialogue_address(current_line,templ_loads,type){
         
         
         //copy        
-        $("#dialogues_"+type+"_copy").off("click").on("click",function(){
+        $("#dialogues_"+type+"_copy").off("click").on("click",async function(){
             var clip_text=$("#dialogues_"+type+"_address").text();
             
 //            console.log("copy to clipboard:"+clip_text);
            
-           navigator.clipboard.writeText(clip_text);
+          // navigator.clipboard.writeText(clip_text);
+           await Capacitor.Plugins.Clipboard.write({string: clip_text});
            show_popup_action(templ_loads,"info","Address copied");
         });
         
