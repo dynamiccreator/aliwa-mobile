@@ -74,6 +74,8 @@ var addressbook_receiving_last_search_time=0;
 var addressbook_contacts_sorting={page:0,field:"pos",descending:true,search:null};
 var addressbook_contacts_last_search_time=0;
 
+var last_backactionfunc=null;
+var backactionfunc=null;
 
 
 
@@ -141,13 +143,13 @@ function view_start_up(){
     
     //
     setTimeout(async function(){
-        var result= await window.electron.ipcRenderer_invoke("open_wallet");
+        var result= await my_invoke("open_wallet");
         if(result){
-            var not_encrypted= await window.electron.ipcRenderer_invoke("load_wallet",null);
+            var not_encrypted= await my_invoke("load_wallet",null);
             if(not_encrypted){
                 $('#view_start_up_when_wallet_exists').slideDown(800,"easeInOutQuad");
                 $('#view_start_up_button_open_wallet').off("click").on("click",async function(){
-                    //await window.electron.ipcRenderer_invoke("load_wallet",null);
+                    //await my_invoke("load_wallet",null);
                     view_overview();
                 });
             }
@@ -167,7 +169,7 @@ function view_start_up(){
                     }                    
                     
                     var password=$("#view_startup_input_password").val();                    
-                    var try_password=await window.electron.ipcRenderer_invoke("load_wallet",password);
+                    var try_password=await my_invoke("load_wallet",password);
                     if(try_password){view_overview();}
                     else{
                         $(this).show(0);
@@ -238,15 +240,15 @@ function view_start_up(){
 function view_create_wallet(){
     //quick testing
     setTimeout(async function(){
-//        var seed_words= await window.electron.ipcRenderer_invoke('get_new_seed');
+//        var seed_words= await my_invoke('get_new_seed');
 //        show_dialogue_info(templ_loads,"SEED WORDS",("This are your seed words:<br><br>"+seed_words),"OK",function(){
 //            show_dialogue_input(templ_loads,"Enter a Seed Password (optional)","Enter a seed password to increase security or leave it empty for no seed password.","Seed Password","password","Proceed","Abort","data",async function(){ 
 //                        var seed_pw=$("#dialogues_input_input").val();
 //                        if(seed_pw==""){
 //                            seed_pw=null;
 //                        }
-//                        await window.electron.ipcRenderer_invoke('create_wallet',seed_words,seed_pw,null);
-//                        await window.electron.ipcRenderer_invoke("load_wallet",null);  
+//                        await my_invoke('create_wallet',seed_words,seed_pw,null);
+//                        await my_invoke("load_wallet",null);  
 //                        $('.ui.modal').modal("hide");
 //                        setTimeout(function(){ view_overview();},300);
 //                                                                                   
@@ -263,7 +265,7 @@ function view_import_from_seed() {
      show_dialogue_modal(templ_loads,"Import Wallet Method","You can enter your Backup Phrase or import from file.","Import from File","Enter Backup Prase",null
         ,async function(){                                             
                 setTimeout(async function(){
-                    var import_path=await window.electron.ipcRenderer_invoke('import_file_dialogue');                 
+                    var import_path=await my_invoke('import_file_dialogue');                 
                     if(import_path){                       
                         setTimeout(function(){
                             $('.ui.modal').modal("hide");
@@ -299,9 +301,9 @@ function view_import_from_seed() {
                             seed_pw = null;
                         }
 
-                        await window.electron.ipcRenderer_invoke('create_wallet', seed_words, seed_pw, null, true);
-                        await window.electron.ipcRenderer_invoke("load_wallet", null);
-                        var seed_words_loaded=await window.electron.ipcRenderer_invoke("get_wallet_seed");
+                        await my_invoke('create_wallet', seed_words, seed_pw, null, true);
+                        await my_invoke("load_wallet", null);
+                        var seed_words_loaded=await my_invoke("get_wallet_seed");
                         if(seed_words!=seed_words_loaded.seed_words){                           
                             alert("CREATE WALLET - I/O ERROR \n\n Could not write or read wallet from disk.\n Your wallet was NOT created!\n Try again or contact support.");
                             $('.ui.modal').modal("hide");
@@ -335,8 +337,8 @@ function view_import_from_seed() {
 
 async function view_overview(){
     //delayed startup variables
-    selected_currency= await window.electron.ipcRenderer_invoke("get_selected_currency");
-    notifications_enabled= await window.electron.ipcRenderer_invoke("is_notifications_enabled");
+    selected_currency= await my_invoke("get_selected_currency");
+    notifications_enabled= await my_invoke("is_notifications_enabled");
     
    window.scrollTo(0, 0);
    $("body").html(build_from_key("main_menu")).hide();
@@ -390,7 +392,7 @@ function actions_overview(){
 }
 
 async function set_about() {
-    var server_infos = await window.electron.ipcRenderer_invoke("get_server_info");
+    var server_infos = await my_invoke("get_server_info");
 //    console.log(server_infos)
     $("#view_about_blockheight").text(server_infos.blockheight);
     $("#view_about_server_label").text(server_infos.server_name);
@@ -448,22 +450,22 @@ async function start_sync_interval(){
 }
 
 async function load_balance(){
-    var sync_state = await window.electron.ipcRenderer_invoke("get_sync_state");
+    var sync_state = await my_invoke("get_sync_state");
             if (sync_state == "synced") {
-                var was_updated= await window.electron.ipcRenderer_invoke("gui_was_updated");
+                var was_updated= await my_invoke("gui_was_updated");
                 //failed sends
                 if(was_updated=="failed_send"){                  
                     setTimeout(function(){
                         show_dialogue_info(templ_loads,"SEND ERROR!","Your transaction could not be sent! <br><br> This could be caused by an unsynced server, no sufficient funds or other unknown reasons.","OK",function(){});
                     },4000);
-                    await window.electron.ipcRenderer_invoke("set_gui_updated");
+                    await my_invoke("set_gui_updated");
                 }
                 if(!was_updated){                  
-                    await window.electron.ipcRenderer_invoke("set_gui_updated");
+                    await my_invoke("set_gui_updated");
                     //update overview and Send
-                    var balance = await window.electron.ipcRenderer_invoke("get_balance");    
+                    var balance = await my_invoke("get_balance");    
                     global_balance = balance;
-                    alias_prices= await window.electron.ipcRenderer_invoke("get_alias_prices");                 
+                    alias_prices= await my_invoke("get_alias_prices");                 
                     set_balance();
                     
                                                      
@@ -482,7 +484,7 @@ async function load_balance(){
                     //show notifications on new txs
                     //update tx and etc. 
                     if(notifications_enabled){
-                        var notifications= await window.electron.ipcRenderer_invoke("get_notifications");
+                        var notifications= await my_invoke("get_notifications");
                         for(var i=0;i<notifications.length;i++){
                             new Notification(notifications[i].title, {
                                 icon: 'view_resources/img/aliwa_light.png',
@@ -566,6 +568,14 @@ function view_send(user_inputs){
      $("#view_back_current").off("click").on("click",function(){
          fill_send_form(false);
          view_overview();
+     });
+     
+     if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();
+         fill_send_form(false);
+         view_overview();
+         document.removeEventListener("backbutton",backactionfunc);
      });
      
      $("#view_send_button_copy").off("click").on("click",async function(){
@@ -659,7 +669,7 @@ function view_send(user_inputs){
          
         var tx_dest = JSON.parse(JSON.stringify(transaction_send_list));
         if(tx_dest.length<1){show_popup_action(templ_loads,"error","List is empty!"); return;}
-        var tx_info = await window.electron.ipcRenderer_invoke("get_raw_tx", tx_dest);
+        var tx_info = await my_invoke("get_raw_tx", tx_dest);
         if (tx_info == false) {
             show_popup_action(templ_loads, "error", "Unknown error");
             return;
@@ -743,7 +753,41 @@ function view_send(user_inputs){
      //send button
      $("#view_send_button_send_transaction").off("click").on("click",async function(){
           open_send_dialogue(false);    
-     });     
+     });
+     
+      $("form").submit(function(e){
+        e.preventDefault();
+        $("#view_send_button_send_transaction").focus().trigger("click");
+    });
+}
+
+function fill_from_qr_code_text(qr_text){
+    try {       
+         if(qr_text.startsWith("alias:")){
+             var qr_text=qr_text.substring(6);
+             var split_text=qr_text.split("?");
+             
+             var address=split_text[0];
+             var rest=split_text[1].split("=");
+             var label=decodeURIComponent(rest[1].split("&")[0]);
+             var narration=decodeURIComponent(rest[2].split("&")[0]);
+             var amount=decodeURIComponent(rest[3]);
+             
+           //  alert(address+" | "+label+" | "+narration+" | "+amount);
+             $("#view_send_input_destination").val(address).trigger("change");
+             $("#view_send_input_label").val(label).trigger("change");
+             $("#view_send_input_note").val(narration).trigger("change");
+             $("#view_send_input_amount").val(amount).trigger("change");
+         }
+         else{
+          //  alert(qr_text);
+            $("#view_send_input_destination").val(qr_text).trigger("change");
+            
+         }
+} catch (e) {
+alert(e);
+}
+   
 }
 
 function set_view_send_currency(){
@@ -903,7 +947,7 @@ async function send_list_remove_items(){
 
                 //update modal
                 var tx_dest = JSON.parse(JSON.stringify(transaction_send_list));
-                var tx_info = await window.electron.ipcRenderer_invoke("get_raw_tx", tx_dest);
+                var tx_info = await my_invoke("get_raw_tx", tx_dest);
                 var fee = tx_info.fee;
 
                 var total_send = new Big(0);
@@ -1062,7 +1106,7 @@ async function open_send_dialogue(list_only){
                     tx_dest.push({amount:amount,destination_address:address,narration:narration,label:label});   
                 }
              }
-             var tx_info=await window.electron.ipcRenderer_invoke("get_raw_tx",tx_dest);
+             var tx_info=await my_invoke("get_raw_tx",tx_dest);
              if(tx_info=="server_not_synced"){show_popup_action(templ_loads,"error","Not connected or synced with the server!",2500);return;}
              if(tx_info==false){show_popup_action(templ_loads,"error","Unknown error"); return;}
              
@@ -1083,13 +1127,13 @@ async function open_send_dialogue(list_only){
              tx_text+="<b>Send Total: "+ minimal_zeros(total_send.toFixed(8),2,8) +' ALIAS </b> <span style="display:inline-block;">(incl. '+fee+' ALIAS fee)</span><div class="ui divider"></div><br>';
              tx_text+=temp_tx_text;
              
-             var pw_result=await window.electron.ipcRenderer_invoke("compare_password","");
+             var pw_result=await my_invoke("compare_password","");
              show_dialogue_modal(templ_loads,"Confirm Transaction"+(tx_dest.length>1 ?"s" : "")+"?","Confirm the following transaction"+(tx_dest.length>1 ?"s" : "")+":<br><br>"+tx_text,(pw_result ? "Send Now":"Confirm"),"Abort",tx_dest,async function(){
                 // ask for password                  
                  console.log("after dialogue:",tx_dest);
                  
                  if(pw_result){ // no password
-                    await window.electron.ipcRenderer_invoke("send",tx_info); 
+                    await my_invoke("send",tx_info); 
                     show_popup_action(templ_loads,"info",'<i class="coins icon"></i>&nbsp;Coins sent!',1500);
                     for(var i=0;i<tx_dest.length;i++){
                         await add_or_update_contact(tx_dest[i].destination_address,tx_dest[i].label);
@@ -1101,9 +1145,9 @@ async function open_send_dialogue(list_only){
                  else{
                     setTimeout(function(){
                     show_dialogue_input(templ_loads,"Enter Password","Your password is required for this transaction.<br>","Password","password","Send Now","Abort","data",async function(){ 
-                        var pw_result=await window.electron.ipcRenderer_invoke("compare_password",$("#dialogues_input_input").val());
+                        var pw_result=await my_invoke("compare_password",$("#dialogues_input_input").val());
                         if(pw_result){
-                            await window.electron.ipcRenderer_invoke("send",tx_info);
+                            await my_invoke("send",tx_info);
                             show_popup_action(templ_loads,"info",'<i class="coins icon"></i>&nbsp;Coins sent!',1500);                           
                             $('.ui.modal').modal("hide");
                             for(var i=0;i<tx_dest.length;i++){
@@ -1147,11 +1191,11 @@ function clear_send_form() {
 
 async function add_or_update_contact(address,label) {
     if(label==""){return;}
-    var can_add = await window.electron.ipcRenderer_invoke("add_new_contact_address", label, address);
+    var can_add = await my_invoke("add_new_contact_address", label, address);
     if (can_add == true) {       
     } else if (can_add == "duplicated label") {      
     } else if (can_add == "duplicated address") {
-        await window.electron.ipcRenderer_invoke("change_contact_address_by_address", address,label);
+        await my_invoke("change_contact_address_by_address", address,label);
     }
 
 }
@@ -1160,7 +1204,7 @@ async function set_label_from_contacts(){
     if(last_dest_val_change!=$("#view_send_input_destination").val()){
              last_dest_val_change=$("#view_send_input_destination").val();
              if(last_dest_val_change!="" && last_dest_val_change.length==34){
-                var list=await window.electron.ipcRenderer_invoke('list_contact_addresses',0, "pos", false,last_dest_val_change);
+                var list=await my_invoke('list_contact_addresses',0, "pos", false,last_dest_val_change);
                 if(list.result[0]!=undefined && list.result[0]!=null){
                     $("#view_send_input_label").val(list.result[0].label);
                 }              
@@ -1254,7 +1298,7 @@ async function check_send_form(address,label,narration,amount,shake_id){
 }
 
 async function check_label(address,label) {
-    var label_list = await window.electron.ipcRenderer_invoke('list_contact_addresses', 0, "pos", false, label);
+    var label_list = await my_invoke('list_contact_addresses', 0, "pos", false, label);
     if (label_list.result[0] != undefined && label_list.result[0] != null) {      
         if(label==label_list.result[0].label && label_list.result[0].address!=address){         
             return false;
@@ -1300,7 +1344,7 @@ async function get_max_amount(destinations_for_send){
 //        var start=new Date().getUTCMilliseconds();
         
         
-        var fee=await window.electron.ipcRenderer_invoke("get_fee",destinations);
+        var fee=await my_invoke("get_fee",destinations);
         if(fee.exceed!=undefined){
            destinations[transaction_current_send_number].amount=new Big(destinations[transaction_current_send_number].amount).minus(fee.exceed).toNumber();
            var max=destinations[transaction_current_send_number].amount;
@@ -1320,18 +1364,18 @@ async function view_receive(){
     
     //manipulate
     $("#navbar_title").text("Receive");
-    var address_obj=await window.electron.ipcRenderer_invoke("get_latest_receive_addr");
+    var address_obj=await my_invoke("get_latest_receive_addr");
     show_qr_code("view_qr_code",address_obj.address);
     //...
     
     $("body").fadeIn(100,"easeInOutQuad");
     
     $("#view_back_overview").off("click").on("click",function(){
-         window.electron.ipcRenderer_invoke("save_wallet",null);
+         my_invoke("save_wallet",null);
          view_overview();
      });
      $("#view_back_current").off("click").on("click",function(){
-         window.electron.ipcRenderer_invoke("save_wallet",null);
+         my_invoke("save_wallet",null);
          view_overview();
      });
      
@@ -1349,7 +1393,7 @@ async function view_receive(){
      
      $("#view_receive_address_label_input").off("change").on("change",async function(){
          $("#view_receive_address_label").text($("#view_receive_address_label_input").val());
-         var result=await window.electron.ipcRenderer_invoke("change_receive_address_label",address_obj.pos,$("#view_receive_address_label_input").val());
+         var result=await my_invoke("change_receive_address_label",address_obj.pos,$("#view_receive_address_label_input").val());
          if(result=="duplicated"){
              show_popup_action(templ_loads,"error","Label is duplicated!");   
          }
@@ -1365,13 +1409,19 @@ async function view_receive(){
      });
      
      $("#view_receive_receive_payment_button").off("click").on("click",function(){
-         window.electron.ipcRenderer_invoke("save_wallet",null);
+         my_invoke("save_wallet",null);
          view_receive_payment();
      });
      
+     if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();     
+         view_overview();
+         document.removeEventListener("backbutton",backactionfunc);
+     });
+     
     
-    
-      
+         
 }
 
 async function view_receive_payment(address_obj){
@@ -1386,17 +1436,17 @@ async function view_receive_payment(address_obj){
     $("body").fadeIn(100,"easeInOutQuad");
     
     $("#view_back_overview").off("click").on("click",function(){
-         window.electron.ipcRenderer_invoke("save_wallet",null);
+         my_invoke("save_wallet",null);
          view_overview();
      });
      $("#view_back_current").off("click").on("click",function(){
-         window.electron.ipcRenderer_invoke("save_wallet",null);       
+         my_invoke("save_wallet",null);       
          view_overview();
      });
      
      
      if(address_obj==undefined){
-        address_obj=await window.electron.ipcRenderer_invoke("get_latest_receive_addr");
+        address_obj=await my_invoke("get_latest_receive_addr");
      }
      var qrcode=show_qr_code("view_qr_code",address_obj.address);
      $("#view_receive_payment_address_address").text(address_obj.address);
@@ -1419,7 +1469,7 @@ async function view_receive_payment(address_obj){
      
      $("#view_receive_payment_label_input").off("change").on("change",async function(){         
          $("#view_receive_payment_address_label").text($("#view_receive_payment_label_input").val());       
-         var result =await window.electron.ipcRenderer_invoke("change_receive_address_label",address_obj.pos,$("#view_receive_payment_label_input").val());
+         var result =await my_invoke("change_receive_address_label",address_obj.pos,$("#view_receive_payment_label_input").val());
          if(result=="duplicated"){
              show_popup_action(templ_loads,"error","Label is duplicated!");  
              return;
@@ -1516,6 +1566,13 @@ async function view_address_book_contacts(){
          view_overview();
      });
      
+     if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();     
+         view_overview();
+         document.removeEventListener("backbutton",backactionfunc);
+     });
+     
     address_book_contacts_actions();
      
 }
@@ -1526,7 +1583,7 @@ async function address_book_contacts_pagination(){
     j_clone=$("<div>"+j_clone+"</div>");
     
                  
-    var list=await window.electron.ipcRenderer_invoke('list_contact_addresses',addressbook_contacts_sorting.page, addressbook_contacts_sorting.field, addressbook_contacts_sorting.descending,addressbook_contacts_sorting.search);    
+    var list=await my_invoke('list_contact_addresses',addressbook_contacts_sorting.page, addressbook_contacts_sorting.field, addressbook_contacts_sorting.descending,addressbook_contacts_sorting.search);    
     var table_list="";
     for(var i=0;i<list.result.length;i++){
         table_list+='<tr class="address_book_line_contacts">'
@@ -1594,11 +1651,11 @@ function address_book_contacts_actions(){
                          }
                         
                         
-                         var can_add=await window.electron.ipcRenderer_invoke("add_new_contact_address",label,address);
-                       // var pw_result=await window.electron.ipcRenderer_invoke("compare_password",$("#dialogues_input_input").val());
+                         var can_add=await my_invoke("add_new_contact_address",label,address);
+                       // var pw_result=await my_invoke("compare_password",$("#dialogues_input_input").val());
                         if(can_add==true){
                              show_popup_action(templ_loads,"info","Contact added"); 
-                             window.electron.ipcRenderer_invoke("save_wallet",null);
+                             my_invoke("save_wallet",null);
                              $('.ui.modal').modal("hide");
                              addressbook_contacts_sorting.page=0;
                              var j_clone=await address_book_contacts_pagination();
@@ -1807,7 +1864,7 @@ async function address_book_receive_pagination(){
     j_clone=$("<div>"+j_clone+"</div>"); //replace parent address_book_tab_content with div
      //manipulate before insert
            
-    var list=await window.electron.ipcRenderer_invoke('list_receive_addresses',addressbook_receiving_sorting.page, addressbook_receiving_sorting.field, addressbook_receiving_sorting.descending,addressbook_receiving_sorting.search);    
+    var list=await my_invoke('list_receive_addresses',addressbook_receiving_sorting.page, addressbook_receiving_sorting.field, addressbook_receiving_sorting.descending,addressbook_receiving_sorting.search);    
     var table_list="";
     for(var i=0;i<list.result.length;i++){
         table_list+='<tr class="address_book_line_receiving">'
@@ -1861,13 +1918,13 @@ function address_book_receiving_actions(){
      });  
      
      $("#address_book_receive_new_address").off("click").on("click",async function(){
-        var pw_result=await window.electron.ipcRenderer_invoke("compare_password",""); 
+        var pw_result=await my_invoke("compare_password",""); 
         if (pw_result) {
             add_new_receiving_address_dialogue();
         } else {
 
             show_dialogue_input(templ_loads, "Enter Password", "Your password is required.<br>", "Password", "password", "OK", "Abort", "data", async function () {
-                var pw_result = await window.electron.ipcRenderer_invoke("compare_password", $("#dialogues_input_input").val());
+                var pw_result = await my_invoke("compare_password", $("#dialogues_input_input").val());
                 if (pw_result) {
                    
                    $('.ui.modal').modal("hide");
@@ -2027,11 +2084,11 @@ function address_book_receiving_actions(){
 
 function add_new_receiving_address_dialogue(){
     show_dialogue_input(templ_loads,"New Address","Enter a label for your new address. (optional)<br>","Label (optional)","text","OK","Abort","data",async function(){ 
-                        var can_add=await window.electron.ipcRenderer_invoke("add_new_receive_addr",$("#dialogues_input_input").val());
-                       // var pw_result=await window.electron.ipcRenderer_invoke("compare_password",$("#dialogues_input_input").val());
+                        var can_add=await my_invoke("add_new_receive_addr",$("#dialogues_input_input").val());
+                       // var pw_result=await my_invoke("compare_password",$("#dialogues_input_input").val());
                         if(can_add==true){
                              show_popup_action(templ_loads,"info","Address added"); 
-                             window.electron.ipcRenderer_invoke("save_wallet",null);
+                             my_invoke("save_wallet",null);
                              $('.ui.modal').modal("hide");
                              addressbook_receiving_sorting.page=0;
                              var j_clone=await address_book_receive_pagination();
@@ -2060,8 +2117,8 @@ async function view_settings(){
     window.scrollTo(0, 0);
     var j_load=$(build_from_key("settings"));
     
-    var has_no_password=await window.electron.ipcRenderer_invoke("compare_password","");
-    var has_backup=await window.electron.ipcRenderer_invoke("has_backup");
+    var has_no_password=await my_invoke("compare_password","");
+    var has_backup=await my_invoke("has_backup");
     
     //manipulate
 
@@ -2078,6 +2135,13 @@ async function view_settings(){
      });
      $("#view_back_current").off("click").on("click",function(){
          view_overview();
+     });
+     
+     if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();
+         view_overview();
+         document.removeEventListener("backbutton",backactionfunc);
      });
      
      //settings
@@ -2137,8 +2201,8 @@ async function view_settings(){
               $(this).find("input[type=checkbox]").prop("checked",false);
             notifications_enabled = false;
             
-            await window.electron.ipcRenderer_invoke("set_notifications_enabled", false);
-            await window.electron.ipcRenderer_invoke("save_wallet", null);
+            await my_invoke("set_notifications_enabled", false);
+            await my_invoke("save_wallet", null);
                      
         } else {
             $(this).find("label").text('ON');
@@ -2152,8 +2216,8 @@ async function view_settings(){
                     body: "Notifications enabled"
                 });
                                 
-            await window.electron.ipcRenderer_invoke("set_notifications_enabled", true);
-            await window.electron.ipcRenderer_invoke("save_wallet", null);
+            await my_invoke("set_notifications_enabled", true);
+            await my_invoke("save_wallet", null);
             
             
         }       
@@ -2193,9 +2257,9 @@ function view_native_currency(){
      //select currency  
      $(".currency_item_select").off("click").on("click",async function(){
          show_popup_action(templ_loads,"info",$(this).find("span").first().text()+" selected");
-         await window.electron.ipcRenderer_invoke("set_selected_currency",$(this).find("span").first().text());
+         await my_invoke("set_selected_currency",$(this).find("span").first().text());
          selected_currency=$(this).find("span").first().text();
-         window.electron.ipcRenderer_invoke("save_wallet",null);
+         my_invoke("save_wallet",null);
 //         view_settings()();
      });
      
@@ -2207,7 +2271,7 @@ async function view_settings_custom_server(){
     var j_load=$(build_from_key("custom_server"));
     
     //list server addresses
-    var addresses=await window.electron.ipcRenderer_invoke("list_server_aliwa_addresses");
+    var addresses=await my_invoke("list_server_aliwa_addresses");
    
     var community=addresses.community;
     var custom=addresses.custom;
@@ -2344,12 +2408,12 @@ async function view_settings_custom_server(){
                                 +'Even with thousands of transactions on hundreds of addresses this will take just a few seconds.'                              
                                 ,"COMPLETE RESYNC","JUST SWITCH TO SERVER",addresses
                                 ,async function(){ 
-                                     await window.electron.ipcRenderer_invoke("switch_to_aliwa_server_address",cur_label,true);
+                                     await my_invoke("switch_to_aliwa_server_address",cur_label,true);
                                      view_settings_custom_server();
                                      clean_modal("modal");
                                      setTimeout(function () { show_popup_action(templ_loads, "info", ('Server setted to:<br>"'+cur_label+'"'),3000); }, 300);
                                 },async function(){
-                                    await window.electron.ipcRenderer_invoke("switch_to_aliwa_server_address",cur_label,false);  
+                                    await my_invoke("switch_to_aliwa_server_address",cur_label,false);  
                                     view_settings_custom_server();
                                     clean_modal("modal");
                                     setTimeout(function () {show_popup_action(templ_loads, "info", ('Server setted to:<br>"'+cur_label+'"'),3000); }, 300);
@@ -2370,7 +2434,7 @@ async function view_settings_custom_server(){
             show_dialogue_input(templ_loads, "Edit Server", "Edit address of server <b>\""+cur_label+"\"</b><br>", "Address", "text", "Edit Server", "Abort", "data", async function () {
             var address = $("#dialogues_input_input").val();
                  
-            var can_add = await window.electron.ipcRenderer_invoke("edit_aliwa_server_address",cur_label,address);            
+            var can_add = await my_invoke("edit_aliwa_server_address",cur_label,address);            
             if (can_add == true) {
                 show_popup_action(templ_loads, "info", "Server address edited");               
                 $('.ui.modal').modal("hide"); 
@@ -2397,7 +2461,7 @@ async function view_settings_custom_server(){
                                +cur_address+'</span>'
                                 ,"DELETE SERVER","Abort",addresses
                                 ,async function(){ 
-                                     await window.electron.ipcRenderer_invoke("delete_aliwa_server_address",cur_label);
+                                     await my_invoke("delete_aliwa_server_address",cur_label);
                                      $('.ui.modal').modal("hide"); 
                                      setTimeout(function(){
                                        view_settings_custom_server();                                     
@@ -2415,7 +2479,7 @@ async function view_settings_custom_server(){
             var label = $("#dialogues_input_input").val();
             var address = $("#dialogues_input_input2").val();
         
-            var can_add = await window.electron.ipcRenderer_invoke("add_aliwa_server_address",label,address,"custom");            
+            var can_add = await my_invoke("add_aliwa_server_address",label,address,"custom");            
             if (can_add == true) {
                 show_popup_action(templ_loads, "info", "Server address added");               
                 $('.ui.modal').modal("hide"); 
@@ -2463,6 +2527,13 @@ async function tab_to_transactions(){
           tab_to_overview();
       });
       
+     if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();     
+          tab_to_overview();
+         document.removeEventListener("backbutton",backactionfunc);
+     });
+      
       
          
 }
@@ -2471,7 +2542,7 @@ async function transactions_pagination(){
     var j_load=$(templ_loads["transactions"]);
      //manipulate
      var j_clone=j_load.clone();
-     var list=await window.electron.ipcRenderer_invoke("list_transactions",transaction_table_sorting.page,transaction_table_sorting.field,transaction_table_sorting.descending,transaction_table_sorting.search);
+     var list=await my_invoke("list_transactions",transaction_table_sorting.page,transaction_table_sorting.field,transaction_table_sorting.descending,transaction_table_sorting.search);
 //    console.log(list);
     var sync_height=list.sync_height;  
     var result=list.result;
@@ -2482,7 +2553,7 @@ async function transactions_pagination(){
     for(var i=0;i<result.length;i++){
         address_list.push(result[i].address);
     }
-    var label_list = await window.electron.ipcRenderer_invoke("get_address_labels",address_list);
+    var label_list = await my_invoke("get_address_labels",address_list);
 //    console.log(label_list)
     
     for(var i=0;i<result.length;i++){
@@ -2575,7 +2646,7 @@ async function transactions_pagination_actions(){
                 var tx=$(this).prop("id").split("_")[1];
                 var confirmations=$(this).find("td:nth-child(1) h4 div span").text();
               
-                var full_tx=await window.electron.ipcRenderer_invoke("get_single_transaction",tx);
+                var full_tx=await my_invoke("get_single_transaction",tx);
                 console.log(full_tx);               
                 show_dialogue_info(templ_loads,"Details","","OK",function(){},f => view_single_transaction_in_dialogue(tx,full_tx,confirmations));
           });
@@ -2800,7 +2871,7 @@ function view_single_transaction_in_dialogue(tx,full_tx,confirmations) {
             $("#single_transaction_dialogue_tx_popup").toggle();
             
             $("#single_transaction_dialogue_popup_tx_confirm").off("click").on("click", async function () {
-                await window.electron.ipcRenderer_invoke("open_tx_link", $("#single_transaction_dialogue_tx_link a").attr("href"));
+                await my_invoke("open_tx_link", $("#single_transaction_dialogue_tx_link a").attr("href"));
             });
                        
         });
@@ -2817,7 +2888,7 @@ function view_single_transaction_in_dialogue(tx,full_tx,confirmations) {
             $("#single_transaction_dialogue_blockhash_popup").toggle();
             
             $("#single_transaction_dialogue_popup_blockhash_confirm").off("click").on("click", async function () {
-                await window.electron.ipcRenderer_invoke("open_tx_link", $("#single_transaction_dialogue_blockhash_link a").attr("href"));
+                await my_invoke("open_tx_link", $("#single_transaction_dialogue_blockhash_link a").attr("href"));
             });
                        
         });
@@ -2895,7 +2966,7 @@ function edit_label_on_single_transaction(full_tx){
                      edit_label_on_single_transaction(full_tx);
                     return;
                 }
-                var res= await window.electron.ipcRenderer_invoke("set_address_label_contact_or_receive",full_tx.destinations[i].address,new_label);
+                var res= await my_invoke("set_address_label_contact_or_receive",full_tx.destinations[i].address,new_label);
                 if(res==false){
                     show_popup_action(templ_loads,"error","Basic Contacts are immutable!");
                     $(this).parent().find("input")
@@ -2907,8 +2978,8 @@ function edit_label_on_single_transaction(full_tx){
                 }
                 else if(res=="duplicated" || res=="duplicated label"){show_popup_action(templ_loads,"error","Label is duplicated!");} 
                 else{
-                     full_tx=await window.electron.ipcRenderer_invoke("get_single_transaction",full_tx.tx);  
-                    window.electron.ipcRenderer_invoke("save_wallet",null);
+                     full_tx=await my_invoke("get_single_transaction",full_tx.tx);  
+                    my_invoke("save_wallet",null);
                     
                     //update transactions
                     var cur_num=parseInt($("#view_transactions_pagination_container_page_third").text());
@@ -2986,8 +3057,8 @@ async function view_set_password(startup=false,seed_words){
     }
     else{
         $("body").html(build_from_key("set_password")).hide();
-    var has_no_password=await window.electron.ipcRenderer_invoke("compare_password","");
-    var has_backup=await window.electron.ipcRenderer_invoke("has_backup");
+    var has_no_password=await my_invoke("compare_password","");
+    var has_backup=await my_invoke("has_backup");
     
     //manipulate
     $("#navbar_title").text("Set Password");
@@ -3090,11 +3161,11 @@ async function view_set_password(startup=false,seed_words){
         
     });   
     
-    //var not_encrypted= await window.electron.ipcRenderer_invoke("load_wallet",null);
+    //var not_encrypted= await my_invoke("load_wallet",null);
     //set password
     $("#view_set_password_button_setPassword").off("click").on("click",async function(){
         if(!startup){
-            var match_old_pw=await window.electron.ipcRenderer_invoke("compare_password",$("#view_set_password_input_OldPassword").val());             
+            var match_old_pw=await my_invoke("compare_password",$("#view_set_password_input_OldPassword").val());             
             if(!match_old_pw){
                 show_popup_action(templ_loads,"error","Old Password is incorrect!");
                 return;
@@ -3105,9 +3176,9 @@ async function view_set_password(startup=false,seed_words){
         
         if(new_pw==""){
             if(startup){
-                await window.electron.ipcRenderer_invoke('create_wallet', seed_words.seed_words, seed_words.seed_pw, null,true);
-                await window.electron.ipcRenderer_invoke("load_wallet", null);
-                var seed_words_loaded = await window.electron.ipcRenderer_invoke("get_wallet_seed");
+                await my_invoke('create_wallet', seed_words.seed_words, seed_words.seed_pw, null,true);
+                await my_invoke("load_wallet", null);
+                var seed_words_loaded = await my_invoke("get_wallet_seed");
                 if (seed_words.seed_words != seed_words_loaded.seed_words) {
                     alert("CREATE WALLET - I/O ERROR \n\n Could not write or read wallet from disk.\n Your wallet was NOT created!\n Try again or contact support.");
                     $('.ui.modal').modal("hide");
@@ -3119,7 +3190,7 @@ async function view_set_password(startup=false,seed_words){
                 view_overview();
                 return;
             }                      
-            var is_set= await window.electron.ipcRenderer_invoke("set_password",new_pw);
+            var is_set= await my_invoke("set_password",new_pw);
            /* show_popup_action(templ_loads,"info","No Password in use <br> => Wallet is not encrypted!!!",2500);
             
             //reset form or return to settings?
@@ -3141,9 +3212,9 @@ async function view_set_password(startup=false,seed_words){
             }
             
             if(startup){
-                await window.electron.ipcRenderer_invoke('create_wallet', seed_words.seed_words, seed_words.seed_pw, new_pw,true);
-                await window.electron.ipcRenderer_invoke("load_wallet", new_pw);
-                var seed_words_loaded = await window.electron.ipcRenderer_invoke("get_wallet_seed");
+                await my_invoke('create_wallet', seed_words.seed_words, seed_words.seed_pw, new_pw,true);
+                await my_invoke("load_wallet", new_pw);
+                var seed_words_loaded = await my_invoke("get_wallet_seed");
                 if (seed_words.seed_words != seed_words_loaded.seed_words) {
                     alert("CREATE WALLET - I/O ERROR \n\n Could not write or read wallet from disk.\n Your wallet was NOT created!\n Try again or contact support.");
                     $('.ui.modal').modal("hide");
@@ -3157,7 +3228,7 @@ async function view_set_password(startup=false,seed_words){
             }
             $(this).hide(0);
             $("#view_set_password_button_setPassword_loading").show(0);
-            var is_set= await window.electron.ipcRenderer_invoke("set_password",new_pw);
+            var is_set= await my_invoke("set_password",new_pw);
             view_settings();
             setTimeout(function(){show_popup_action(templ_loads,"info","Password was set!");},300);
            /* show_popup_action(templ_loads,"info","Password was set!");
@@ -3197,18 +3268,18 @@ async function view_backup_phrase() {
     });
 
     $("#unhide_backupphrase").off("click").on("click", async function () {
-        var pw_result = await window.electron.ipcRenderer_invoke("compare_password", "");
+        var pw_result = await my_invoke("compare_password", "");
         
         if (pw_result) {
-            var backup_phrase = await window.electron.ipcRenderer_invoke("get_wallet_seed");
+            var backup_phrase = await my_invoke("get_wallet_seed");
             $("#view_backup_phrase_phrase").html('<b>Seed Words:</b><br><div style="padding:1rem;background:#382b3f;border-radius: 1rem;width: 97%;margin: auto;">' + backup_phrase.seed_words + '</div><br><b>Seed Password:</b><br><div style="padding:1rem;background:#382b3f;border-radius: 1rem;width: 97%;margin: auto;">' + (backup_phrase.seed_pw == null ? "</div><br><br><br>" : (backup_phrase.seed_pw + "</div><br><br><br>")));
             $("#unhide_backupphrase").remove();
         } else {
 
             show_dialogue_input(templ_loads, "Enter Password", "Your password is required.<br>", "Password", "password", "Show Backup Phrase", "Abort", "data", async function () {
-                var pw_result = await window.electron.ipcRenderer_invoke("compare_password", $("#dialogues_input_input").val());
+                var pw_result = await my_invoke("compare_password", $("#dialogues_input_input").val());
                 if (pw_result) {
-                   var backup_phrase = await window.electron.ipcRenderer_invoke("get_wallet_seed");
+                   var backup_phrase = await my_invoke("get_wallet_seed");
                    $("#view_backup_phrase_phrase").html('<b>Seed Words:</b><br><div style="padding:1rem;background:#382b3f;border-radius: 1rem;width: 97%;margin: auto;">' + backup_phrase.seed_words + '</div><br><b>Seed Password:</b><br><div style="padding:1rem;background:#382b3f;border-radius: 1rem;width: 97%;margin: auto;">' + (backup_phrase.seed_pw == null ? "</div><br><br><br>" : (backup_phrase.seed_pw + "</div><br><br><br>")));
                    $('.ui.modal').modal("hide");
 //                    clean_modal("input");
@@ -3262,14 +3333,14 @@ async function view_backup(startup) {
     
     
     if(startup){
-    var seed_words=await window.electron.ipcRenderer_invoke("get_new_seed"); 
+    var seed_words=await my_invoke("get_new_seed"); 
 //    console.log(seed_words);
     view_backup_page_start_up_info(startup,segment,seed_words);
         
     }
     
     else{
-    var seed_words=await window.electron.ipcRenderer_invoke("get_wallet_seed");        
+    var seed_words=await my_invoke("get_wallet_seed");        
            
     view_backup_page_start_up_info(startup,segment_menu,seed_words);
     
@@ -3281,7 +3352,7 @@ async function view_backup(startup) {
 async function view_backup_page_start_up_info(startup,segment,seed_words){
     var nav_bar=templ_loads["sub_navbar"];
     var page_start_up_info=$(templ_loads["backup"]).find("#view_backup_page_start_up_info");
-    var has_backup=await window.electron.ipcRenderer_invoke("has_backup");
+    var has_backup=await my_invoke("has_backup");
     
     if(startup){$("body").html(segment+page_start_up_info.html()+"</div>").hide(); }
     else{$("body").html(nav_bar+segment+page_start_up_info.html()+"</div>").hide(); }
@@ -3297,6 +3368,13 @@ async function view_backup_page_start_up_info(startup,segment,seed_words){
     $("#view_back_current").off("click").on("click", function () {
         view_settings();
     });
+    
+     if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();     
+         view_settings();
+         document.removeEventListener("backbutton",backactionfunc);
+     });
     
     $("#view_backup_it_is_safe").off("click").on("click",function(e){         
        if($("#view_backup_it_is_safe_checkbox").prop("checked")==true){
@@ -3316,7 +3394,7 @@ async function view_backup_page_start_up_info(startup,segment,seed_words){
     $("#view_start_backup_button").off("click").on("click", async function () {
         var pw_result=true;
         if(!startup){
-             pw_result = await window.electron.ipcRenderer_invoke("compare_password", "");
+             pw_result = await my_invoke("compare_password", "");
         }
           
         if ($("#view_backup_it_is_safe_checkbox").prop("checked") == true) {
@@ -3324,7 +3402,7 @@ async function view_backup_page_start_up_info(startup,segment,seed_words){
                 view_backup_page_write_down(startup, segment, seed_words, 1);
             } else {
                 show_dialogue_input(templ_loads, "Enter Password", "Your password is required.<br>", "Password", "password", "Show Backup Phrase", "Abort", "data", async function () {
-                    var pw_result = await window.electron.ipcRenderer_invoke("compare_password", $("#dialogues_input_input").val());
+                    var pw_result = await my_invoke("compare_password", $("#dialogues_input_input").val());
                     if (pw_result) {
                         $('.ui.modal').modal("hide");
                         setTimeout(function(){view_backup_page_write_down(startup, segment, seed_words, 1);},300);
@@ -3359,7 +3437,7 @@ async function view_backup_page_start_up_info(startup,segment,seed_words){
         $("#view_start_backup_button_abort").remove();
         
         $("#view_savebackup_file_button").off("click").on("click", async function () {
-            var file_was_saved=await window.electron.ipcRenderer_invoke('save_as_dialogue');
+            var file_was_saved=await my_invoke('save_as_dialogue');
             if(file_was_saved){show_popup_action(templ_loads, "info", 'Backup File was saved!');}
         });
     }
@@ -3504,9 +3582,9 @@ function view_backup_page_seed_password_no_backup(startup,segment,seed_words){
         if (seed_pw == "") {
                     seed_pw = null;
         }
-        await window.electron.ipcRenderer_invoke('create_wallet', seed_words.seed_words, seed_pw, null);
-        await window.electron.ipcRenderer_invoke("load_wallet", null); 
-        var seed_words_loaded = await window.electron.ipcRenderer_invoke("get_wallet_seed");
+        await my_invoke('create_wallet', seed_words.seed_words, seed_pw, null);
+        await my_invoke("load_wallet", null); 
+        var seed_words_loaded = await my_invoke("get_wallet_seed");
         if (seed_words.seed_words != seed_words_loaded.seed_words) {
             alert("CREATE WALLET - I/O ERROR \n\n Could not write or read wallet from disk.\n Your wallet was NOT created!\n Try again or contact support.");
             $('.ui.modal').modal("hide");
@@ -3754,7 +3832,7 @@ function view_backup_page_verify(startup,segment,seed_words){
                 }
                   view_set_password(true,seed_words); 
             } else {
-                await window.electron.ipcRenderer_invoke("set_backup");
+                await my_invoke("set_backup");
                 view_settings();
             }
             
