@@ -77,8 +77,6 @@ var addressbook_contacts_last_search_time=0;
 var last_backactionfunc=null;
 var backactionfunc=null;
 
-var last_swipeleftfunc=null;
-var swipeleftfunc=null;
 
 
 
@@ -132,6 +130,14 @@ function view_start_up(){
     $("body").fadeIn(1000,"easeInOutQuad");
     input_clear_button_func("#view_startup_input_password","#view_startup_input_password_label_clear");
     
+    
+    if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();      
+         document.removeEventListener("backbutton",backactionfunc);
+         Capacitor.Plugins.App.exitApp();        
+     });
+       
     $("#view_startup_input_password_eye").off("click").on("click",function(){
          if($(this).hasClass("slash")){
             $(this).removeClass("slash");
@@ -357,6 +363,13 @@ async function view_overview(){
 }
 
 function actions_overview(){
+    if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();      
+         document.removeEventListener("backbutton",backactionfunc);
+         Capacitor.Plugins.App.exitApp();        
+     });
+    
    $("#tab_second").removeClass("active");
    $("#tab_first").removeClass("active");
    $("#tab_first").addClass("active");
@@ -596,15 +609,7 @@ function view_send(user_inputs){
          view_overview();
          document.removeEventListener("backbutton",backactionfunc);
      });
-     
-     if(swipeleftfunc!=null){document.removeEventListener("swipeleft",swipeleftfunc);}
-     document.addEventListener("swipeleft", swipeleftfunc = function(e){
-         e.preventDefault();
-         fill_send_form(false);
-         view_overview();
-         document.removeEventListener("swipeleft",swipeleftfunc);
-     });
-     
+          
      $("#view_send_button_copy").off("click").on("click",async function(){
           var clip_text={ type, value}=await Capacitor.Plugins.Clipboard.read();
 //          console.log(clip_text);
@@ -613,12 +618,40 @@ function view_send(user_inputs){
           $("#view_send_input_destination").trigger("change");            
      });
      
-     $("#view_send_button_scan").off("click").on("click",async function(){
-         fill_send_form(false);
-          //cordova camera
-          //qr reader
-          //....
-     });
+     $("#view_send_button_scan").off("click").on("click",async function(){  
+        
+        if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+        document.addEventListener("backbutton", backactionfunc = function(e){
+        document.removeEventListener("backbutton",backactionfunc); 
+        e.preventDefault();                     
+        });
+        
+        var CapacitorQRScanner  = Capacitor.Plugins.CapacitorQRScanner;
+        var result=  CapacitorQRScanner.scan().then(
+            function(value) {
+                if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+                    document.addEventListener("backbutton", backactionfunc = function(e){
+                    document.removeEventListener("backbutton",backactionfunc); 
+                    e.preventDefault();  
+                        view_overview();
+                    });   
+                fill_from_qr_code_text(value.code);
+            
+            },function(error) {
+                 if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+                    document.addEventListener("backbutton", backactionfunc = function(e){
+                    document.removeEventListener("backbutton",backactionfunc); 
+                    e.preventDefault();  
+                        view_overview();
+                    });  
+                 show_popup_action(templ_loads,"error","Scan aborted!",500);    
+            }
+        );
+            
+        
+
+    });
+    
      
      $("#view_send_button_address_book").off("click").on("click",function(){
          fill_send_form(false);
@@ -637,6 +670,38 @@ function view_send(user_inputs){
      input_clear_button_func("#view_send_input_note","#view_send_input_note_clear");
      input_clear_button_func("#view_send_input_amount","#view_send_input_amount_clear");
      input_clear_button_func("#send_currency_input_value","#send_currency_input_value_clear");
+     
+     
+     //enter key will jump to next input or close keyboard for amount/value
+     $("#view_send_input_destination").off('keydown').on('keydown',e=>{
+            if(e.keyCode ===13){
+            $("#view_send_input_label").focus();   
+            }
+        });
+        
+     $("#view_send_input_label").off('keydown').on('keydown',e=>{
+            if(e.keyCode ===13){
+            $("#view_send_input_note").focus();   
+            }
+        });
+        
+     $("#view_send_input_note").off('keydown').on('keydown',e=>{
+            if(e.keyCode ===13){
+            $("#view_send_input_amount").focus();   
+            }
+        });
+        
+     $("#view_send_input_amount").off('keydown').on('keydown',e=>{
+            if(e.keyCode ===13){
+            $("#view_send_input_amount").blur();   
+            }
+        });
+        
+        $("#send_currency_input_value").off('keydown').on('keydown',e=>{
+            if(e.keyCode ===13){
+            $("#send_currency_input_value").blur();   
+            }
+        }); 
      
      
      set_view_send_currency();
@@ -696,13 +761,13 @@ function view_send(user_inputs){
          
         var tx_dest = JSON.parse(JSON.stringify(transaction_send_list));
         if(tx_dest.length<1){show_popup_action(templ_loads,"error","List is empty!"); return;}
-        var tx_info = await my_invoke("get_raw_tx", tx_dest);
-        if (tx_info == false) {
+        var fee = await window.electron.ipcRenderer_invoke("get_fee", tx_dest);
+        if (fee == false) {
             show_popup_action(templ_loads, "error", "Unknown error");
             return;
         }
-        if(tx_info=="server_not_synced"){show_popup_action(templ_loads,"error","Not connected or synced with the server!",2500);return;}        
-        var fee = tx_info.fee;
+//        if(tx_info=="server_not_synced"){show_popup_action(templ_loads,"error","Not connected or synced with the server!",2500);return;}        
+//        var fee = tx_info.fee;
         $("#view_send_fee").text(new Big(fee).toFixed(8));
         var tx_text = "";
         var temp_tx_text = "";
@@ -799,6 +864,7 @@ function fill_from_qr_code_text(qr_text){
              var label=decodeURIComponent(rest[1].split("&")[0]);
              var narration=decodeURIComponent(rest[2].split("&")[0]);
              var amount=decodeURIComponent(rest[3]);
+             amount=amount.replaceAll(",",".");
              
            //  alert(address+" | "+label+" | "+narration+" | "+amount);
              $("#view_send_input_destination").val(address).trigger("change");
@@ -974,8 +1040,8 @@ async function send_list_remove_items(){
 
                 //update modal
                 var tx_dest = JSON.parse(JSON.stringify(transaction_send_list));
-                var tx_info = await my_invoke("get_raw_tx", tx_dest);
-                var fee = tx_info.fee;
+                var fee = await window.electron.ipcRenderer_invoke("get_fee", tx_dest);
+               // var fee = tx_info.fee;
 
                 var total_send = new Big(0);
                 total_send=total_send.plus(fee);
@@ -1406,9 +1472,15 @@ async function view_receive(){
          view_overview();
      });
      
+     if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();     
+         view_overview();
+         document.removeEventListener("backbutton",backactionfunc);
+     });
      
      
-     
+         
      $("#view_receive_address_address").text(address_obj.address);
      $("#view_receive_address_label").text(address_obj.label);
      $("#view_receive_address_label_input").val(address_obj.label!=null ? address_obj.label : "");
