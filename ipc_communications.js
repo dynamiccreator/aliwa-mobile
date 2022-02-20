@@ -188,8 +188,8 @@
         return list_result;
    });
    
-   my_handle('list_contact_addresses', async (event,page, order_field, direction, search) => {
-        var list_result= wallet.list_contact_addresses(page, order_field, direction, search);
+   my_handle('list_contact_addresses', async (event,page, order_field, direction, search,strict_label=false) => {
+        var list_result= wallet.list_contact_addresses(page, order_field, direction, search,strict_label);
         return list_result;
    });
    
@@ -304,7 +304,22 @@
            return true;
        }
        return false;*/
-   });
+    var data = await wallet.read_wallet_DB();
+    var datetime = new Date().getDate() + "-" + new Date().getMonth() + "-" + new Date().getFullYear()
+    +"--"+new Date().getHours()+"-"+new Date().getMinutes()+"-"+new Date().getSeconds();
+    try {
+        await Capacitor.Plugins.Filesystem.writeFile({
+            data: data,
+            directory: "DOCUMENTS",
+            path: "light-wallet-" + datetime + ".txt",
+            encoding: "utf8"});
+        return true;
+    } catch (e) {
+
+    }
+    return false;
+
+});
    
    my_handle('import_file_dialogue', async (event) => {
      /*  var filename = await dialog.showOpenDialog({title:"Import Backup File",buttonLabel:"Import Backup File"});
@@ -325,9 +340,29 @@
             
             }                                             
        }
-       return false;*/
-   });
-   
+       return false;*/             
+    var result = await Capacitor.Plugins.FilePicker.pickFiles({
+        types: ["text/example","text/plain","audio/DAT12","application/activity+json"],
+        multiple: false,
+    });  
+//    console.log(result); 
+//    console.log(result.files[0].name);
+//    console.log(result.files[0].path);
+//    console.log(atob(result.files[0].data));
+    
+    /*var contents = await Capacitor.Plugins.Filesystem.readFile({path: result.path,encoding: "utf8"});
+     console.log("file contents: ",contents); */
+        
+    await Capacitor.Plugins.Storage.set({
+            key: "light_wallet.dat",
+            value: atob(result.files[0].data)
+    });
+    
+    return true;
+        
+    
+    });
+                
    //save on exit test
 //   my_handle('wallet_save_on_exit', async (event) => {
 //         console.log("save_on_exit");       

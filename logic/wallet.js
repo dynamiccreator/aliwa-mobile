@@ -581,7 +581,7 @@ class aliwa_wallet{
     }
         
     
-     list_contact_addresses(page, order_field, direction, search) { 
+     list_contact_addresses(page, order_field, direction, search,strict_label=false) { 
         // add / update standard contacts
         
                                         
@@ -599,12 +599,19 @@ class aliwa_wallet{
         } else {
             search=search.trim();
             var txs = this.db_wallet.get_contact_addresses();
-            var result = [];
-            var tx_array = txs.chain().find({'$or': [
+            var result = [];           
+            var tx_array=[];
+            if(strict_label){
+                tx_array = txs.chain().find({"label": {'$aeq': search}})
+                    .simplesort(order_field, {desc: direction}).data({forceClones: true, removeMeta: true});
+            }
+            else{
+                tx_array = txs.chain().find({'$or': [
                     {"pos": {'$aeq': (parseInt(search)-1)}},
                     {"label": {'$contains': search}},
                     {"address": {'$contains': search}}                    
                 ]}).simplesort(order_field, {desc: direction}).data({forceClones: true, removeMeta: true});
+            }
             var len = tx_array.length;
             var page_start = page * this.pagination_num;
             for (var i = page_start; i < page_start + this.pagination_num && i < len; i++) {

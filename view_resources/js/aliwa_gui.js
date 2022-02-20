@@ -1390,8 +1390,9 @@ async function check_send_form(address,label,narration,amount,shake_id){
          return true;
 }
 
-async function check_label(address,label) {
-    var label_list = await my_invoke('list_contact_addresses', 0, "pos", false, label);
+async function check_label(address,label) {    
+    if(label ==""){return true;}
+    var label_list = await my_invoke('list_contact_addresses', 0, "pos", false, label,true);
     if (label_list.result[0] != undefined && label_list.result[0] != null) {      
         if(label==label_list.result[0].label && label_list.result[0].address!=address){         
             return false;
@@ -3561,7 +3562,18 @@ async function view_backup_page_start_up_info(startup,segment,seed_words){
         
         $("#view_savebackup_file_button").off("click").on("click", async function () {
             var file_was_saved=await my_invoke('save_as_dialogue');
-            if(file_was_saved){show_popup_action(templ_loads, "info", 'Backup File was saved!');}
+            if(file_was_saved){
+//                show_popup_action(templ_loads, "info", 'Backup File (light-wallet-'+
+//                        new Date().getDate()+"-"+new Date().getMonth()+"-"+new Date().getFullYear()+'.txt)'+'was saved to \"Documents\"!',3000);
+             show_dialogue_info(templ_loads,"Backup saved!",
+             'Backup File \"light-wallet-'+new Date().getDate()+"-"+new Date().getMonth()+"-"+new Date().getFullYear()
+                     +"--"+new Date().getHours()+"-"+new Date().getMinutes()+"-"+new Date().getSeconds()+'.txt\"'
+             +' was saved to \"Documents\"!'
+            ,"OK",function(){});
+            }
+            else{
+                 show_popup_action(templ_loads, "error", "Could not save backup file!",2000);
+            }
         });
     }
     
