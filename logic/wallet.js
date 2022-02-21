@@ -2,8 +2,7 @@
 //  ->serverlist
 var aliwa_serverlist=[{label:"Default Server (onion)",address:"ws://mumdrm3iakrhu5uu2kau5j6t6bm3vz5qwi236pv2tubyunhjqlstipid.onion:6657"},                                          
                       {label:"localhost example",address:"ws://localhost:3000"},
-                      {label:"ssl example",address:"wss://your_domain:port"},
-                      {label:"Default TEST Server (onion)",address:"ws://aliwa5ld6pm66lbwb2kfyzvqzco24ihnmzoknvaqg4uqhpdtelnfa4id.onion:3000"}];
+                      {label:"ssl example",address:"wss://your_domain:port"}];
 
 
 class aliwa_wallet{       
