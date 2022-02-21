@@ -1,4 +1,11 @@
 function show_dialogue_address(current_line,templ_loads,type){
+        last_backactionfunc=backactionfunc.bind({});
+        if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+            document.addEventListener("backbutton", backactionfunc = function(e){
+            e.preventDefault();
+            $('.ui.modal').modal("hide");
+        });
+        
         console.log("line clicked");
         var dialogue=$(templ_loads["dialogues"]).filter("#dialogues_"+type);
         $("body").append(dialogue);
@@ -148,7 +155,9 @@ function show_dialogue_address(current_line,templ_loads,type){
                 //doing custom stuff 
                 
                 
-            },onHidden:function(){                  
+            },onHidden:function(){
+                document.addEventListener("backbutton", backactionfunc = last_backactionfunc.bind({}));
+                last_backactionfunc=null;
                 clean_modal(type);
                
             }/*,onHide:function(){
@@ -239,6 +248,13 @@ function clean_modal(type) {
 
 
 function show_dialogue_modal(templ_loads,title,text,yes_title,no_title,data,yes,no,inside_f){  
+        last_backactionfunc=backactionfunc.bind({});
+        if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+            document.addEventListener("backbutton", backactionfunc = function(e){
+            e.preventDefault();
+            $('.ui.modal').modal("hide");
+        });
+    
         var dialogue=$(templ_loads["dialogues"]).filter("#dialogues_modal");
         $("body").append(dialogue);
        
@@ -269,6 +285,8 @@ function show_dialogue_modal(templ_loads,title,text,yes_title,no_title,data,yes,
                 
                 
             },onHidden:function(){
+                document.addEventListener("backbutton", backactionfunc = last_backactionfunc.bind({}));
+                last_backactionfunc=null;
                 clean_modal("modal");
                
             }/*,onHide:function(){
@@ -279,7 +297,13 @@ function show_dialogue_modal(templ_loads,title,text,yes_title,no_title,data,yes,
        
 }
 
- function show_dialogue_info(templ_loads,title,text,ok_title,f,inside_f){  
+ function show_dialogue_info(templ_loads,title,text,ok_title,f,inside_f){
+        last_backactionfunc=backactionfunc.bind({});
+        if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+            document.addEventListener("backbutton", backactionfunc = function(e){
+            e.preventDefault();
+            $('.ui.modal').modal("hide");
+        });
         var dialogue=$(templ_loads["dialogues"]).filter("#dialogues_info");
         $("body").append(dialogue);
        
@@ -317,6 +341,8 @@ function show_dialogue_modal(templ_loads,title,text,yes_title,no_title,data,yes,
                 
                 
             },onHidden:function(){
+                document.addEventListener("backbutton", backactionfunc = last_backactionfunc.bind({}));
+                last_backactionfunc=null;
                 clean_modal("info");
                
             }/*,onHide:function(){
@@ -328,6 +354,12 @@ function show_dialogue_modal(templ_loads,title,text,yes_title,no_title,data,yes,
 }
 
 function show_dialogue_input(templ_loads,title,text,input_name,input_type,yes_title,no_title,data,yes,no,more){  
+        last_backactionfunc=backactionfunc.bind({});
+        if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+            document.addEventListener("backbutton", backactionfunc = function(e){
+            e.preventDefault();
+            $('.ui.modal').modal("hide");
+        });
         var dialogue=$(templ_loads["dialogues"]).filter("#dialogues_input");
         $("body").append(dialogue);
        
@@ -380,7 +412,9 @@ function show_dialogue_input(templ_loads,title,text,input_name,input_type,yes_ti
                 //doing custom stuff 
                 
                 
-            },onHidden:function(){                  
+            },onHidden:function(){
+                document.addEventListener("backbutton", backactionfunc = last_backactionfunc.bind({}));
+                last_backactionfunc=null;
                 clean_modal("input");
                
             }/*,onHide:function(){

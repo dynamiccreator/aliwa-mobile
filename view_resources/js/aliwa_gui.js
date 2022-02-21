@@ -80,7 +80,6 @@ var backactionfunc=null;
 
 
 
-
  async function gui() {    
    //start_up    
     view_start_up();
@@ -605,9 +604,9 @@ function view_send(user_inputs){
      if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
      document.addEventListener("backbutton", backactionfunc = function(e){
          e.preventDefault();
-         fill_send_form(false);
-         view_overview();
          document.removeEventListener("backbutton",backactionfunc);
+         fill_send_form(false);
+         view_overview();         
      });
           
      $("#view_send_button_copy").off("click").on("click",async function(){
@@ -630,9 +629,9 @@ function view_send(user_inputs){
         var result=  CapacitorQRScanner.scan().then(
             function(value) {
                 if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
-                    document.addEventListener("backbutton", backactionfunc = function(e){
+                    document.addEventListener("backbutton", backactionfunc = function(e){                   
+                    e.preventDefault();
                     document.removeEventListener("backbutton",backactionfunc); 
-                    e.preventDefault();  
                         view_overview();
                     });   
                 fill_from_qr_code_text(value.code);
@@ -1475,9 +1474,9 @@ async function view_receive(){
      
      if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
      document.addEventListener("backbutton", backactionfunc = function(e){
-         e.preventDefault();     
-         view_overview();
+         e.preventDefault();
          document.removeEventListener("backbutton",backactionfunc);
+         view_overview();        
      });
      
      
@@ -1515,9 +1514,10 @@ async function view_receive(){
      
      if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
      document.addEventListener("backbutton", backactionfunc = function(e){
-         e.preventDefault();     
-         view_overview();
+         e.preventDefault();  
          document.removeEventListener("backbutton",backactionfunc);
+         view_overview();
+         
      });
      
     
@@ -1669,9 +1669,10 @@ async function view_address_book_contacts(){
      
      if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
      document.addEventListener("backbutton", backactionfunc = function(e){
-         e.preventDefault();     
-         view_overview();
+         e.preventDefault();
          document.removeEventListener("backbutton",backactionfunc);
+         view_overview();
+         
      });
      
     address_book_contacts_actions();
@@ -2241,8 +2242,8 @@ async function view_settings(){
      if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
      document.addEventListener("backbutton", backactionfunc = function(e){
          e.preventDefault();
-         view_overview();
          document.removeEventListener("backbutton",backactionfunc);
+         view_overview();      
      });
      
      //settings
@@ -2377,6 +2378,13 @@ function view_native_currency(){
          view_settings();
      });
      
+     if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault(); 
+         document.removeEventListener("backbutton",backactionfunc);
+         view_settings();         
+     });
+     
      //select currency  
      $(".currency_item_select").off("click").on("click",async function(){
          show_popup_action(templ_loads,"info",$(this).find("span").first().text()+" selected");
@@ -2439,6 +2447,14 @@ async function view_settings_custom_server(){
      });
      $("#view_back_current").off("click").on("click",function(){
          view_settings();
+     });
+     
+     if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault(); 
+         document.removeEventListener("backbutton",backactionfunc);
+         view_settings();
+         
      });
      
      $("#view_settings_custom_server_list").off("click").on("click",function(){
@@ -2652,9 +2668,9 @@ async function tab_to_transactions(){
       
      if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
      document.addEventListener("backbutton", backactionfunc = function(e){
-         e.preventDefault();     
-          tab_to_overview();
+         e.preventDefault();  
          document.removeEventListener("backbutton",backactionfunc);
+         tab_to_overview();        
      });
       
       
@@ -2987,7 +3003,8 @@ function view_single_transaction_in_dialogue(tx,full_tx,confirmations) {
         $("#single_transaction_dialogue_tx_link a").attr("href", 'https://chainz.cryptoid.info/alias/tx.dws?' + tx + '.htm');
         $("#single_transaction_dialogue_tx_link a").text(tx);
 
-        $("#single_transaction_dialogue_tx_link").off("click").on("click", function () {
+        $("#single_transaction_dialogue_tx_link").off("click").on("click", function (e) {
+            e.preventDefault();
             var button_top_pos = $("#single_transaction_dialogue_tx_link").position().top;
             button_top_pos -= $("#single_transaction_dialogue_tx_popup").height();
             $("#single_transaction_dialogue_tx_popup").css({position: "fixed", width: "90%", top: (button_top_pos - 10)});
@@ -3003,7 +3020,8 @@ function view_single_transaction_in_dialogue(tx,full_tx,confirmations) {
         $("#single_transaction_dialogue_blockhash_link a").attr("href", 'https://chainz.cryptoid.info/alias/block.dws?' + full_tx.blockhash + '.htm');
         $("#single_transaction_dialogue_blockhash_link a").text(full_tx.blockhash);
 
-        $("#single_transaction_dialogue_blockhash_link").off("click").on("click", function () {
+        $("#single_transaction_dialogue_blockhash_link").off("click").on("click", function (e) {
+            e.preventDefault();
             if(full_tx.blockhash==null){return;}
             var button_top_pos = $("#single_transaction_dialogue_blockhash_link").position().top;
             button_top_pos -= $("#single_transaction_dialogue_blockhash_popup").height();
@@ -3198,6 +3216,13 @@ async function view_set_password(startup=false,seed_words){
          view_settings();
      });
      
+     if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault(); 
+         document.removeEventListener("backbutton",backactionfunc);
+         view_settings();       
+     });
+     
      if(has_no_password){
         $("#view_set_password_input_OldPassword_fluid,#view_set_password_input_OldPassword_label").hide();
         var insert_text='<div class="ui warning icon message huge">'
@@ -3336,6 +3361,12 @@ async function view_set_password(startup=false,seed_words){
             }
             
             if(startup){
+                if (backactionfunc != null) {document.removeEventListener("backbutton", backactionfunc);}
+                    document.addEventListener("backbutton", backactionfunc = function (e) {
+                    e.preventDefault();                  
+                });
+                
+                
                 await my_invoke('create_wallet', seed_words.seed_words, seed_words.seed_pw, new_pw,true);
                 await my_invoke("load_wallet", new_pw);
                 var seed_words_loaded = await my_invoke("get_wallet_seed");
@@ -3390,6 +3421,13 @@ async function view_backup_phrase() {
     $("#view_back_current").off("click").on("click", function () {
         view_settings();
     });
+    
+    if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();
+         document.removeEventListener("backbutton",backactionfunc);
+         view_settings();        
+     });
 
     $("#unhide_backupphrase").off("click").on("click", async function () {
         var pw_result = await my_invoke("compare_password", "");
@@ -3436,6 +3474,14 @@ function view_about() {
     $("#view_back_current").off("click").on("click", function () {
         view_settings();
     });
+    
+    if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault(); 
+         document.removeEventListener("backbutton",backactionfunc);
+         view_settings();       
+     });
+    
 }
 
 async function view_backup(startup) {
@@ -3493,12 +3539,23 @@ async function view_backup_page_start_up_info(startup,segment,seed_words){
         view_settings();
     });
     
-     if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
-     document.addEventListener("backbutton", backactionfunc = function(e){
-         e.preventDefault();     
-         view_settings();
-         document.removeEventListener("backbutton",backactionfunc);
-     });
+    if(startup){
+        if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+        document.addEventListener("backbutton", backactionfunc = function(e){
+            e.preventDefault(); 
+            document.removeEventListener("backbutton",backactionfunc);
+            view_start_up();           
+        });
+    }
+    else{
+        if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+        document.addEventListener("backbutton", backactionfunc = function(e){
+            e.preventDefault(); 
+            document.removeEventListener("backbutton",backactionfunc);
+            view_settings();            
+        });
+    }
+    
     
     $("#view_backup_it_is_safe").off("click").on("click",function(e){         
        if($("#view_backup_it_is_safe_checkbox").prop("checked")==true){
@@ -3636,7 +3693,18 @@ function view_backup_page_write_down(startup,segment,seed_words,page){
         }        
     });
     
-      
+    if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();
+         document.removeEventListener("backbutton",backactionfunc);
+         if(page==1){
+            view_backup_page_start_up_info(startup,segment,seed_words);
+        }
+        else{
+            view_backup_page_write_down(startup,segment,seed_words,page-1);
+        }         
+     });
+               
     if(page==4){
     $("#view_backup_next_words").text("Proceed");    
     }
@@ -3669,6 +3737,14 @@ function view_backup_page_seed_password_define(startup,segment,seed_words){
         seed_words.seed_pw=null;
         view_backup_page_write_down(startup,segment,seed_words,4)
     });  
+    
+    if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();
+         document.removeEventListener("backbutton",backactionfunc);
+         seed_words.seed_pw=null;
+         view_backup_page_write_down(startup,segment,seed_words,4);       
+     });
     
     $("#view_backup_next_words").off("click").on("click", function () {
         var pw=$("#view_backup_seed_password").val();
@@ -3705,7 +3781,16 @@ function view_backup_page_seed_password_no_backup(startup,segment,seed_words){
     $("#view_backup_go_back").off("click").on("click", function () {
         seed_words.seed_pw=null;
         view_backup(startup);
-    });  
+    }); 
+    
+    if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+     document.addEventListener("backbutton", backactionfunc = function(e){
+         e.preventDefault();
+         document.removeEventListener("backbutton",backactionfunc);
+         seed_words.seed_pw=null;
+         view_backup(startup);        
+     });
+    
     
     $("#view_backup_next_words").off("click").on("click", async function () {
         var seed_pw=$("#view_backup_seed_password").val();
@@ -3773,7 +3858,16 @@ function view_backup_page_seed_password_show(startup,segment,seed_words){
     $("#view_backup_next_words").off("click").on("click", function () {
         view_backup_page_verify(startup,segment,seed_words); 
     });
-        
+    
+    if (backactionfunc != null) {
+        document.removeEventListener("backbutton", backactionfunc);
+    }
+    document.addEventListener("backbutton", backactionfunc = function (e) {
+        e.preventDefault();
+        document.removeEventListener("backbutton", backactionfunc);
+        view_backup_page_write_down(startup, segment, seed_words, 4);       
+    });
+
 }
 
 function view_backup_page_verify(startup,segment,seed_words){
@@ -3928,8 +4022,35 @@ function view_backup_page_verify(startup,segment,seed_words){
                     view_backup_page_seed_password_show(startup,segment,seed_words);
                 }
             }
-    });  
-    
+    }); 
+             
+    if (backactionfunc != null) {
+        document.removeEventListener("backbutton", backactionfunc);
+    }
+    document.addEventListener("backbutton", backactionfunc = function (e) {
+        e.preventDefault();       
+        document.removeEventListener("backbutton", backactionfunc);
+        
+        fill_backup_seed_words=[];    
+        $(".aliwa_input_field,.aliwa_input_field_red").each(function(){
+            fill_backup_seed_words.push($(this).val());           
+        });
+        
+        if(seed_words.seed_pw!=null){       
+            fill_backup_seed_pw=$("#view_backup_seed_password_confirm").val();         
+        } 
+        
+        
+        if(startup){view_backup_page_seed_password_define(startup,segment,seed_words);}
+            else{
+                if(seed_words.seed_pw==null){
+                    view_backup_page_write_down(startup,segment,seed_words,4);
+                }
+                else{
+                    view_backup_page_seed_password_show(startup,segment,seed_words);
+                }
+            }
+    });                           
     $("#view_backup_confirm_backup").off("click").on("click", async function () {
         var found_wrong_word=false;
         

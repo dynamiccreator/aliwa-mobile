@@ -231,7 +231,8 @@
    
    //open in browser
    my_handle('open_tx_link', async (event,link) => {
-        require("electron").shell.openExternal(link);
+//        require("electron").shell.openExternal(link);
+          window.open(link);  
    });
    
    //label list
