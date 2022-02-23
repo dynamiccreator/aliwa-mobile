@@ -63,7 +63,8 @@ class wallet_functions {
         for (var o = 0; o < tx_input_data.outputs.length; o++) {
             output_hex += int_toVarint_byte(Math.floor(new Big(tx_input_data.outputs[o].amount).times(100000000).toNumber()), 8); // Math.floor because of javascript adding some 0.000000000001 at the end after multiplying 
             output_hex += int_toVarint_byte(25, 1);// script length  
-            output_hex += "76a914" + bs58_2.decode(tx_input_data.outputs[o].destination_address).toString("hex").substr(2, 40) + "88ac";//output script            
+            output_hex += "76a914" + Buffer(bs58_2.decode(tx_input_data.outputs[o].destination_address)).toString("hex").substr(2, 40) + "88ac";//output script            
+                 
             //build narration if available
             if (tx_input_data.outputs[o].narration != undefined) {
 //                console.log("narration:\n");
@@ -149,7 +150,7 @@ class wallet_functions {
         }
 
         final_raw_tx += output_hex;
-
+console.log("final_raw_tx: ",final_raw_tx);
         return final_raw_tx;
     }
 
