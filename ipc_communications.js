@@ -1,6 +1,4 @@
-module.exports = function () {
-   const aliwa= require("./logic/wallet");      
-   const {ipcMain, Notification,dialog} =require ("electron");
+//     const {ipcMain, Notification,dialog} =require ("electron");
 //   const path = require('path');
    
    var wallet=null;
@@ -24,71 +22,71 @@ module.exports = function () {
    }
    
           
-   ipcMain.handle('open_wallet', async (event) => {
-    var wal = new aliwa.aliwa_wallet();
-    var data = wal.read_wallet_DB();
+   my_handle('open_wallet', async (event) => {
+    var wal = new aliwa_wallet();
+    var data = await wal.read_wallet_DB();
     if (data == false) {return false;}
     else{ return true;}
    });
    
-   ipcMain.handle('create_wallet', async (event, seed_words,seed_pw,wallet_pw,has_backup) => {
+   my_handle('create_wallet', async (event, seed_words,seed_pw,wallet_pw,has_backup) => {
     if(wallet!=null){
         wallet.disconnect();
         delete wallet;
         wallet=null;
     }   
-    var wal = new aliwa.aliwa_wallet();
+    var wal = new aliwa_wallet();
     await wal.create_wallet(seed_words,seed_pw,wallet_pw,has_backup);
     //inital update for address gen
     await wal.db_wallet.update_addressbook_receive(-1);   
     await wal.save_wallet(null,true,true);  
-    var data = wal.read_wallet_DB();
+    var data = await wal.read_wallet_DB();
     if (data == false) {return false;}
     else{ return true;}
    });
    
    //SEED*****************************************************************
-   ipcMain.handle('get_wallet_seed', async (event) => {
+   my_handle('get_wallet_seed', async (event) => {
        var seed=wallet.get_wallet_seed();
        return seed;
    });
    
-   ipcMain.handle('get_new_seed', async (event) => {
-       var wal = new aliwa.aliwa_wallet();
+   my_handle('get_new_seed', async (event) => {
+       var wal = new aliwa_wallet();
        var seed={seed_words:wal.wallet_functions.get_new_seed_words(),seed_pw:null};
        return seed;
    });
    
    //SETTINGS*************************************************************
    
-    ipcMain.handle('set_password', async (event,pw) => {
+    my_handle('set_password', async (event,pw) => {
         return await wallet.set_wallet_pw(pw);       
    });
    
-   ipcMain.handle('compare_password', async (event,pw) => {
+   my_handle('compare_password', async (event,pw) => {
         return await wallet.compare_pw(pw);       
    });
    
-   ipcMain.handle('has_backup', async (event) => {
+   my_handle('has_backup', async (event) => {
        if(wallet!=null){
         return await wallet.has_backup(); 
         }
         else{return false;}
    });
    
-   ipcMain.handle('set_backup', async (event) => {
+   my_handle('set_backup', async (event) => {
         return await wallet.set_backup();       
    });
    
    //OVERVIEW*************************************************************  
-   ipcMain.handle('load_wallet', async (event,pw) => {
+   my_handle('load_wallet', async (event,pw) => {
     if(wallet!=null){
         wallet.disconnect();
         delete wallet;
         wallet=null;
     }
-    wallet = new aliwa.aliwa_wallet();
-    var data = wallet.read_wallet_DB();
+    wallet = new aliwa_wallet();
+    var data = await wallet.read_wallet_DB();
     var can_load_db = await wallet.load_wallet_DB(data, pw);   
     if (can_load_db === true) {
         await wallet.connect_to_server();
@@ -101,48 +99,48 @@ module.exports = function () {
     else{ return false;}
    });
      
-   ipcMain.handle('get_sync_state', async (event) => {
+   my_handle('get_sync_state', async (event) => {
         return wallet.sync_state;
    });
    
-  ipcMain.handle('gui_was_updated', async (event) => {      
+  my_handle('gui_was_updated', async (event) => {      
     return wallet.gui_was_updated;
    });
    
-   ipcMain.handle('set_gui_updated', async (event) => {      
+   my_handle('set_gui_updated', async (event) => {      
      wallet.gui_was_updated=true;
    }); 
    
-   ipcMain.handle('get_balance', async (event) => {     
+   my_handle('get_balance', async (event) => {     
         var balance=await wallet.get_balance();
         return balance;   
    });
    
-    ipcMain.handle('get_server_info', async (event) => {     
+    my_handle('get_server_info', async (event) => {     
         var info=await wallet.get_server_info();
         return info;   
    });
    
    //RECEIVE*****************************************************************
-       ipcMain.handle('get_latest_receive_addr', async (event) => {             
+       my_handle('get_latest_receive_addr', async (event) => {             
         return wallet.get_highest_unused_receive_address();
    });
    
-    ipcMain.handle('add_new_receive_addr', async (event,label) => {             
+    my_handle('add_new_receive_addr', async (event,label) => {             
         return wallet.new_receive_address(label);
    });
    
-     ipcMain.handle('change_receive_address_label', async (event,pos,label) => {             
+     my_handle('change_receive_address_label', async (event,pos,label) => {             
         return wallet.change_receive_address_label(pos,label);
    });
    
-    ipcMain.handle('save_wallet', async (event,path) => {             
+    my_handle('save_wallet', async (event,path) => {             
         return wallet.save_wallet(path);
    });
    
    
    //SENDING***************************************************************** 
-    ipcMain.handle('send', async (event,tx_info) => {             
+    my_handle('send', async (event,tx_info) => {             
       //  console.log("before_sending: ",JSON.stringify(tx_info));
        //CLEAN Private and Public KEYS!!!!
        var cleaned_tx_info={};
@@ -163,7 +161,7 @@ module.exports = function () {
         wallet.send_transaction(tx_info.hex,cleaned_tx_info);
    });
    
-   ipcMain.handle('get_fee', async (event,destinations) => {
+   my_handle('get_fee', async (event,destinations) => {
         var tx_build= await wallet.create_transaction(destinations,undefined,undefined,true);
         if(tx_build!=false){
         if(tx_build.exceed!=undefined){
@@ -175,7 +173,7 @@ module.exports = function () {
         else{return false;}
    });
    
-   ipcMain.handle('get_raw_tx', async (event,destinations) => {
+   my_handle('get_raw_tx', async (event,destinations) => {
         var tx_build= await wallet.create_transaction(destinations);
         if(tx_build!=false){
         return tx_build;}
@@ -185,32 +183,32 @@ module.exports = function () {
    //ADDRESSBOOK*************************************************************
    
    
-   ipcMain.handle('list_receive_addresses', async (event,page, order_field, direction, search) => {
+   my_handle('list_receive_addresses', async (event,page, order_field, direction, search) => {
         var list_result= wallet.list_receive_addresses(page, order_field, direction, search);
         return list_result;
    });
    
-   ipcMain.handle('list_contact_addresses', async (event,page, order_field, direction, search) => {
-        var list_result= wallet.list_contact_addresses(page, order_field, direction, search);
+   my_handle('list_contact_addresses', async (event,page, order_field, direction, search,strict_label=false) => {
+        var list_result= wallet.list_contact_addresses(page, order_field, direction, search,strict_label);
         return list_result;
    });
    
-   ipcMain.handle('add_new_contact_address', async (event,label,address) => {
+   my_handle('add_new_contact_address', async (event,label,address) => {
         var list_result= wallet.new_contact_address(label,address);
         return list_result;
    });
    
-    ipcMain.handle('change_contact_address', async (event,pos,label) => {
+    my_handle('change_contact_address', async (event,pos,label) => {
         var list_result= wallet.change_contact_address_label(pos,label);
         return list_result;
    });
    
-   ipcMain.handle('change_contact_address_by_address', async (event,address,label) => {
+   my_handle('change_contact_address_by_address', async (event,address,label) => {
         var list_result= wallet.change_contact_address_label_find_by_address(address,label);
         return list_result;
    });
    
-     ipcMain.handle('delete_contact_address', async (event,pos) => {
+     my_handle('delete_contact_address', async (event,pos) => {
         var list_result= wallet.delete_contact_address(pos);
         return list_result;
    });
@@ -221,98 +219,114 @@ module.exports = function () {
   
   //TRANSACTIONS VIEW********************************************************
   
-    ipcMain.handle('list_transactions', async (event,page, order_field, direction, search) => {
+    my_handle('list_transactions', async (event,page, order_field, direction, search) => {
         var list_result= wallet.list_transactions(page, order_field, direction, search);
         return list_result;
    });
    
-    ipcMain.handle('get_single_transaction', async (event,tx) => {
+    my_handle('get_single_transaction', async (event,tx) => {
         var list_result= wallet.get_single_transaction(tx);
         return list_result;
    });
    
    //open in browser
-   ipcMain.handle('open_tx_link', async (event,link) => {
-        require("electron").shell.openExternal(link);
+   my_handle('open_tx_link', async (event,link) => {
+//        require("electron").shell.openExternal(link);
+          window.open(link);  
    });
    
    //label list
-   ipcMain.handle('get_address_labels', async (event,address_list) => {
+   my_handle('get_address_labels', async (event,address_list) => {
         var list_result= wallet.get_labels(address_list);
         return list_result;
    });
    
-   ipcMain.handle('set_address_label_contact_or_receive', async (event,address,label) => {
+   my_handle('set_address_label_contact_or_receive', async (event,address,label) => {
         return wallet.set_label_contact_or_receive(address,label);       
    });
    
    //NOTIFICATIONS************************************************
-   ipcMain.handle('get_notifications', async (event) => {
+   my_handle('get_notifications', async (event) => {
         return wallet.get_and_remove_notifications();       
    });
    
    
-   ipcMain.handle('is_notifications_enabled', async (event) => {
+   my_handle('is_notifications_enabled', async (event) => {
         return wallet.is_notifications_enabled();       
    });
    
-   ipcMain.handle('set_notifications_enabled', async (event,value) => {
+   my_handle('set_notifications_enabled', async (event,value) => {
         return wallet.set_notifications_enabled(value);       
    });
    
    
     //CURRENCIES************************************************
-   ipcMain.handle('get_alias_prices', async (event) => {
+   my_handle('get_alias_prices', async (event) => {
         return wallet.get_alias_prices();       
    });
    
-   ipcMain.handle('set_selected_currency', async (event,currency) => {
+   my_handle('set_selected_currency', async (event,currency) => {
         return wallet.set_selected_currency(currency);       
    });
    
-   ipcMain.handle('get_selected_currency', async (event) => {
+   my_handle('get_selected_currency', async (event) => {
         return wallet.get_selected_currency();       
    });
    
    //CUSTOM SERVER ADDRESSES************************************
-   ipcMain.handle('list_server_aliwa_addresses', async (event) => {
+   my_handle('list_server_aliwa_addresses', async (event) => {
         return wallet.list_server_aliwa_addresses();       
    });
    
    
-   ipcMain.handle('add_aliwa_server_address', async (event,label,address,type) => {
+   my_handle('add_aliwa_server_address', async (event,label,address,type) => {
         return wallet.add_aliwa_server_address(label,address,type);       
    });
    
    
-   ipcMain.handle('edit_aliwa_server_address', async (event,label,address) => {
+   my_handle('edit_aliwa_server_address', async (event,label,address) => {
         return wallet.edit_aliwa_server_address(label,address);       
    });
    
-   ipcMain.handle('delete_aliwa_server_address', async (event,label) => {
+   my_handle('delete_aliwa_server_address', async (event,label) => {
         return wallet.delete_aliwa_server_address(label);       
    });
    
-   ipcMain.handle('switch_to_aliwa_server_address', async (event,label,complete_resync) => {
+   my_handle('switch_to_aliwa_server_address', async (event,label,complete_resync) => {
         return wallet.switch_to_aliwa_server_address(label,complete_resync);       
    });
    
    //save and import dialogue
-   ipcMain.handle('save_as_dialogue', async (event) => {
-       var filename = await dialog.showSaveDialog({title:"Save Backup File",defaultPath:"light_wallet.dat",buttonLabel:"Save Backup File"});
+   my_handle('save_as_dialogue', async (event) => {
+    /*   var filename = await dialog.showSaveDialog({title:"Save Backup File",defaultPath:"light_wallet.dat",buttonLabel:"Save Backup File"});
        console.log(filename);
        if(!filename.canceled){
            wallet.save_wallet(filename.filePath,true);
            return true;
        }
-       return false;
-   });
+       return false;*/
+    var data = await wallet.read_wallet_DB();
+    var datetime = new Date().getDate() + "-" + new Date().getMonth() + "-" + new Date().getFullYear()
+    +"--"+new Date().getHours()+"-"+new Date().getMinutes()+"-"+new Date().getSeconds();
+    try {
+        await Capacitor.Plugins.Filesystem.writeFile({
+            data: data,
+            directory: "DOCUMENTS",
+            path: "light-wallet-" + datetime + ".txt",
+            encoding: "utf8"});
+        return true;
+    } catch (e) {
+
+    }
+    return false;
+
+});
    
-   ipcMain.handle('import_file_dialogue', async (event) => {
-       var filename = await dialog.showOpenDialog({title:"Import Backup File",buttonLabel:"Import Backup File"});
+   my_handle('import_file_dialogue', async (event) => {
+     /*  var filename = await dialog.showOpenDialog({title:"Import Backup File",buttonLabel:"Import Backup File"});
        console.log(filename);
        if(!filename.canceled){
-           var wal = new aliwa.aliwa_wallet();
+           var wal = new aliwa_wallet();
            var data = wal.read_wallet_DB(filename.filePaths[0]);
            if (data == false) {console.log("nothing to read");return false;}
            else{ 
@@ -327,11 +341,31 @@ module.exports = function () {
             
             }                                             
        }
-       return false;
-   });
-   
+       return false;*/             
+    var result = await Capacitor.Plugins.FilePicker.pickFiles({
+        types: ["text/example","text/plain","audio/DAT12","application/activity+json"],
+        multiple: false,
+    });  
+//    console.log(result); 
+//    console.log(result.files[0].name);
+//    console.log(result.files[0].path);
+//    console.log(atob(result.files[0].data));
+    
+    /*var contents = await Capacitor.Plugins.Filesystem.readFile({path: result.path,encoding: "utf8"});
+     console.log("file contents: ",contents); */
+        
+    await Capacitor.Plugins.Storage.set({
+            key: "light_wallet.dat",
+            value: atob(result.files[0].data)
+    });
+    
+    return true;
+        
+    
+    });
+                
    //save on exit test
-//   ipcMain.handle('wallet_save_on_exit', async (event) => {
+//   my_handle('wallet_save_on_exit', async (event) => {
 //         console.log("save_on_exit");       
 //   });
 
@@ -340,5 +374,46 @@ module.exports = function () {
             await wallet.save_wallet(null,true);
         }
     }
-             
-};
+    
+    document.addEventListener("pause", async () => {   
+      await save_on_exit();
+}, false);    
+
+ temp_wallet_saver="file not found";
+ sync_sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+
+function writeFile(fileEntry, dataObj) {
+    // Create a FileWriter object for our FileEntry (log.txt).
+    fileEntry.createWriter(function (fileWriter) {
+
+        fileWriter.onwriteend = function() {
+            console.log("Successful file write...");    
+        };
+
+        fileWriter.onerror = function (e) {
+            console.log("Failed file write: " + e.toString());
+        };
+
+        // If data object is not passed in,
+        // create a new Blob instead.
+        if (!dataObj) {
+            dataObj = new Blob(['some file data'], { type: 'text/plain' });
+        }
+
+        fileWriter.write(dataObj);
+    });
+}
+
+function readFile(fileEntry) {
+
+    fileEntry.file(function (file) {
+        var reader = new FileReader();       
+       reader.onloadend = function() {
+            console.log("Successful file read: ");// + this.result);
+//            displayFileData(fileEntry.fullPath + ": " + this.result);
+            temp_wallet_saver=this.result;           
+        };
+        reader.readAsText(file);  
+       
+    }, function(){console.error("onErrorReadFile");temp_wallet_saver="---read error---";});
+}

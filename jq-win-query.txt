@@ -1,3 +1,0 @@
-(.config.forge.packagerConfig | .asar) |= true |
-(.config.forge.packagerConfig | .icon) |= "view_resources/img/aliwa_light.ico" |
-(.config.forge.packagerConfig | .setupIcon) |= "view_resources/img/aliwa_light.ico"

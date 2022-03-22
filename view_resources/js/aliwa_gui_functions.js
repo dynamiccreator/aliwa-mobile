@@ -1,8 +1,15 @@
 function show_dialogue_address(current_line,templ_loads,type){
+        last_backactionfunc=backactionfunc.bind({});
+        if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+            document.addEventListener("backbutton", backactionfunc = function(e){
+            e.preventDefault();
+            $('.ui.modal').modal("hide");
+        });
+        
         console.log("line clicked");
         var dialogue=$(templ_loads["dialogues"]).filter("#dialogues_"+type);
         $("body").append(dialogue);
-        show_qr_code("modal_qr_code",current_line.children(':nth-child(3)').text());
+        show_qr_code("modal_qr_code","alias:"+current_line.children(':nth-child(3)').text()+"?label=&narration=&amount=");
         var title_text=(type=="contacts" ? "Contact Address - " : "Receiving Address - HD #");
         $("#dialogues_"+type+"_header").text(title_text+current_line.children(':nth-child(1)').text());
         $("#dialogues_"+type+"_address").text(current_line.children(':nth-child(3)').text());
@@ -23,12 +30,13 @@ function show_dialogue_address(current_line,templ_loads,type){
         
         
         //copy        
-        $("#dialogues_"+type+"_copy").off("click").on("click",function(){
+        $("#dialogues_"+type+"_copy").off("click").on("click",async function(){
             var clip_text=$("#dialogues_"+type+"_address").text();
             
 //            console.log("copy to clipboard:"+clip_text);
            
-           navigator.clipboard.writeText(clip_text);
+          // navigator.clipboard.writeText(clip_text);
+           await Capacitor.Plugins.Clipboard.write({string: clip_text});
            show_popup_action(templ_loads,"info","Address copied");
         });
         
@@ -77,15 +85,15 @@ function show_dialogue_address(current_line,templ_loads,type){
                      $("#dialogues_"+type+"_label").text($("#dialogues_"+type+"_edit_input").val());
                      current_line.children(':nth-child(2)').text($("#dialogues_"+type+"_edit_input").val());
                      
-                    var res=await window.electron.ipcRenderer_invoke("change_receive_address_label",(parseInt(current_line.children(':nth-child(1)').text())-1),$("#dialogues_"+type+"_edit_input").val());
+                    var res=await my_invoke("change_receive_address_label",(parseInt(current_line.children(':nth-child(1)').text())-1),$("#dialogues_"+type+"_edit_input").val());
                     if(res=="duplicated"){
                         show_popup_action(templ_loads,"error","Label is duplicated!");
                         return;
                     }                   
-                    await window.electron.ipcRenderer_invoke("save_wallet",null);
+                    await my_invoke("save_wallet",null);
                 }
                 if(type=="contacts"){
-                    var res=await window.electron.ipcRenderer_invoke("change_contact_address",(parseInt(current_line.children(':nth-child(1)').text())-1),$("#dialogues_"+type+"_edit_input").val());
+                    var res=await my_invoke("change_contact_address",(parseInt(current_line.children(':nth-child(1)').text())-1),$("#dialogues_"+type+"_edit_input").val());
                     if(res=="duplicated label"){
                         show_popup_action(templ_loads,"error","Label is duplicated!"); 
                         return;
@@ -98,7 +106,7 @@ function show_dialogue_address(current_line,templ_loads,type){
                     //change label and hide
                     $("#dialogues_"+type+"_label").text($("#dialogues_"+type+"_edit_input").val());
                     current_line.children(':nth-child(2)').text($("#dialogues_"+type+"_edit_input").val());
-                    await window.electron.ipcRenderer_invoke("save_wallet",null);
+                    await my_invoke("save_wallet",null);
                 }
 //                
                 $("#dialogues_"+type+"_edit_popup").hide();
@@ -119,10 +127,10 @@ function show_dialogue_address(current_line,templ_loads,type){
             
             $("#dialogues_contacts_delete_popup_confirm").off("click").on("click", async function () {
                              
-                var res=await window.electron.ipcRenderer_invoke("delete_contact_address",(parseInt(current_line.children(':nth-child(1)').text())-1));
+                var res=await my_invoke("delete_contact_address",(parseInt(current_line.children(':nth-child(1)').text())-1));
                 if(res==false){ show_popup_action(templ_loads,"error","Basic Contacts are immutable!"); return;}
                 $('.ui.modal').modal("hide");
-                await window.electron.ipcRenderer_invoke("save_wallet",null);
+                await my_invoke("save_wallet",null);
                 
                 show_popup_action(templ_loads,"info","Contact deleted!");
                 var j_clone=await address_book_contacts_pagination();
@@ -147,7 +155,9 @@ function show_dialogue_address(current_line,templ_loads,type){
                 //doing custom stuff 
                 
                 
-            },onHidden:function(){                  
+            },onHidden:function(){
+                document.addEventListener("backbutton", backactionfunc = last_backactionfunc.bind({}));
+                last_backactionfunc=null;
                 clean_modal(type);
                
             }/*,onHide:function(){
@@ -238,6 +248,13 @@ function clean_modal(type) {
 
 
 function show_dialogue_modal(templ_loads,title,text,yes_title,no_title,data,yes,no,inside_f){  
+        last_backactionfunc=backactionfunc.bind({});
+        if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+            document.addEventListener("backbutton", backactionfunc = function(e){
+            e.preventDefault();
+            $('.ui.modal').modal("hide");
+        });
+    
         var dialogue=$(templ_loads["dialogues"]).filter("#dialogues_modal");
         $("body").append(dialogue);
        
@@ -268,6 +285,8 @@ function show_dialogue_modal(templ_loads,title,text,yes_title,no_title,data,yes,
                 
                 
             },onHidden:function(){
+                document.addEventListener("backbutton", backactionfunc = last_backactionfunc.bind({}));
+                last_backactionfunc=null;
                 clean_modal("modal");
                
             }/*,onHide:function(){
@@ -278,7 +297,13 @@ function show_dialogue_modal(templ_loads,title,text,yes_title,no_title,data,yes,
        
 }
 
- function show_dialogue_info(templ_loads,title,text,ok_title,f,inside_f){  
+ function show_dialogue_info(templ_loads,title,text,ok_title,f,inside_f){
+        last_backactionfunc=backactionfunc.bind({});
+        if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+            document.addEventListener("backbutton", backactionfunc = function(e){
+            e.preventDefault();
+            $('.ui.modal').modal("hide");
+        });
         var dialogue=$(templ_loads["dialogues"]).filter("#dialogues_info");
         $("body").append(dialogue);
        
@@ -290,7 +315,7 @@ function show_dialogue_modal(templ_loads,title,text,yes_title,no_title,data,yes,
         $(".dialogue_link").off("click").on("click", async function () {
             var link=$(this).attr("href");
             var conf=window.confirm("Open external link in default browser?");//, "Are you sure you want to open "+link+" in your browser?");
-            if(conf){ await window.electron.ipcRenderer_invoke("open_tx_link", link);}          
+            if(conf){ await my_invoke("open_tx_link", link);}          
         });
         
         if(inside_f!=undefined){
@@ -316,6 +341,8 @@ function show_dialogue_modal(templ_loads,title,text,yes_title,no_title,data,yes,
                 
                 
             },onHidden:function(){
+                document.addEventListener("backbutton", backactionfunc = last_backactionfunc.bind({}));
+                last_backactionfunc=null;
                 clean_modal("info");
                
             }/*,onHide:function(){
@@ -327,6 +354,12 @@ function show_dialogue_modal(templ_loads,title,text,yes_title,no_title,data,yes,
 }
 
 function show_dialogue_input(templ_loads,title,text,input_name,input_type,yes_title,no_title,data,yes,no,more){  
+        last_backactionfunc=backactionfunc.bind({});
+        if(backactionfunc!=null){document.removeEventListener("backbutton",backactionfunc);}
+            document.addEventListener("backbutton", backactionfunc = function(e){
+            e.preventDefault();
+            $('.ui.modal').modal("hide");
+        });
         var dialogue=$(templ_loads["dialogues"]).filter("#dialogues_input");
         $("body").append(dialogue);
        
@@ -379,7 +412,9 @@ function show_dialogue_input(templ_loads,title,text,input_name,input_type,yes_ti
                 //doing custom stuff 
                 
                 
-            },onHidden:function(){                  
+            },onHidden:function(){
+                document.addEventListener("backbutton", backactionfunc = last_backactionfunc.bind({}));
+                last_backactionfunc=null;
                 clean_modal("input");
                
             }/*,onHide:function(){

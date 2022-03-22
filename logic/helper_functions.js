@@ -1,4 +1,4 @@
-module.exports = function () {
+
     get_DER_sig = function (hash, priv_key) {
         var ec = new EC("secp256k1");
         var mySign = ec.sign(Buffer.from(hash, "hex"), Buffer.from(priv_key, "hex"), {canonical: true});
@@ -129,7 +129,24 @@ module.exports = function () {
         l=l>max_z ? max_z : l;
         return new Big(num).toFixed(l);  
     
-    }  
+    }
+    
+        intArray_to_hex_string = function(intArr){
+        var out="";
+        for(var i=0;i<intArr.length;i++){
+          out+=  int_toVarint_byte(intArr[i],1);        
+        }
+        return out;
+    }
+    
+    shuffleArray = function (array) {
+        var my_number_array = new Uint32Array(1);            
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor((crypto.getRandomValues(my_number_array) / 4294967295) * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+}
 
-};
 
