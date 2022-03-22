@@ -9,7 +9,7 @@ function show_dialogue_address(current_line,templ_loads,type){
         console.log("line clicked");
         var dialogue=$(templ_loads["dialogues"]).filter("#dialogues_"+type);
         $("body").append(dialogue);
-        show_qr_code("modal_qr_code",current_line.children(':nth-child(3)').text());
+        show_qr_code("modal_qr_code","alias:"+current_line.children(':nth-child(3)').text()+"?label=&narration=&amount=");
         var title_text=(type=="contacts" ? "Contact Address - " : "Receiving Address - HD #");
         $("#dialogues_"+type+"_header").text(title_text+current_line.children(':nth-child(1)').text());
         $("#dialogues_"+type+"_address").text(current_line.children(':nth-child(3)').text());
