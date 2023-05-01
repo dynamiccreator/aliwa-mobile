@@ -59,7 +59,7 @@ class aliwa_wallet{
                                   
         //add basic contacts
         this.new_contact_address("Alias Foundation","SdrdWNtjD7V6BSt3EyQZKCnZDkeE28cZhr");
-        this.new_contact_address("Aliwa Donation Address","SSq7CjsPzfanmCkcN9XhKHg7yMn3bXj8i5");
+        
         this.new_contact_address("Aliwa Server Provider","not provided");
         
         //save wallet
